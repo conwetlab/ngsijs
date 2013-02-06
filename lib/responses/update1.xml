@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<updateContextResponse>
+  <contextResponseList>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="Technician" isPattern="false">
+          <id>tech1</id>
+        </entityId>
+        <attributeDomainName></attributeDomainName>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>mobile_phone</name>
+            <type>string</type>
+            <contextValue>0034223456789</contextValue>
+            <metadata>
+            </metadata>
+          </contextAttribute>
+        </contextAttributeList>
+        <domainMetadata>
+        </domainMetadata>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>Ok</reasonPhrase>
+        <details>a</details>
+      </statusCode>
+    </contextElementResponse>
+  </contextResponseList>
+</updateContextResponse>

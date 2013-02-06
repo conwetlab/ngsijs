@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>a</title>
+    <link rel="stylesheet" href="jasmine.css"/>
+    <script src="jasmine.js"></script>
+    <script src="jasmine-html.js"></script>
+    <script src="NGSI.js"></script>
+    <script src="tests.js"></script>
+
+    <script type="text/javascript">
+    (function() {
+        var jasmineEnv = jasmine.getEnv();
+        jasmineEnv.updateInterval = 1000;
+
+        var htmlReporter = new jasmine.HtmlReporter();
+
+        jasmineEnv.addReporter(htmlReporter);
+
+        jasmineEnv.specFilter = function(spec) {
+            return htmlReporter.specFilter(spec);
+        };
+
+        var currentWindowOnload = window.onload;
+        window.onload = function() {
+            if (currentWindowOnload) {
+                currentWindowOnload();
+            }
+            jasmineEnv.execute();
+        };
+  
+    })();
+    </script>
+
+</head>
+<body>
+</body>
+</html>

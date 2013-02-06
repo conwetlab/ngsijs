@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<queryContextResponse>
+  <contextResponseList>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="Technician" isPattern="false">
+          <id>tech1</id>
+        </entityId>
+        <attributeDomainName></attributeDomainName>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>email</name>
+            <type>string</type>
+            <contextValue>jacinto.salas@mycompany.com</contextValue>
+            <metadata>
+            </metadata>
+          </contextAttribute>
+          <contextAttribute>
+            <name>function</name>
+            <type>string</type>
+            <contextValue>MV Keeper</contextValue>
+            <metadata>
+            </metadata>
+          </contextAttribute>
+          <contextAttribute>
+            <name>mobile_phone</name>
+            <type>string</type>
+            <contextValue>0034123456789</contextValue>
+            <metadata>
+            </metadata>
+          </contextAttribute>
+          <contextAttribute>
+            <name>name</name>
+            <type>string</type>
+            <contextValue>Jacinto Salas Torres</contextValue>
+            <metadata>
+            </metadata>
+          </contextAttribute>
+          <contextAttribute>
+            <name>twitter</name>
+            <type>string</type>
+            <contextValue>jsalas</contextValue>
+            <metadata>
+            </metadata>
+          </contextAttribute>
+          <contextAttribute>
+            <name>van</name>
+            <type>string</type>
+            <contextValue>van1</contextValue>
+            <metadata>
+            </metadata>
+          </contextAttribute>
+          <contextAttribute>
+            <name>working_area</name>
+            <type>integer</type>
+            <contextValue>28050</contextValue>
+            <metadata>
+            </metadata>
+          </contextAttribute>
+        </contextAttributeList>
+        <domainMetadata>
+        </domainMetadata>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>Ok</reasonPhrase>
+        <details>a</details>
+      </statusCode>
+    </contextElementResponse>
+  </contextResponseList>
+</queryContextResponse>
