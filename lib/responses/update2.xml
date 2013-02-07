@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<updateContextResponse>
+  <contextResponseList>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="Technician" isPattern="false">
+          <id>tech1</id>
+        </entityId>
+        <attributeDomainName></attributeDomainName>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>new_attribute</name>
+            <type>string</type>
+            <contextValue>value</contextValue>
+            <metadata>
+            </metadata>
+          </contextAttribute>
+        </contextAttributeList>
+        <domainMetadata>
+        </domainMetadata>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>Ok</reasonPhrase>
+        <details>response details</details>
+      </statusCode>
+    </contextElementResponse>
+  </contextResponseList>
+</updateContextResponse>
