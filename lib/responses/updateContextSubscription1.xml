@@ -1,0 +1,6 @@
+<updateContextSubscriptionResponse>
+    <subscribeResponse>
+        <subscriptionId>sub1</subscriptionId>
+        <duration>PT20H</duration>
+    </subscribeResponse>
+</updateContextSubscriptionResponse>
