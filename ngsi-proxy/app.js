@@ -40,7 +40,9 @@ app.configure('development', function(){
     app.use(express.errorHandler());
 });
 
-app.get('/eventsource', logic.eventsource);
+app.post('/eventsource', logic.create_eventsource);
+app.get('/eventsource/:id', logic.eventsource);
+app.post('/callbacks', logic.create_callback);
 app.get('/callbacks/:id', logic.process_callback);
 
 http.createServer(app).listen(app.get('port'), function() {

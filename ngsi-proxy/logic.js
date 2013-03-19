@@ -18,58 +18,148 @@
  *
  */
 
-var notifications = {};
+var connections = {};
+var connections_by_callback = {};
 
-var createNotification = function createNotification(res) {
+var createConnection = function createConnection(res) {
     var id;
 
     id = (new Date()).toLocaleTimeString();
-    while (id in notifications) {
+    while (id in connections) {
         id += "'";
     }
 
-    var notification = {
+    var connection = {
         id: id,
-        response: res
+        response: res,
+        callbacks: {}
     };
-    notifications[id] = notification;
+    connections[id] = connection;
 
-    return notification;
+    console.log('created connection with id: ' + connection.id);
+    return connection;
 };
 
-var removeNotification = function removeNotification(id) {
-    delete notifications[id];
+var createCallback = function createCallback(connection) {
+    var local_id, id;
+
+    local_id = (new Date()).toLocaleTimeString();
+    while (local_id in connection.callbacks) {
+        local_id += "'";
+    }
+
+    id = connection.id + ':' + local_id;
+    callback_info = connection.callbacks[id] = {
+        id: id
+    };
+    connections_by_callback[id] = connection;
+
+    console.log('created callback with id: ' + id);
+    return callback_info;
+};
+
+var removeCallback = function removeCallback(id) {
+    connection = connections_by_callback[id];
+
+    delete connection.callbacks[id];
+    delete connections_by_callback[id];
+    console.log('deleted callback with id: ' + id);
+};
+
+var removeConnection = function removeConnection(id) {
+    delete connections[id];
+    console.log('closed connection with id: ' + id);
+};
+
+exports.create_eventsource = function create_eventsource(req, res) {
+    var connection = createConnection(res);
+    res.header('Cache-Control', 'no-cache');
+    res.header('Connection', 'keep-alive');
+    res.header('Access-Control-Allow-Origin', req.header('Origin'));
+    res.location('/eventsource/' + connection.id);
+    res.send(201);
 };
 
 exports.eventsource = function eventsource(req, res) {
-    res.header('Content-Type', 'text/event-stream');
+    var connection = connections[req.params.id];
+
     res.header('Cache-Control', 'no-cache');
     res.header('Connection', 'keep-alive');
-
-    var notification = createNotification(res);
-    console.log('created callback listener with id: ' + notification.id);
-
-    res.write('event: init\n');
-    res.write('data: ' + JSON.stringify({id: notification.id}).toString('utf8') + '\n\n');
-
-    // If the client disconnects, let's not leak any resources
-    res.on('close', function() {
-        removeNotification(notification.id);
-    });
-};
-
-exports.process_callback = function process_callback(req, res) {
-    var notification = notifications[req.params.id];
-
-    if (notification == null) {
+    res.header('Access-Control-Allow-Origin', req.header('Origin'));
+    if (connection == null) {
         res.send(404);
         return;
     }
 
-    var eventsource = notification.response;
+    res.header('Content-Type', 'text/event-stream');
+
+    res.write('event: init\n');
+    res.write('data: ' + JSON.stringify({
+            id: connection.id,
+            url: 'http://localhost/eventsource/' + connection.id
+        }).toString('utf8') + '\n\n');
+
+    // If the client disconnects, let's not leak any resources
+    // res.on('close', function() {
+    //     removeConnection(connection.id);
+    // });
+};
+
+exports.create_callback = function create_callback(req, res) {
+    res.header('Cache-Control', 'no-cache');
+    res.header('Connection', 'keep-alive');
+    res.header('Access-Control-Allow-Origin', req.header('Origin'));
+
+    var buf = '';
+    req.setEncoding('utf8');
+    req.on('data', function (chunck) { buf += chunck; });
+    req.on('end', function () {
+        var data, connection, callback_info;
+
+        buf = buf.trim();
+
+        if (buf.length === 0) {
+            res.send(400, 'invalid json: empty request body');
+            return;
+        }
+
+        try {
+            data = JSON.parse(buf);
+        } catch (e) {
+            res.send(400, 'invalid json: ' + e);
+            return;
+        }
+
+        connection = connections[data.connection_id];
+
+        if (connection == null) {
+            res.send(404);
+            return;
+        }
+        callback_info = createCallback(connection);
+        res.header('Content-Type', 'application/json');
+        res.send(200, JSON.stringify({
+            callback_id: callback_info.id,
+            url: 'http://localhost:3000/callbacks/' + callback_info.id
+        }));
+    });
+};
+
+exports.process_callback = function process_callback(req, res) {
+    var connection = connections[req.params.id];
+
+    if (connection == null) {
+        res.send(404);
+        return;
+    }
+
+    var eventsource = connection.response;
 
     eventsource.write('event: notification\n');
     eventsource.write('data: ' + JSON.stringify({payload: 'hola'}).toString('utf8') + '\n\n');
 
     res.send(204);
+};
+
+exports.delete_callback = function delete_callback(req, res) {
 };
