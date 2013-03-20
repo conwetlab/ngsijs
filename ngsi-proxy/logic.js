@@ -21,7 +21,7 @@
 var connections = {};
 var connections_by_callback = {};
 
-var createConnection = function createConnection(res) {
+var createConnection = function createConnection() {
     var id;
 
     id = (new Date()).toLocaleTimeString();
@@ -31,7 +31,7 @@ var createConnection = function createConnection(res) {
 
     var connection = {
         id: id,
-        response: res,
+        response: null,
         callbacks: {}
     };
     connections[id] = connection;
@@ -50,7 +50,8 @@ var createCallback = function createCallback(connection) {
 
     id = connection.id + ':' + local_id;
     callback_info = connection.callbacks[id] = {
-        id: id
+        id: id,
+        local_id: local_id
     };
     connections_by_callback[id] = connection;
 
@@ -72,7 +73,7 @@ var removeConnection = function removeConnection(id) {
 };
 
 exports.create_eventsource = function create_eventsource(req, res) {
-    var connection = createConnection(res);
+    var connection = createConnection();
     res.header('Cache-Control', 'no-cache');
     res.header('Connection', 'keep-alive');
     res.header('Access-Control-Allow-Origin', req.header('Origin'));
@@ -86,17 +87,20 @@ exports.eventsource = function eventsource(req, res) {
     res.header('Cache-Control', 'no-cache');
     res.header('Connection', 'keep-alive');
     res.header('Access-Control-Allow-Origin', req.header('Origin'));
+    req.socket.setTimeout(0);
+
     if (connection == null) {
         res.send(404);
         return;
     }
 
-    res.header('Content-Type', 'text/event-stream');
+    connection.response = res;
 
+    res.header('Content-Type', 'text/event-stream');
     res.write('event: init\n');
     res.write('data: ' + JSON.stringify({
             id: connection.id,
-            url: 'http://localhost/eventsource/' + connection.id
+            url: 'http://localhost:3000/eventsource/' + connection.id
         }).toString('utf8') + '\n\n');
 
     // If the client disconnects, let's not leak any resources
@@ -146,19 +150,26 @@ exports.create_callback = function create_callback(req, res) {
 };
 
 exports.process_callback = function process_callback(req, res) {
-    var connection = connections[req.params.id];
+    console.log('Processing callback ' + req.params.id);
+    var connection = connections_by_callback[req.params.id];
 
     if (connection == null) {
         res.send(404);
         return;
     }
 
-    var eventsource = connection.response;
+    buf = '';
+    req.on('data', function (chunck) { buf += chunck; });
+    req.on('end', function () {
+        var eventsource = connection.response;
 
-    eventsource.write('event: notification\n');
-    eventsource.write('data: ' + JSON.stringify({payload: 'hola'}).toString('utf8') + '\n\n');
+        var data = JSON.stringify({callback_id: req.params.id, payload: buf}).toString('utf8');
+        eventsource.write('event: notification\n');
+        eventsource.write('data: ' + data + '\n\n');
+        console.log('Processed response: ' + data);
 
-    res.send(204);
+        res.send(204);
+    });
 };
 
 exports.delete_callback = function delete_callback(req, res) {
