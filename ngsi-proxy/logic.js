@@ -88,19 +88,25 @@ var build_absolute_url = function build_absolute_url(req, url) {
 
 exports.options_eventsource = function create_eventsource(req, res) {
     res.header('Connection', 'keep-alive');
-    res.header('Access-Control-Allow-Origin', req.header('Origin'));
-    res.header('Access-Control-Allow-Methods', 'POST, OPTIONS');
+    var origin = req.header('Origin');
+    if (origin != null) {
+        res.header('Access-Control-Allow-Origin', origin);
+        res.header('Access-Control-Allow-Methods', 'POST, OPTIONS');
+    }
     res.send(204);
 };
 
 exports.create_eventsource = function create_eventsource(req, res) {
-    var connection = createConnection();
+    var origin, connection = createConnection();
 
     url = build_absolute_url(req, '/eventsource/' + connection.id);
 
     res.header('Cache-Control', 'no-cache');
     res.header('Connection', 'keep-alive');
-    res.header('Access-Control-Allow-Origin', req.header('Origin'));
+    origin = req.header('Origin');
+    if (origin != null) {
+        res.header('Access-Control-Allow-Origin', origin);
+    }
     res.location(url);
     res.send(201, JSON.stringify({
         connection_id: connection.id,
@@ -109,11 +115,14 @@ exports.create_eventsource = function create_eventsource(req, res) {
 };
 
 exports.eventsource = function eventsource(req, res) {
-    var connection = connections[req.params.id];
+    var origin, connection = connections[req.params.id];
 
     res.header('Cache-Control', 'no-cache');
     res.header('Connection', 'keep-alive');
-    res.header('Access-Control-Allow-Origin', req.header('Origin'));
+    origin = req.header('Origin');
+    if (origin != null) {
+        res.header('Access-Control-Allow-Origin', origin);
+    }
     req.socket.setTimeout(0);
 
     if (connection == null) {
@@ -139,17 +148,25 @@ exports.eventsource = function eventsource(req, res) {
 exports.options_callbacks = function options_callbacks(req, res) {
     res.header('Cache-Control', 'no-cache');
     res.header('Connection', 'keep-alive');
-    res.header('Access-Control-Allow-Origin', req.header('Origin'));
-    res.header('Access-Control-Allow-Methods', 'OPTIONS, POST');
+    var origin = req.header('Origin');
+    if (origin != null) {
+        res.header('Access-Control-Allow-Origin', origin);
+        res.header('Access-Control-Allow-Methods', 'OPTIONS, POST');
+    }
     res.send(204);
 };
 
 exports.create_callback = function create_callback(req, res) {
+    var origin, buf;
+
     res.header('Cache-Control', 'no-cache');
     res.header('Connection', 'keep-alive');
-    res.header('Access-Control-Allow-Origin', req.header('Origin'));
+    origin = req.header('Origin');
+    if (origin != null) {
+        res.header('Access-Control-Allow-Origin', origin);
+    }
 
-    var buf = '';
+    buf = '';
     req.setEncoding('utf8');
     req.on('data', function (chunck) { buf += chunck; });
     req.on('end', function () {
@@ -210,8 +227,11 @@ exports.process_callback = function process_callback(req, res) {
 exports.options_callback_entry = function options_callback_entry(req, res) {
     res.header('Cache-Control', 'no-cache');
     res.header('Connection', 'keep-alive');
-    res.header('Access-Control-Allow-Origin', req.header('Origin'));
-    res.header('Access-Control-Allow-Methods', 'DELETE, OPTIONS, POST');
+    var origin = req.header('Origin');
+    if (origin != null) {
+        res.header('Access-Control-Allow-Origin', origin);
+        res.header('Access-Control-Allow-Methods', 'DELETE, OPTIONS, POST');
+    }
     res.send(204);
 };
 
