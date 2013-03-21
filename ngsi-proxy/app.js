@@ -40,10 +40,13 @@ app.configure('development', function(){
     app.use(express.errorHandler());
 });
 
+app.options('/eventsource', logic.options_eventsource);
 app.post('/eventsource', logic.create_eventsource);
 app.get('/eventsource/:id', logic.eventsource);
+app.options('/callbacks', logic.options_callbacks);
 app.post('/callbacks', logic.create_callback);
 app.post('/callbacks/:id', logic.process_callback);
+app.options('/callbacks/:id', logic.options_callback_entry);
 app.delete('/callbacks/:id', logic.delete_callback);
 
 http.createServer(app).listen(app.get('port'), function() {
