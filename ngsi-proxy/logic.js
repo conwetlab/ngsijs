@@ -19,7 +19,7 @@
  */
 
 var connections = {};
-var connections_by_callback = {};
+var callbacks = {};
 
 var createConnection = function createConnection() {
     var id;
@@ -36,7 +36,7 @@ var createConnection = function createConnection() {
     };
     connections[id] = connection;
 
-    console.log('created connection with id: ' + connection.id);
+    console.log('Created connection with id: ' + connection.id);
     return connection;
 };
 
@@ -49,36 +49,56 @@ var createCallback = function createCallback(connection) {
     }
 
     id = connection.id + ':' + local_id;
-    callback_info = connection.callbacks[id] = {
+    callback_info = connection.callbacks[local_id] = {
         id: id,
-        local_id: local_id
+        local_id: local_id,
+        connection: connection
     };
-    connections_by_callback[id] = connection;
+    callbacks[id] = callback_info;
 
-    console.log('created callback with id: ' + id);
+    console.log('Created callback with id: ' + id);
     return callback_info;
 };
 
 var removeCallback = function removeCallback(id) {
-    connection = connections_by_callback[id];
+    var callback_info = callbacks[id];
 
-    delete connection.callbacks[id];
-    delete connections_by_callback[id];
-    console.log('deleted callback with id: ' + id);
+    delete callback_info.connection.callbacks[callback_info.local_id];
+    delete callbacks[id];
+    callback_info.connection = null;
+
+    console.log('Deleted callback with id: ' + id);
 };
 
 var removeConnection = function removeConnection(id) {
     delete connections[id];
-    console.log('closed connection with id: ' + id);
+    console.log('Closed connection with id: ' + id);
+};
+
+var URL = require('url');
+var build_absolute_url = function build_absolute_url(req, url) {
+    var protocol, domain, path;
+
+    protocol = req.protocol;
+    domain = req.header('host');
+    path = req.url;
+
+    return URL.resolve(protocol + "://" + domain + req.url, url);
 };
 
 exports.create_eventsource = function create_eventsource(req, res) {
     var connection = createConnection();
+
+    url = build_absolute_url(req, '/eventsource/' + connection.id);
+
     res.header('Cache-Control', 'no-cache');
     res.header('Connection', 'keep-alive');
     res.header('Access-Control-Allow-Origin', req.header('Origin'));
-    res.location('/eventsource/' + connection.id);
-    res.send(201);
+    res.location(url);
+    res.send(201, JSON.stringify({
+        connection_id: connection.id,
+        url: url
+    }));
 };
 
 exports.eventsource = function eventsource(req, res) {
@@ -100,7 +120,7 @@ exports.eventsource = function eventsource(req, res) {
     res.write('event: init\n');
     res.write('data: ' + JSON.stringify({
             id: connection.id,
-            url: 'http://localhost:3000/eventsource/' + connection.id
+            url: build_absolute_url(req, '/eventsource/' + connection.id)
         }).toString('utf8') + '\n\n');
 
     // If the client disconnects, let's not leak any resources
@@ -144,19 +164,20 @@ exports.create_callback = function create_callback(req, res) {
         res.header('Content-Type', 'application/json');
         res.send(200, JSON.stringify({
             callback_id: callback_info.id,
-            url: 'http://localhost:3000/callbacks/' + callback_info.id
+            url: build_absolute_url(req, '/callbacks/' + callback_info.id)
         }));
     });
 };
 
 exports.process_callback = function process_callback(req, res) {
-    console.log('Processing callback ' + req.params.id);
-    var connection = connections_by_callback[req.params.id];
 
-    if (connection == null) {
+    if (!(req.params.id in callbacks)) {
         res.send(404);
         return;
     }
+
+    console.log('Processing callback ' + req.params.id);
+    var connection = callbacks[req.params.id].connection;
 
     buf = '';
     req.on('data', function (chunck) { buf += chunck; });
@@ -173,4 +194,13 @@ exports.process_callback = function process_callback(req, res) {
 };
 
 exports.delete_callback = function delete_callback(req, res) {
+    console.log('Deleting callback ' + req.params.id);
+
+    if (!(req.params.id in callbacks)) {
+        res.send(404);
+        return;
+    }
+
+    removeCallback(req.params.id);
+    res.send(204);
 };

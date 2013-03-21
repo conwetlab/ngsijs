@@ -44,6 +44,7 @@ app.post('/eventsource', logic.create_eventsource);
 app.get('/eventsource/:id', logic.eventsource);
 app.post('/callbacks', logic.create_callback);
 app.post('/callbacks/:id', logic.process_callback);
+app.delete('/callbacks/:id', logic.delete_callback);
 
 http.createServer(app).listen(app.get('port'), function() {
     console.log("ngsi-proxy server listening on port " + app.get('port'));
