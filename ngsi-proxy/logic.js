@@ -202,7 +202,6 @@ exports.process_callback = function process_callback(req, res) {
         var data = JSON.stringify({callback_id: req.params.id, payload: buf}).toString('utf8');
         eventsource.write('event: notification\n');
         eventsource.write('data: ' + data + '\n\n');
-        console.log('Processed response: ' + data);
 
         res.send(204);
     });
