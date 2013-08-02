@@ -1,0 +1,3 @@
+ngsi-proxy/node_modules
+nodejs/lib/NGSI.js
+nodejs/*.log

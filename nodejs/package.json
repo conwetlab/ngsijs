@@ -1,0 +1,25 @@
+{
+    "author": {
+        "name": "Álvaro Arranz",
+        "email": "aarranz@conwet.com"
+    },
+    "name": "ngsijs",
+    "version": "0.1.0",
+    "description": "",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/conwetlab/ngsijs"
+    },
+    "main": "./lib/ngsi-node.js",
+    "dependencies": {
+        "xmldom": "*",
+        "xpath": "*"
+    },
+    "scripts": {
+        "prepublish": "cp ../lib/NGSI.js lib"
+    },
+    "license": "AGPLv3 with linking exception",
+    "engines": {
+        "node": ">= 0.10.11"
+    }
+}
