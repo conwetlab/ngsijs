@@ -1,5 +1,3 @@
 <unsubscribeContextResponse>
-    <unsubscribeResponse>
-        <subscriptionId>sub1</subscriptionId>
-    </unsubscribeResponse>
+    <subscriptionId>sub1</subscriptionId>
 </unsubscribeContextResponse>
