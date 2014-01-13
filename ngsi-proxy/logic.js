@@ -1,5 +1,5 @@
 /*
- *     (C) Copyright 2013 CoNWeT Lab - Universidad Politécnica de Madrid
+ *     (C) Copyright 2014 CoNWeT Lab - Universidad Politécnica de Madrid
  *
  *     This file is part of ngsi-proxy.
  *
@@ -39,11 +39,12 @@ var connections = {};
 var callbacks = {};
 
 var createConnection = function createConnection() {
-    var id;
+    var id_base, id, inc = 2;
 
-    id = (new Date()).toLocaleTimeString();
+    id_base = (new Date()).toLocaleTimeString();
+    id = id_base + "-1";
     while (id in connections) {
-        id += "'";
+        id = id_base + "-" + inc++;
     }
 
     var connection = {
@@ -58,11 +59,12 @@ var createConnection = function createConnection() {
 };
 
 var createCallback = function createCallback(connection) {
-    var local_id, id;
+    var local_id, id_base, id, inc = 2;
 
-    local_id = (new Date()).toLocaleTimeString();
+    id_base = (new Date()).toLocaleTimeString();
+    local_id = id_base + "-1";
     while (local_id in connection.callbacks) {
-        local_id += "'";
+        local_id += id_base + "-" + inc++;
     }
 
     id = connection.id + ':' + local_id;
