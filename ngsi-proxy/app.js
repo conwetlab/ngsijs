@@ -49,7 +49,7 @@ var app = express();
 app.configure(function() {
     app.set('port', process.env.PORT || 3000);
     app.enable('case sensitive routing');
-    app.use(express.logger('dev'));
+    app.use(express.logger('default'));
     app.use(app.router);
 });
 
