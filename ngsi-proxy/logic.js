@@ -64,7 +64,7 @@ var createCallback = function createCallback(connection) {
     id_base = (new Date()).toLocaleTimeString();
     local_id = id_base + "-1";
     while (local_id in connection.callbacks) {
-        local_id += id_base + "-" + inc++;
+        local_id = id_base + "-" + inc++;
     }
 
     id = connection.id + ':' + local_id;
