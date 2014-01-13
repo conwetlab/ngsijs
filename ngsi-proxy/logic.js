@@ -49,6 +49,7 @@ var createConnection = function createConnection() {
 
     var connection = {
         id: id,
+        client_ip: null,
         response: null,
         callbacks: {}
     };
@@ -126,6 +127,12 @@ exports.list_eventsources = function list_eventsources(req, res) {
             var connection = connections[connection_id];
             content += '<li><b>' + connection_id + '</b>. ';
 
+            if (connection.response != null) {
+                content += 'Client connected (' + connection.client_ip + '). ';
+            } else {
+                content += 'Client currently not connected. ';
+            }
+
             var callback_count = Object.keys(connection.callbacks).length;
 
             if (callback_count > 0 ) {
@@ -186,6 +193,7 @@ exports.eventsource = function eventsource(req, res) {
     }
 
     connection.response = res;
+    connection.client_ip = req.connection.remoteAddress;
 
     res.header('Content-Type', 'text/event-stream');
     res.write('event: init\n');
@@ -194,10 +202,10 @@ exports.eventsource = function eventsource(req, res) {
             url: build_absolute_url(req, '/eventsource/' + connection.id)
         }).toString('utf8') + '\n\n');
 
-    // If the client disconnects, let's not leak any resources
-    // res.on('close', function() {
-    //     removeConnection(connection.id);
-    // });
+    res.on('close', function() {
+        connection.response = null;
+        connection.client_ip = null;
+    });
 };
 
 exports.options_callbacks = function options_callbacks(req, res) {
@@ -271,9 +279,13 @@ exports.process_callback = function process_callback(req, res) {
     req.on('end', function () {
         var eventsource = connection.response;
 
-        var data = JSON.stringify({callback_id: req.params.id, payload: buf}).toString('utf8');
-        eventsource.write('event: notification\n');
-        eventsource.write('data: ' + data + '\n\n');
+        if (eventsource != null) {
+            var data = JSON.stringify({callback_id: req.params.id, payload: buf}).toString('utf8');
+            eventsource.write('event: notification\n');
+            eventsource.write('data: ' + data + '\n\n');
+        } else {
+            console.log('Ignoring notification as the client is not connected');
+        }
 
         res.send(204);
         callbacks[req.params.id].notification_counter++;
