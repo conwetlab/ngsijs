@@ -58,6 +58,7 @@ app.configure('development', function(){
 });
 
 app.options('/eventsource', logic.options_eventsource);
+app.get('/eventsources', logic.list_eventsources);
 app.post('/eventsource', logic.create_eventsource);
 app.get('/eventsource/:id', logic.eventsource);
 app.options('/callbacks', logic.options_callbacks);

@@ -71,7 +71,8 @@ var createCallback = function createCallback(connection) {
     callback_info = connection.callbacks[local_id] = {
         id: id,
         local_id: local_id,
-        connection: connection
+        connection: connection,
+        notification_counter: 0
     };
     callbacks[id] = callback_info;
 
@@ -113,6 +114,41 @@ exports.options_eventsource = function create_eventsource(req, res) {
         res.header('Access-Control-Allow-Methods', 'POST, OPTIONS');
     }
     res.send(204);
+};
+
+exports.list_eventsources = function list_eventsources(req, res) {
+    res.writeHead(200, {'Content-Type': 'application/xhtml+xml; charset=UTF-8'});
+    var content = '<!DOCTYPE html>\n<html xmlns="http://www.w3.org/1999/xhtml"><head></head><body>';
+    content += '<h1>Current connections</h1>'
+    if (Object.keys(connections).length > 0) {
+        content += '<ul>';
+        for (var connection_id in connections) {
+            var connection = connections[connection_id];
+            content += '<li><b>' + connection_id + '</b>. ';
+
+            var callback_count = Object.keys(connection.callbacks).length;
+
+            if (callback_count > 0 ) {
+                content += callback_count + ' callbacks:';
+
+                content += '<ul>';
+                for (var callback_id in connection.callbacks) {
+                    content += '<li><b>' + callback_id + '</b> (' + connection.callbacks[callback_id].notification_counter + ' received notifications)</li>';
+                }
+                content += '</ul>';
+            } else {
+                content += "No callbacks";
+            }
+
+            content += '</li>';
+        }
+        content += '</ul>';
+    } else {
+        content += 'Currently there is not connection';
+    }
+    content += '</body></html>';
+    res.write(content);
+    res.end();
 };
 
 exports.create_eventsource = function create_eventsource(req, res) {
@@ -240,6 +276,7 @@ exports.process_callback = function process_callback(req, res) {
         eventsource.write('data: ' + data + '\n\n');
 
         res.send(204);
+        callbacks[req.params.id].notification_counter++;
     });
 };
 
