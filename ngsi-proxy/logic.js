@@ -50,6 +50,7 @@ var createConnection = function createConnection() {
     var connection = {
         id: id,
         client_ip: null,
+        reconnection_count: 0,
         response: null,
         callbacks: {}
     };
@@ -127,10 +128,11 @@ exports.list_eventsources = function list_eventsources(req, res) {
             var connection = connections[connection_id];
             content += '<li><b>' + connection_id + '</b>. ';
 
+            content += 'The client has started the connection ' + connection.reconnection_count + ' times and is currently '
             if (connection.response != null) {
-                content += 'Client connected (' + connection.client_ip + '). ';
+                content += ' connected (' + connection.client_ip + '). ';
             } else {
-                content += 'Client currently not connected. ';
+                content += ' not connected. ';
             }
 
             var callback_count = Object.keys(connection.callbacks).length;
@@ -192,8 +194,23 @@ exports.eventsource = function eventsource(req, res) {
         return;
     }
 
+    if (connection.response != null) {
+        console.log('A client is currently connected to this eventsource. Closing connection with the old client (' + connection.client_ip + ').');
+        try {
+            connection.response.removeListener('close', connection.close_listener);
+        } catch (e) {}
+        try {
+            connection.response.end();
+        } catch (e) {}
+    }
     connection.response = res;
     connection.client_ip = req.connection.remoteAddress;
+    connection.reconnection_count++;
+    connection.close_listener = function close_listener() {
+        console.log('Client closed connection with eventsource: ' + connection.id);
+        connection.response = null;
+        connection.client_ip = null;
+    };
 
     res.header('Content-Type', 'text/event-stream');
     res.write('event: init\n');
@@ -202,10 +219,7 @@ exports.eventsource = function eventsource(req, res) {
             url: build_absolute_url(req, '/eventsource/' + connection.id)
         }).toString('utf8') + '\n\n');
 
-    res.on('close', function() {
-        connection.response = null;
-        connection.client_ip = null;
-    });
+    res.on('close', connection.close_listener);
 };
 
 exports.options_callbacks = function options_callbacks(req, res) {
