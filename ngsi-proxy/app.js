@@ -51,6 +51,7 @@ app.configure(function() {
     app.enable('case sensitive routing');
     app.use(express.logger('default'));
     app.use(app.router);
+    app.use(express.compress());
 });
 
 app.configure('development', function(){
