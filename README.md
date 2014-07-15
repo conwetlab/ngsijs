@@ -10,10 +10,11 @@ Using ngsijs from browsers
 
     <script type="text/javascript" src="url_to_NGSI.js"></script>
 
-Using ngsijs from Wirecloud widgets/operators
+Using ngsijs from WireCloud widgets/operators
 ---------------------------------------------
 
-Add ``NGSI`` to the requirements of the widget/operator.
+Take a look to the [Using Oriong Context Broker tutorial](http://conwet.fi.upm.es/docs/display/wirecloud/Using+Orion+Context+Broker)
+available on the WireCloud tutorials page.
 
 Running ngsi-proxy
 ------------------

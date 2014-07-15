@@ -1,25 +1,22 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <updateContextResponse>
   <contextResponseList>
     <contextElementResponse>
       <contextElement>
-        <entityId type="Technician" isPattern="false">
-          <id>tech1</id>
+        <entityId type="City" isPattern="false">
+          <id>Madrid</id>
         </entityId>
-        <attributeDomainName></attributeDomainName>
         <contextAttributeList>
           <contextAttribute>
-            <name>new_attribute</name>
-            <type>string</type>
+            <name>position</name>
+            <type>coords</type>
             <contextValue></contextValue>
           </contextAttribute>
         </contextAttributeList>
-        <domainMetadata>
-        </domainMetadata>
       </contextElement>
       <statusCode>
-        <code>200</code>
-        <reasonPhrase>OK</reasonPhrase>
+        <code>472</code>
+        <reasonPhrase>request parameter is invalid/not allowed</reasonPhrase>
+        <details>action: DELETE - entity: (Madrid, City) - offending attribute: position</details>
       </statusCode>
     </contextElementResponse>
   </contextResponseList>

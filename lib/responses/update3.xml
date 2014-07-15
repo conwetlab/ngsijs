@@ -1,21 +1,24 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <updateContextResponse>
   <contextResponseList>
     <contextElementResponse>
       <contextElement>
-        <entityId type="Technician" isPattern="false">
-          <id>tech1</id>
+        <entityId type="City" isPattern="false">
+          <id>Madrid</id>
         </entityId>
-        <attributeDomainName></attributeDomainName>
         <contextAttributeList>
           <contextAttribute>
-            <name>new_attribute</name>
-            <type>string</type>
+            <name>position</name>
+            <type>coords</type>
             <contextValue></contextValue>
+            <metadata>
+              <contextMetadata>
+                <name>location</name>
+                <type>string</type>
+                <value>WSG84</value>
+              </contextMetadata>
+            </metadata>
           </contextAttribute>
         </contextAttributeList>
-        <domainMetadata>
-        </domainMetadata>
       </contextElement>
       <statusCode>
         <code>200</code>

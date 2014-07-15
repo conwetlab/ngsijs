@@ -1,0 +1,7 @@
+<queryContextResponse>
+  <errorCode>
+    <code>404</code>
+    <reasonPhrase>No context element found</reasonPhrase>
+    <details>Number of matching entities: 5. Offset is 1000</details>
+  </errorCode>
+</queryContextResponse>
