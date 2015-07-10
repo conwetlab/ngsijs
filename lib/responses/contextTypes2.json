@@ -1,0 +1,14 @@
+{
+  "name" : "Agrarium",
+  "attributes" : [
+    "moisture",
+    "ambientLight",
+    "position",
+    "humidity",
+    "temperature"
+  ],
+  "statusCode" : {
+    "code" : "200",
+    "reasonPhrase" : "OK"
+  }
+}
