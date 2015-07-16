@@ -1,0 +1,63 @@
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "email",
+                        "type": "string",
+                        "value": "jacinto.salas@mycompany.com"
+                    },
+                    {
+                        "name": "function",
+                        "type": "string",
+                        "value": "MV Keeper"
+                    },
+                    {
+                        "name": "mobile_phone",
+                        "type": "string",
+                        "value": "0034123456789"
+                    },
+                    {
+                        "name": "name",
+                        "type": "string",
+                        "value": "Jacinto Salas Torres"
+                    },
+                    {
+                        "name": "twitter",
+                        "type": "string",
+                        "value": "jsalas"
+                    },
+                    {
+                        "name": "van",
+                        "type": "string",
+                        "value": "van1"
+                    },
+                    {
+                        "name": "working_area",
+                        "type": "integer",
+                        "value": "28050"
+                    }
+                ],
+                "id": "tech1",
+                "isPattern": "false",
+                "type": "Technician"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        },
+        {
+            "contextElement": {
+                "id": "tech2",
+                "isPattern": "false",
+                "type": "Technician"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
