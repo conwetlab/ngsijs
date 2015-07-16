@@ -1,0 +1,22 @@
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [ 
+                    {
+                        "name": "new_attribute",
+                        "type": "string",
+                        "value": ""
+                    }
+                ],
+                "id": "tech1",
+                "isPattern": "false",
+                "type": "Technician"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}

@@ -1,0 +1,41 @@
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "position",
+                        "type": "coords",
+                        "value": ""
+                    }
+                ],
+                "id": "Madrid",
+                "isPattern": "false",
+                "type": "City"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        },
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "mobile_phone",
+                        "type": "string",
+                        "value": ""
+                    }
+                ],
+                "id": "A",
+                "isPattern": "false",
+                "type": "Point"
+            },
+            "statusCode": {
+                "code": "472",
+                "reasonPhrase": "request parameter is invalid/not allowed",
+                "details": "action: UPDATE - entity: (A, Point) - offending attribute: mobile_phone"
+            }
+        }
+    ]
+}

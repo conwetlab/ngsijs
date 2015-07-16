@@ -1,0 +1,29 @@
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [ 
+                    {
+                        "name": "position",
+                        "type": "coords",
+                        "value": "",
+                        "metadatas": [
+                            {
+                                "name": "location",
+                                "type": "string",
+                                "value": "WGS84"
+                            }
+                        ]
+                    }
+                ],
+                "id": "Madrid",
+                "isPattern": "false",
+                "type": "City"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}

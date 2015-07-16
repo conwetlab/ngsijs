@@ -1,0 +1,15 @@
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "id": "Madrid",
+                "isPattern": "false",
+                "type": "City"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}

@@ -1,0 +1,22 @@
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [ 
+                    {
+                        "name": "position",
+                        "type": "coords",
+                        "value": ""
+                    }
+                ],
+                "id": "Madrid",
+                "isPattern": "false",
+                "type": "City"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}

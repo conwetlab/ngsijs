@@ -12,8 +12,6 @@
             <name>position</name>
             <type>coords</type>
             <contextValue>5, 5</contextValue>
-            <metadata>
-            </metadata>
           </contextAttribute>
         </contextAttributeList>
         <domainMetadata>
@@ -35,8 +33,6 @@
             <name>position</name>
             <type>coords</type>
             <contextValue>7, 4</contextValue>
-            <metadata>
-            </metadata>
           </contextAttribute>
         </contextAttributeList>
         <domainMetadata>

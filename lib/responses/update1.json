@@ -1,0 +1,32 @@
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [ 
+                    {
+                        "name": "mobile_phone",
+                        "type": "string",
+                        "value": ""
+                    },
+                    {
+                        "name": "attr2",
+                        "type": "",
+                        "value": ""
+                    },
+                    {
+                        "name": "attr3",
+                        "type": "",
+                        "value": ""
+                    }
+                ],
+                "id": "tech1",
+                "isPattern": "false",
+                "type": "Technician"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}

@@ -1,0 +1,23 @@
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "position",
+                        "type": "coords",
+                        "value": ""
+                    }
+                ],
+                "id": "Madrid",
+                "isPattern": "false",
+                "type": "City"
+            },
+            "statusCode": {
+                "code": "472",
+                "reasonPhrase": "request parameter is invalid/not allowed",
+                "details": "action: DELETE - entity: (Madrid, City) - offending attribute: position"
+            }
+        }
+    ]
+}
