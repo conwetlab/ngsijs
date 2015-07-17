@@ -1,0 +1,29 @@
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [ 
+                    {
+                        "name": "structuredattr",
+                        "type": "structure",
+                        "value": [
+                            "22",
+                            {
+                                "x": ["x1", "x2"], 
+                                "y": "3" 
+                            }, 
+                            ["z1", "z2"] 
+                        ]
+                    }
+                ],
+                "id": "tech1",
+                "isPattern": "false",
+                "type": "Technician"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
