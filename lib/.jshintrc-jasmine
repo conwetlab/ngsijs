@@ -1,0 +1,23 @@
+{
+    "jasmine": true,
+    "browser": true,
+    "debug": false,
+    "devel": false,
+    "eqnull": true,
+    "forin": false,
+    "undef": true,
+    "unused": false,
+    "prototypejs": false,
+    "globalstrict": false,
+    "strict": true,
+    "white": false,
+    "quotmark": false,
+    "globals": {
+        "URL": false,
+        "MashupPlatform": true,
+        "Widget": true,
+        "MyStrategy": true,
+        "MockServer": true,
+        "MockSocket": true
+    }
+}
