@@ -1,0 +1,8 @@
+build/
+notifications/
+responses/
+helpers/
+.*
+Gruntfile.js
+tests.js
+eventsource.js

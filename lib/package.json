@@ -1,26 +1,33 @@
 {
     "vendor": "CoNWeT",
-    "name": "kurento-one2one",
-    "version": "1.1.3a3",
-    "description": "A web widget that allows join a one-2-one video call, supported by Kurento Media Server.",
+    "name": "ngsijs",
+    "version": "0.15.1",
+    "description": "Node JavaScript library for Orion Context Broker",
+    "main": "./ngsi-node.js",
     "repository": {
         "type": "git",
-        "url": "https://github.com/wirecloud-fiware/widget-one2one-call.git"
+        "url": "https://github.com/conwetlab/ngsijs"
     },
     "keywords": [
-        "one-2-one",
-        "video-call",
-        "webcam",
-        "kurento",
-        "webrtc",
+        "NGSI",
+        "orion",
+        "context",
+        "broker",
         "wirecloud"
     ],
     "author": "CoNWeT Lab., Universidad Politecnica de Madrid",
-    "license": "https://github.com/wirecloud-fiware/widget-one2one-call/blob/master/LICENSE",
-    "bugs": {
-        "url": "https://github.com/wirecloud-fiware/widget-one2one-call/issues"
+    "license": "AGPLv3 with linking exception",
+    "engines": {
+        "node": ">= 0.10.11"
     },
-    "homepage": "https://github.com/wirecloud-fiware/widget-one2one-call",
+    "bugs": {
+        "url": "https://github.com/conwetlab/ngsijs/issues"
+    },
+    "homepage": "https://github.com/conwetlab/ngsijs",
+    "dependencies": {
+        "xmldom": "*",
+        "xpath": "*"
+    },
     "devDependencies": {
         "grunt": "^0.4.5",
         "grunt-bower-task": "^0.4.0",
