@@ -1,0 +1,6 @@
+{
+    "subscribeResponse": {
+        "subscriptionId": "sub1",
+        "duration": "PT20H"
+    }
+}
