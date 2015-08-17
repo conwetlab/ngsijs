@@ -1,0 +1,30 @@
+{
+    "contextRegistrationResponses": [
+        {
+            "contextRegistration": {
+                "attributes": [],
+                "entities": [
+                    {
+                        "id": "entity1",
+                        "isPattern": "false",
+                        "type": "Technician"
+                    }
+                ],
+                "providingApplication": "http://wirecloud.conwet.fi.upm.es"
+            }
+        },
+        {
+            "contextRegistration": {
+                "attributes": [],
+                "entities": [
+                    {
+                        "id": "van1",
+                        "isPattern": "false",
+                        "type": "Van"
+                    }
+                ],
+                "providingApplication": "http://wirecloud.conwet.fi.upm.es"
+            }
+        }
+    ]
+}
