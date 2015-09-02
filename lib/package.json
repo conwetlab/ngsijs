@@ -24,10 +24,6 @@
         "url": "https://github.com/conwetlab/ngsijs/issues"
     },
     "homepage": "https://github.com/conwetlab/ngsijs",
-    "dependencies": {
-        "xmldom": "*",
-        "xpath": "*"
-    },
     "devDependencies": {
         "grunt": "^0.4.5",
         "grunt-bower-task": "^0.4.0",
