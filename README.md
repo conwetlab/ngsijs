@@ -2,19 +2,31 @@ ngsijs
 ======
 
 This repository houses the Javascript library used for implementing NGSI
-clients. The library has been tested to work against version 0.14.0 of the
+clients. The library has been tested to work against version 0.14.0+ of the
 Orion Context Broker.
-
-Using ngsijs from browsers
---------------------------
-
-    <script type="text/javascript" src="url_to_NGSI.js"></script>
 
 Using ngsijs from WireCloud widgets/operators
 ---------------------------------------------
 
-Take a look to the [Using Oriong Context Broker tutorial](http://conwet.fi.upm.es/docs/display/wirecloud/Using+Orion+Context+Broker)
-available on the WireCloud tutorials page.
+Take a look to the "3.2.1. Using Orion Context Broker" tutorial available at
+[FIWARE Academy] and to the [reference documentation].
+
+[FIWARE Academy]: http://edu.fiware.org/course/view.php?id=53#section-3
+[reference documentation]: https://wirecloud.readthedocs.org/en/latest/development/ngsi_api/
+
+Using ngsijs from normal web pages
+----------------------------------
+
+Altough the documentation provided in the previous section is oriented to
+provide documentation on howto use this library from WireCloud widgets and
+operators, it can be usefull also for developing web pages using this library.
+
+The main difference is that you don't have to edit a `config.xml` file, instead
+you have to add the library as usually in web pages:
+
+```html
+    <script type="text/javascript" src="url_to_NGSI.js"></script>
+```
 
 Running ngsi-proxy
 ------------------
