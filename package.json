@@ -1,36 +1,40 @@
 {
-    "vendor": "CoNWeT",
-    "name": "ngsijs",
-    "version": "0.16.0",
-    "description": "Node JavaScript library for Orion Context Broker",
-    "main": "lib/ngsi-node.js",
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/conwetlab/ngsijs"
-    },
-    "keywords": [
-        "NGSI",
-        "orion",
-        "context",
-        "broker",
-        "wirecloud"
-    ],
-    "author": "CoNWeT Lab., Universidad Politecnica de Madrid",
-    "license": "AGPLv3 with linking exception",
-    "engines": {
-        "node": ">= 0.10.11"
-    },
-    "bugs": {
-        "url": "https://github.com/conwetlab/ngsijs/issues"
-    },
-    "homepage": "https://github.com/conwetlab/ngsijs",
-    "devDependencies": {
-        "grunt": "^0.4.5",
-        "grunt-bower-task": "^0.4.0",
-        "grunt-contrib-clean": "^0.6.0",
-        "grunt-contrib-jasmine": "^0.8.1",
-        "grunt-contrib-jshint": "^0.10.0",
-        "grunt-jscs": "^1.8.0",
-        "grunt-template-jasmine-istanbul": "^0.3.0"
-    }
+  "vendor": "CoNWeT",
+  "name": "ngsijs",
+  "version": "0.16.0",
+  "description": "Node JavaScript library for Orion Context Broker",
+  "main": "lib/ngsi-node.js",
+  "scripts": {
+    "test": "mocha lib/tests.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/conwetlab/ngsijs"
+  },
+  "keywords": [
+    "NGSI",
+    "orion",
+    "context",
+    "broker",
+    "wirecloud"
+  ],
+  "author": "CoNWeT Lab., Universidad Politecnica de Madrid",
+  "license": "AGPLv3 with linking exception",
+  "engines": {
+    "node": ">= 0.10.11"
+  },
+  "bugs": {
+    "url": "https://github.com/conwetlab/ngsijs/issues"
+  },
+  "homepage": "https://github.com/conwetlab/ngsijs",
+  "devDependencies": {
+    "grunt": "^0.4.5",
+    "grunt-bower-task": "^0.4.0",
+    "grunt-contrib-clean": "^0.6.0",
+    "grunt-contrib-jasmine": "^0.8.1",
+    "grunt-contrib-jshint": "^0.10.0",
+    "grunt-jscs": "^1.8.0",
+    "grunt-template-jasmine-istanbul": "^0.3.0",
+    "mocha": "^2.4.5"
+  }
 }
