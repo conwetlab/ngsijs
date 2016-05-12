@@ -3,7 +3,7 @@
     "name": "ngsijs",
     "version": "0.16.0",
     "description": "Node JavaScript library for Orion Context Broker",
-    "main": "./ngsi-node.js",
+    "main": "lib/ngsi-node.js",
     "repository": {
         "type": "git",
         "url": "https://github.com/conwetlab/ngsijs"
