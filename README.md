@@ -1,8 +1,8 @@
 ngsijs
 ======
 
-This repository houses the Javascript library used for implementing NGSI
-clients. The library has been tested to work against version 0.14.0+ of the
+This repository houses the JavaScript library used for implementing NGSI
+clients. The library has been tested to work against version 0.26.0+ of the
 Orion Context Broker.
 
 Using ngsijs from WireCloud widgets/operators
