@@ -5,7 +5,7 @@
   "description": "Node JavaScript library for Orion Context Broker",
   "main": "lib/ngsi-node.js",
   "scripts": {
-    "test": "mocha lib/tests.js"
+    "test": "jasmine"
   },
   "repository": {
     "type": "git",
@@ -35,6 +35,8 @@
     "grunt-contrib-jshint": "^0.10.0",
     "grunt-jscs": "^1.8.0",
     "grunt-template-jasmine-istanbul": "^0.3.0",
-    "mocha": "^2.4.5"
+    "xmldom": "^0.1.22",
+    "xmlhttprequest": "^1.8.0",
+    "xpath": "0.0.23"
   }
 }
