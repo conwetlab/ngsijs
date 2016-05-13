@@ -16,7 +16,7 @@
                     {
                         "name": "mobile_phone",
                         "type": "string",
-                        "value": "0034123456789"
+                        "value": ""
                     },
                     {
                         "name": "name",
