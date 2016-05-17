@@ -9,9 +9,9 @@
                         "value": ""
                     }
                 ],
-                "id": "Madrid",
+                "id": "tech1",
                 "isPattern": "false",
-                "type": "City"
+                "type": "Technician"
             },
             "statusCode": {
                 "code": "200",
@@ -27,14 +27,14 @@
                         "value": ""
                     }
                 ],
-                "id": "A",
+                "id": "tech1",
                 "isPattern": "false",
-                "type": "Point"
+                "type": "Technician"
             },
             "statusCode": {
-                "code": "472",
-                "reasonPhrase": "request parameter is invalid/not allowed",
-                "details": "action: UPDATE - entity: (A, Point) - offending attribute: mobile_phone"
+                "code": "404",
+                "reasonPhrase": "No context element found",
+                "details": "tech1"
             }
         }
     ]
