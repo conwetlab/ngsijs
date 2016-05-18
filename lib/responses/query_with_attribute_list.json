@@ -1,0 +1,27 @@
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "name",
+                        "type": "string",
+                        "value": "Jacinto Salas Torres"
+                    },
+                    {
+                        "name": "van",
+                        "type": "string",
+                        "value": "van1"
+                    }
+                ],
+                "id": "tech1",
+                "isPattern": "false",
+                "type": "Technician"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}

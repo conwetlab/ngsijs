@@ -33,40 +33,6 @@
                 "code": "200",
                 "reasonPhrase": "OK"
             }
-        },
-        {
-            "contextElement": {
-                "id": "OUTSMART.NODE_3502",
-                "type": "Node",
-                "isPattern": "false"
-            },
-            "statusCode": {
-                "code": "200",
-                "reasonPhrase": "OK"
-            }
-        },
-        {
-            "contextElement": {
-                "attributes": [
-                    {
-                        "name": "TimeInstant",
-                        "type": "urn:x-ogc:def:trs:IDAS:1.0:ISO8601",
-                        "value": "2014-05-26T08:37:08.022Z"
-                    },
-                    {
-                        "name": "volume",
-                        "type": "urn:x-ogc:def:phenomenon:IDAS:1.0:volume",
-                        "value": "16.9724"
-                    }
-                ],
-                "id": "Sevilla:01727449",
-                "type": "sevilla:water",
-                "isPattern": "false"
-            },
-            "statusCode": {
-                "code": "200",
-                "reasonPhrase": "OK"
-            }
         }
     ],
     "errorCode": {
