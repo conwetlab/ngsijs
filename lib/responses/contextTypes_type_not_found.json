@@ -1,0 +1,7 @@
+{
+    "name" : "Agrarium",
+    "statusCode" : {
+        "code" : "404",
+        "reasonPhrase" : "No context element found"
+    }
+}

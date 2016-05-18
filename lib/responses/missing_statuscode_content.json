@@ -1,0 +1,10 @@
+{
+  "name" : "Agrarium",
+  "attributes" : [
+    "moisture",
+    "ambientLight",
+    "position",
+    "humidity",
+    "temperature"
+  ]
+}
