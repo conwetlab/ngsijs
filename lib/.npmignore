@@ -5,4 +5,3 @@ helpers/
 .*
 Gruntfile.js
 tests.js
-eventsource.js
