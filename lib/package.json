@@ -1,40 +1,39 @@
 {
-    "vendor": "CoNWeT",
-    "name": "ngsijs",
-    "version": "0.16.1",
-    "description": "Node JavaScript library for Orion Context Broker",
-    "main": "./ngsi-node.js",
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/conwetlab/ngsijs"
-    },
-    "keywords": [
-        "NGSI",
-        "orion",
-        "context",
-        "broker",
-        "wirecloud"
-    ],
-    "author": "CoNWeT Lab., Universidad Politecnica de Madrid",
-    "license": "AGPLv3 with linking exception",
-    "engines": {
-        "node": ">= 0.10.11"
-    },
-    "bugs": {
-        "url": "https://github.com/conwetlab/ngsijs/issues"
-    },
-    "homepage": "https://github.com/conwetlab/ngsijs",
-    "devDependencies": {
-        "grunt": "^0.4.5",
-        "grunt-bower-task": "^0.4.0",
-        "grunt-contrib-clean": "^0.6.0",
-        "grunt-contrib-jshint": "^0.10.0",
-        "grunt-jscs": "^1.8.0",
-        "grunt-karma": "^2.0.0",
-        "karma": "^1.1.0",
-        "karma-chrome-launcher": "^1.0.1",
-        "karma-coverage": "^1.0.0",
-        "karma-firefox-launcher": "^1.0.0",
-        "karma-jasmine": "^1.0.2"
-    }
+  "vendor": "CoNWeT",
+  "name": "ngsijs",
+  "version": "0.16.1",
+  "description": "Node JavaScript library for Orion Context Broker",
+  "main": "./ngsi-node.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/conwetlab/ngsijs"
+  },
+  "keywords": [
+    "NGSI",
+    "orion",
+    "context",
+    "broker",
+    "wirecloud"
+  ],
+  "author": "CoNWeT Lab., Universidad Politecnica de Madrid",
+  "license": "AGPLv3 with linking exception",
+  "engines": {
+    "node": ">= 0.10.11"
+  },
+  "bugs": {
+    "url": "https://github.com/conwetlab/ngsijs/issues"
+  },
+  "homepage": "https://github.com/conwetlab/ngsijs",
+  "devDependencies": {
+    "grunt": "^0.4.5",
+    "grunt-bower-task": "^0.4.0",
+    "grunt-contrib-clean": "^0.6.0",
+    "grunt-karma": "^2.0.0",
+    "gruntify-eslint": "^3.1.0",
+    "karma": "^1.1.0",
+    "karma-chrome-launcher": "^1.0.1",
+    "karma-coverage": "^1.0.0",
+    "karma-firefox-launcher": "^1.0.0",
+    "karma-jasmine": "^1.0.2"
+  }
 }
