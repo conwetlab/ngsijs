@@ -9,10 +9,14 @@
     "url": "https://github.com/conwetlab/ngsijs"
   },
   "keywords": [
+    "context broker",
+    "fiware",
+    "FIWARE",
+    "fiware-orion",
+    "iot",
+    "IoT",
     "NGSI",
     "orion",
-    "context",
-    "broker",
     "wirecloud"
   ],
   "author": "CoNWeT Lab., Universidad Politecnica de Madrid",
