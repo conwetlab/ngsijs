@@ -3,4 +3,6 @@ nodejs/lib/NGSI.js
 nodejs/*.log
 node_modules
 build
+dist
 .grunt
+*.DS_Store
