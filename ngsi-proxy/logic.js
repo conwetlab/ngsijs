@@ -1,5 +1,5 @@
 /*
- *     (C) Copyright 2014 CoNWeT Lab - Universidad Politécnica de Madrid
+ *     Copyright (c) 2014-2017 CoNWeT Lab., Universidad Politécnica de Madrid
  *
  *     This file is part of ngsi-proxy.
  *
@@ -294,7 +294,11 @@ exports.process_callback = function process_callback(req, res) {
         var eventsource = connection.response;
 
         if (eventsource != null) {
-            var data = JSON.stringify({callback_id: req.params.id, payload: buf}).toString('utf8');
+            var data = JSON.stringify({
+                callback_id: req.params.id,
+                payload: buf,
+                headers: req.headers
+            }).toString('utf8');
             eventsource.write('event: notification\n');
             eventsource.write('data: ' + data + '\n\n');
         } else {
