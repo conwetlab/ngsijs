@@ -222,6 +222,35 @@ exports.eventsource = function eventsource(req, res) {
     res.on('close', connection.close_listener);
 };
 
+exports.delete_eventsource = function delete_eventsource(req, res) {
+    var origin, connection = connections[req.params.id];
+
+    if (connection == null) {
+        res.send(404);
+        return;
+    }
+
+    console.log('Deleting subscription ' + req.params.id);
+    delete connections[req.params.id];
+
+    if (connection.response != null) {
+        console.log('A client is currently connected to this eventsource. Closing connection with (' + connection.client_ip + ').');
+        try {
+            connection.response.removeListener('close', connection.close_listener);
+        } catch (e) {}
+        try {
+            connection.response.end();
+        } catch (e) {}
+    }
+
+    for (var callback_id in connection.callbacks) {
+        console.log('Deleting callback ' + callback_id);
+        delete callbacks[connection.id + ':' + callback_id];
+    }
+
+    res.send(204);
+};
+
 exports.options_callbacks = function options_callbacks(req, res) {
     res.header('Cache-Control', 'no-cache');
     res.header('Connection', 'keep-alive');

@@ -1,5 +1,5 @@
 /*
- *     (C) Copyright 2013 CoNWeT Lab - Universidad Politécnica de Madrid
+ *     Copyright (c) 2013-2017 CoNWeT Lab - Universidad Politécnica de Madrid
  *
  *     This file is part of ngsi-proxy.
  *
@@ -62,6 +62,7 @@ app.options('/eventsource', logic.options_eventsource);
 app.get('/eventsources', logic.list_eventsources);
 app.post('/eventsource', logic.create_eventsource);
 app.get('/eventsource/:id', logic.eventsource);
+app.delete('/eventsource/:id', logic.delete_eventsource);
 app.options('/callbacks', logic.options_callbacks);
 app.post('/callbacks', logic.create_callback);
 app.post('/callbacks/:id', logic.process_callback);
