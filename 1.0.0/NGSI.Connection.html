@@ -5,14 +5,10 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width">
 	<title>Documentation Class: Connection</title>
-
-	<!--[if lt IE 9]>
-	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-	<![endif]-->
-	<link type="text/css" rel="stylesheet" href="styles/sunlight.default.css">
-
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
 	<link type="text/css" rel="stylesheet" href="styles/site.simplex.css">
-
 </head>
 
 <body>
@@ -77,13 +73,6 @@
 
 <header>
     
-        <h2>
-            <span class="ancestors"><a href="NGSI.html">NGSI</a>.</span>
-        
-        Connection
-        </h2>
-        
-    
 </header>
 
 
@@ -93,9 +82,7 @@
         
 <hr>
 <dt>
-    <h4 class="name" id="Connection"><span class="type-signature"></span>new Connection(url, options)</h4>
-    
-    
+    <h4 class="name toc-ignore" id="Connection">new <a href="NGSI.html">NGSI</a>.Connection(url, options)</h4>
 </dt>
 <dd>
 
@@ -125,8 +112,6 @@
 
         
 
-        
-
         <th class="last">Description</th>
     </tr>
     </thead>
@@ -136,7 +121,9 @@
 
         <tr>
             
+                
                 <td class="name"><code>url</code></td>
+                
             
 
             <td class="type">
@@ -152,10 +139,6 @@
             
             </td>
 
-            
-
-            
-
             <td class="description last"><p>URL of the context broker</p></td>
         </tr>
 
@@ -163,7 +146,9 @@
 
         <tr>
             
+                
                 <td class="name"><code>options</code></td>
+                
             
 
             <td class="type">
@@ -175,10 +160,6 @@
 
             
             </td>
-
-            
-
-            
 
             <td class="description last"></td>
         </tr>
@@ -246,16 +227,15 @@
         
         <p class="code-caption">Basic usage</p>
     
-    <pre class="sunlight-highlight-javascript">var connection = new NGSI.Connection(&quot;https://orion.example.com&quot;);</pre>
+    <pre class="prettyprint"><code>var connection = new NGSI.Connection("https://orion.example.com");</code></pre>
 
         <p class="code-caption">Using the FIWARE Lab's instance</p>
     
-    <pre class="sunlight-highlight-javascript">var connection = new NGSI.Connection(&quot;http://orion.lab.fiware.org&quot;, {
+    <pre class="prettyprint"><code>var connection = new NGSI.Connection("http://orion.lab.fiware.org", {
     requestHeaders: {
-        &quot;X-Auth-Token&quot;: token
+        "X-Auth-Token": token
     }
-});</pre>
-
+});</code></pre>
 
     
 </dd>
@@ -282,9 +262,7 @@
             
 <hr>
 <dt>
-    <h4 class="name" id="appendEntityAttributes"><span class="type-signature"></span>appendEntityAttributes(changes [, options])</h4>
-    
-    
+    <h4 class="name" id=".%22v2.appendEntityAttributes%22">v2.appendEntityAttributes(changes [, options])</h4>
 </dt>
 <dd>
 
@@ -316,10 +294,6 @@
         <th>Type</th>
 
         
-        <th>Argument</th>
-        
-
-        
 
         <th class="last">Description</th>
     </tr>
@@ -330,7 +304,9 @@
 
         <tr>
             
+                
                 <td class="name"><code>changes</code></td>
+                
             
 
             <td class="type">
@@ -342,18 +318,6 @@
 
             
             </td>
-
-            
-                <td class="attributes">
-                
-
-                
-
-                
-                </td>
-            
-
-            
 
             <td class="description last"></td>
         </tr>
@@ -362,7 +326,9 @@
 
         <tr>
             
-                <td class="name"><code>options</code></td>
+                
+                <td class="name">[<code>options</code>]</td>
+                
             
 
             <td class="type">
@@ -374,20 +340,6 @@
 
             
             </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
 
             <td class="description last"><p>Object with extra options:</p>
 <pre class="prettyprint source"><code>- `correlator` (`String`): transaction id
@@ -487,41 +439,40 @@
         
         <p class="code-caption">Append or update the temperature attribute</p>
     
-    <pre class="sunlight-highlight-javascript">connection.v2.appendEntityAttributes({
-    &quot;id&quot;: &quot;Bcn-Welt&quot;,
-    &quot;temperature&quot;: {
-        &quot;value&quot;: 31.5
+    <pre class="prettyprint"><code>connection.v2.appendEntityAttributes({
+    "id": "Bcn-Welt",
+    "temperature": {
+        "value": 31.5
     }
 }).then(
-    (response) =&gt; {
+    (response) => {
         // Attributes appended successfully
         // response.correlator transaction id associated with the server response
-    }, (error) =&gt; {
+    }, (error) => {
         // Error appending the attributes to the entity
         // If the error was reported by Orion, error.correlator will be
         // filled with the associated transaction id
     }
-);</pre>
+);</code></pre>
 
         <p class="code-caption">Append the temperature attribute</p>
     
-    <pre class="sunlight-highlight-javascript">connection.v2.appendEntityAttributes({
-    &quot;id&quot;: &quot;Bcn-Welt&quot;,
-    &quot;temperature&quot;: 31.5
+    <pre class="prettyprint"><code>connection.v2.appendEntityAttributes({
+    "id": "Bcn-Welt",
+    "temperature": 31.5
 }, {
     strict: true,
     keyValues: true
 }).then(
-    (response) =&gt; {
+    (response) => {
         // Attributes appended successfully
         // response.correlator transaction id associated with the server response
-    }, (error) =&gt; {
+    }, (error) => {
         // Error appending the attributes to the entity
         // If the error was reported by Orion, error.correlator will be
         // filled with the associated transaction id
     }
-);</pre>
-
+);</code></pre>
 
     
 </dd>
@@ -530,9 +481,208 @@
             
 <hr>
 <dt>
-    <h4 class="name" id="batchUpdate"><span class="type-signature"></span>batchUpdate(changes [, options])</h4>
+    <h4 class="name" id=".%22v2.batchQuery%22">v2.batchQuery([options])</h4>
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>This operation allows to make several entity queries at once.</p>
+<blockquote>
+<p>This method uses v2 of the FIWARE's NGSI Specification</p>
+</blockquote>
+    </div>
+    
+
+    
+
+    
+
     
     
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                
+                <td class="name">[<code>options</code>]</td>
+                
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            <td class="description last"><p>Object with extra options:</p>
+<ul>
+<li><code>correlator</code> (<code>String</code>): Transaction id</li>
+<li><code>count</code> (<code>Boolean</code>; default: <code>false</code>): Request total count</li>
+<li><code>limit</code> (<code>Number</code>; default: <code>20</code>): This option allow you to specify
+the maximum number of entities you want to receive from the server</li>
+<li><code>offset</code> (<code>Number</code>; default: <code>0</code>): Allows you to skip a given number of
+elements at the beginning</li>
+<li><code>orderBy</code> (<code>String</code>): Criteria for ordering results</li>
+<li><code>service</code> (<code>String</code>): Service/tenant to use in this operation</li>
+<li><code>servicepath</code> (<code>String</code>): Service path to use in this operation</li>
+<li><code>unique</code> (<code>Boolean</code>): Represent entities as an array of non-repeated
+attribute values.</li>
+<li><code>values</code> (<code>Boolean</code>): Represent entities as an array of attribute
+values</li>
+</ul></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+	<dt class="tag-since method-doc-label method-doc-details-label">Since:</dt>
+	<dd class="tag-since">
+		<ul class="dummy">
+			<li>1.0</li>
+		</ul>
+	</dd>
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise</span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+        <h5>Example</h5>
+        
+        <p class="code-caption">Retrieve first 20 entities from the Context Broker</p>
+    
+    <pre class="prettyprint"><code>connection.v2.batchQuery({
+   "entities": [
+       {
+           "idPattern": ".*",
+           "type": "myFooType"
+       },
+       {
+           "id": "myBar",
+           "type": "myBarType"
+       }
+   ],
+   "attributes": [
+       "temperature",
+       "humidity"
+   ]
+}).then(
+    (response) => {
+        // Entities retrieved successfully
+        // response.correlator transaction id associated with the server response
+        // response.limit contains the used page size
+        // response.results is an array with the retrieved entities
+        // response.offset contains the offset used in the request
+    }, (error) => {
+        // Error retrieving entities
+        // If the error was reported by Orion, error.correlator will be
+        // filled with the associated transaction id
+    }
+);</code></pre>
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id=".%22v2.batchUpdate%22">v2.batchUpdate(changes [, options])</h4>
 </dt>
 <dd>
 
@@ -565,10 +715,6 @@ in a single batch operation.</p>
         <th>Type</th>
 
         
-        <th>Argument</th>
-        
-
-        
 
         <th class="last">Description</th>
     </tr>
@@ -579,7 +725,9 @@ in a single batch operation.</p>
 
         <tr>
             
+                
                 <td class="name"><code>changes</code></td>
+                
             
 
             <td class="type">
@@ -591,18 +739,6 @@ in a single batch operation.</p>
 
             
             </td>
-
-            
-                <td class="attributes">
-                
-
-                
-
-                
-                </td>
-            
-
-            
 
             <td class="description last"></td>
         </tr>
@@ -611,7 +747,9 @@ in a single batch operation.</p>
 
         <tr>
             
-                <td class="name"><code>options</code></td>
+                
+                <td class="name">[<code>options</code>]</td>
+                
             
 
             <td class="type">
@@ -624,25 +762,13 @@ in a single batch operation.</p>
             
             </td>
 
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-
             <td class="description last"><p>Object with extra options:</p>
-<pre class="prettyprint source"><code>- `correlator` (`String`): Transaction id
-- `keyValues` (`Boolean`; default: `false`): Use flat attributes
-- `service` (`String`): Service/tenant to use in this operation
-- `servicepath` (`String`): Service path to use in this operation</code></pre></td>
+<ul>
+<li><code>correlator</code> (<code>String</code>): Transaction id</li>
+<li><code>keyValues</code> (<code>Boolean</code>; default: <code>false</code>): Use flat attributes</li>
+<li><code>service</code> (<code>String</code>): Service/tenant to use in this operation</li>
+<li><code>servicepath</code> (<code>String</code>): Service path to use in this operation</li>
+</ul></td>
         </tr>
 
     
@@ -735,41 +861,40 @@ in a single batch operation.</p>
         
         <p class="code-caption">Basic usage</p>
     
-    <pre class="sunlight-highlight-javascript">connection.v2.batchUpdate({
-   &quot;actionType&quot;: &quot;APPEND&quot;,
-   &quot;entities&quot;: [
+    <pre class="prettyprint"><code>connection.v2.batchUpdate({
+   "actionType": "APPEND",
+   "entities": [
        {
-           &quot;type&quot;: &quot;Room&quot;,
-           &quot;id&quot;: &quot;Bcn-Welt&quot;,
-           &quot;temperature&quot;: {
-               &quot;value&quot;: 21.7
+           "type": "Room",
+           "id": "Bcn-Welt",
+           "temperature": {
+               "value": 21.7
            },
-           &quot;humidity&quot;: {
-               &quot;value&quot;: 60
+           "humidity": {
+               "value": 60
            }
        },
        {
-           &quot;type&quot;: &quot;Room&quot;,
-           &quot;id&quot;: &quot;Mad_Aud&quot;,
-           &quot;temperature&quot;: {
-               &quot;value&quot;: 22.9
+           "type": "Room",
+           "id": "Mad_Aud",
+           "temperature": {
+               "value": 22.9
            },
-           &quot;humidity&quot;: {
-               &quot;value&quot;: 85
+           "humidity": {
+               "value": 85
            }
        }
    ]
 }).then(
-    (response) =&gt; {
+    (response) => {
         // Attributes appended successfully
         // response.correlator transaction id associated with the server response
-    }, (error) =&gt; {
+    }, (error) => {
         // Error appending attributes to the entities
         // If the error was reported by Orion, error.correlator will be
         // filled with the associated transaction id
     }
-);</pre>
-
+);</code></pre>
 
     
 </dd>
@@ -778,9 +903,7 @@ in a single batch operation.</p>
             
 <hr>
 <dt>
-    <h4 class="name" id="createEntity"><span class="type-signature"></span>createEntity(entity [, options])</h4>
-    
-    
+    <h4 class="name" id=".%22v2.createEntity%22">v2.createEntity(entity [, options])</h4>
 </dt>
 <dd>
 
@@ -812,10 +935,6 @@ in a single batch operation.</p>
         <th>Type</th>
 
         
-        <th>Argument</th>
-        
-
-        
 
         <th class="last">Description</th>
     </tr>
@@ -826,7 +945,9 @@ in a single batch operation.</p>
 
         <tr>
             
+                
                 <td class="name"><code>entity</code></td>
+                
             
 
             <td class="type">
@@ -838,18 +959,6 @@ in a single batch operation.</p>
 
             
             </td>
-
-            
-                <td class="attributes">
-                
-
-                
-
-                
-                </td>
-            
-
-            
 
             <td class="description last"><p>values to be used for creating the new entity</p></td>
         </tr>
@@ -858,7 +967,9 @@ in a single batch operation.</p>
 
         <tr>
             
-                <td class="name"><code>options</code></td>
+                
+                <td class="name">[<code>options</code>]</td>
+                
             
 
             <td class="type">
@@ -871,25 +982,13 @@ in a single batch operation.</p>
             
             </td>
 
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-
             <td class="description last"><p>Object with extra options:</p>
-<pre class="prettyprint source"><code>- `correlator` (`String`): Transaction id
-- `keyValues` (`Boolean`; default: `false`): Use flat attributes
-- `service` (`String`): Service/tenant to use in this operation
-- `servicepath` (`String`): Service path to use in this operation</code></pre></td>
+<ul>
+<li><code>correlator</code> (<code>String</code>): Transaction id</li>
+<li><code>keyValues</code> (<code>Boolean</code>; default: <code>false</code>): Use flat attributes</li>
+<li><code>service</code> (<code>String</code>): Service/tenant to use in this operation</li>
+<li><code>servicepath</code> (<code>String</code>): Service path to use in this operation</li>
+</ul></td>
         </tr>
 
     
@@ -982,58 +1081,57 @@ in a single batch operation.</p>
         
         <p class="code-caption">Basic usage</p>
     
-    <pre class="sunlight-highlight-javascript">connection.createEntity({
-    &quot;id&quot;: &quot;Spain-Road-A62&quot;,
-    &quot;type&quot;: &quot;Road&quot;,
-    &quot;name&quot;: {&quot;value&quot;: &quot;A-62&quot;},
-    &quot;alternateName&quot;: {&quot;value&quot;: &quot;E-80&quot;},
-    &quot;description&quot;: {&quot;value&quot;: &quot;Autovía de Castilla&quot;},
-    &quot;roadClass&quot;: {&quot;value&quot;: &quot;motorway&quot;},
-    &quot;length&quot;: {&quot;value&quot;: 355},
-    &quot;refRoadSegment&quot;: {
-        &quot;value&quot;: [
-            &quot;Spain-RoadSegment-A62-0-355-forwards&quot;,
-            &quot;Spain-RoadSegment-A62-0-355-backwards&quot;
+    <pre class="prettyprint"><code>connection.v2.createEntity({
+    "id": "Spain-Road-A62",
+    "type": "Road",
+    "name": {"value": "A-62"},
+    "alternateName": {"value": "E-80"},
+    "description": {"value": "Autovía de Castilla"},
+    "roadClass": {"value": "motorway"},
+    "length": {"value": 355},
+    "refRoadSegment": {
+        "value": [
+            "Spain-RoadSegment-A62-0-355-forwards",
+            "Spain-RoadSegment-A62-0-355-backwards"
         ]
      },
-    &quot;responsible&quot;: {&quot;value&quot;: &quot;Ministerio de Fomento - Gobierno de España&quot;}
+    "responsible": {"value": "Ministerio de Fomento - Gobierno de España"}
 }).then(
-    (response) =&gt; {
+    (response) => {
         // Entity created successfully
         // response.correlator transaction id associated with the server response
-    }, (error) =&gt; {
+    }, (error) => {
         // Error creating the entity
         // If the error was reported by Orion, error.correlator will be
         // filled with the associated transaction id
     }
-);</pre>
+);</code></pre>
 
         <p class="code-caption">Using the keyValues option</p>
     
-    <pre class="sunlight-highlight-javascript">connection.createEntity({
-    &quot;id&quot;: &quot;Spain-Road-A62&quot;,
-    &quot;type&quot;: &quot;Road&quot;,
-    &quot;name&quot;: &quot;A-62&quot;,
-    &quot;alternateName&quot;: &quot;E-80&quot;,
-    &quot;description&quot;: &quot;Autovía de Castilla&quot;,
-    &quot;roadClass&quot;: &quot;motorway&quot;,
-    &quot;length&quot;: 355,
-    &quot;refRoadSegment&quot;: [
-        &quot;Spain-RoadSegment-A62-0-355-forwards&quot;,
-        &quot;Spain-RoadSegment-A62-0-355-backwards&quot;
+    <pre class="prettyprint"><code>connection.v2.createEntity({
+    "id": "Spain-Road-A62",
+    "type": "Road",
+    "name": "A-62",
+    "alternateName": "E-80",
+    "description": "Autovía de Castilla",
+    "roadClass": "motorway",
+    "length": 355,
+    "refRoadSegment": [
+        "Spain-RoadSegment-A62-0-355-forwards",
+        "Spain-RoadSegment-A62-0-355-backwards"
     ],
-    &quot;responsible&quot;: &quot;Ministerio de Fomento - Gobierno de España&quot;
+    "responsible": "Ministerio de Fomento - Gobierno de España"
 }, {keyValues: true}).then(
-    (response) =&gt; {
+    (response) => {
         // Entity created successfully
         // response.correlator transaction id associated with the server response
-    }, (error) =&gt; {
+    }, (error) => {
         // Error creating the entity
         // If the error was reported by Orion, error.correlator will be
         // filled with the associated transaction id
     }
-);</pre>
-
+);</code></pre>
 
     
 </dd>
@@ -1042,9 +1140,7 @@ in a single batch operation.</p>
             
 <hr>
 <dt>
-    <h4 class="name" id="createSubscription"><span class="type-signature"></span>createSubscription(subscription [, options])</h4>
-    
-    
+    <h4 class="name" id=".%22v2.createSubscription%22">v2.createSubscription(subscription [, options])</h4>
 </dt>
 <dd>
 
@@ -1076,10 +1172,6 @@ in a single batch operation.</p>
         <th>Type</th>
 
         
-        <th>Argument</th>
-        
-
-        
 
         <th class="last">Description</th>
     </tr>
@@ -1090,7 +1182,9 @@ in a single batch operation.</p>
 
         <tr>
             
+                
                 <td class="name"><code>subscription</code></td>
+                
             
 
             <td class="type">
@@ -1102,18 +1196,6 @@ in a single batch operation.</p>
 
             
             </td>
-
-            
-                <td class="attributes">
-                
-
-                
-
-                
-                </td>
-            
-
-            
 
             <td class="description last"><p>values to be used for creating it</p></td>
         </tr>
@@ -1122,7 +1204,9 @@ in a single batch operation.</p>
 
         <tr>
             
-                <td class="name"><code>options</code></td>
+                
+                <td class="name">[<code>options</code>]</td>
+                
             
 
             <td class="type">
@@ -1135,24 +1219,12 @@ in a single batch operation.</p>
             
             </td>
 
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-
             <td class="description last"><p>Object with extra options:</p>
-<pre class="prettyprint source"><code>- `correlator` (`String`): Transaction id
-- `service` (`String`): Service/tenant to use in this operation
-- `servicepath` (`String`): Service path to use in this operation</code></pre></td>
+<ul>
+<li><code>correlator</code> (<code>String</code>): Transaction id</li>
+<li><code>service</code> (<code>String</code>): Service/tenant to use in this operation</li>
+<li><code>servicepath</code> (<code>String</code>): Service path to use in this operation</li>
+</ul></td>
         </tr>
 
     
@@ -1245,87 +1317,86 @@ in a single batch operation.</p>
         
         <p class="code-caption">Basic usage</p>
     
-    <pre class="sunlight-highlight-javascript">connection.createSubscription({
-   &quot;description&quot;: &quot;One subscription to rule them all&quot;,
-   &quot;subject&quot;: {
-       &quot;entities&quot;: [
+    <pre class="prettyprint"><code>connection.v2.createSubscription({
+   "description": "One subscription to rule them all",
+   "subject": {
+       "entities": [
            {
-               &quot;idPattern&quot;: &quot;.*&quot;,
-               &quot;type&quot;: &quot;Room&quot;
+               "idPattern": ".*",
+               "type": "Room"
            }
        ],
-       &quot;condition&quot;: {
-           &quot;attrs&quot;: [
-               &quot;temperature&quot;
+       "condition": {
+           "attrs": [
+               "temperature"
            ],
-           &quot;expression&quot;: {
-               &quot;q&quot;: &quot;temperature&gt;40&quot;
+           "expression": {
+               "q": "temperature>40"
            }
        }
    },
-   &quot;notification&quot;: {
-       &quot;http&quot;: {
-           &quot;url&quot;: &quot;http://localhost:1234&quot;
+   "notification": {
+       "http": {
+           "url": "http://localhost:1234"
        },
-       &quot;attrs&quot;: [
-           &quot;temperature&quot;,
-           &quot;humidity&quot;
+       "attrs": [
+           "temperature",
+           "humidity"
        ]
    },
-   &quot;expires&quot;: &quot;2016-04-05T14:00:00.00Z&quot;,
-   &quot;throttling&quot;: 5
+   "expires": "2016-04-05T14:00:00.00Z",
+   "throttling": 5
 }).then(
-    (response) =&gt; {
+    (response) => {
         // Subscription created successfully
         // response.correlator transaction id associated with the server response
-    }, (error) =&gt; {
+    }, (error) => {
         // Error creating the subscription
         // If the error was reported by Orion, error.correlator will be
         // filled with the associated transaction id
     }
-);</pre>
+);</code></pre>
 
         <p class="code-caption">Creating a subscription using a callback</p>
     
-    <pre class="sunlight-highlight-javascript">connection.createSubscription({
-   &quot;description&quot;: &quot;One subscription to rule them all&quot;,
-   &quot;subject&quot;: {
-       &quot;entities&quot;: [
+    <pre class="prettyprint"><code>connection.v2.createSubscription({
+   "description": "One subscription to rule them all",
+   "subject": {
+       "entities": [
            {
-               &quot;idPattern&quot;: &quot;.*&quot;,
-               &quot;type&quot;: &quot;Room&quot;
+               "idPattern": ".*",
+               "type": "Room"
            }
        ],
-       &quot;condition&quot;: {
-           &quot;attrs&quot;: [
-               &quot;temperature&quot;
+       "condition": {
+           "attrs": [
+               "temperature"
            ],
-           &quot;expression&quot;: {
-               &quot;q&quot;: &quot;temperature&gt;40&quot;
+           "expression": {
+               "q": "temperature>40"
            }
        }
    },
-   &quot;notification&quot;: {
-       &quot;callback&quot;: function () {
+   "notification": {
+       "callback": function () {
        },
-       &quot;attrs&quot;: [
-           &quot;temperature&quot;,
-           &quot;humidity&quot;
+       "attrs": [
+           "temperature",
+           "humidity"
        ]
    },
-   &quot;expires&quot;: &quot;2016-04-05T14:00:00.00Z&quot;,
-   &quot;throttling&quot;: 5
+   "expires": "2016-04-05T14:00:00.00Z",
+   "throttling": 5
 }).then(
-    (response) =&gt; {
+    (response) => {
         // Subscription created successfully
         // response.correlator transaction id associated with the server response
-    }, (error) =&gt; {
+    }, (error) => {
         // Error creating the subscription
         // If the error was reported by Orion, error.correlator will be
         // filled with the associated transaction id
     }
-);</pre>
-
+);</code></pre>
 
     
 </dd>
@@ -1334,9 +1405,573 @@ in a single batch operation.</p>
             
 <hr>
 <dt>
-    <h4 class="name" id="getEntity"><span class="type-signature"></span>getEntity(options)</h4>
+    <h4 class="name" id=".%22v2.deleteEntity%22">v2.deleteEntity(options)</h4>
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Removes an entity from the orion context broker server.</p>
+<blockquote>
+<p>This method uses v2 of the FIWARE's NGSI Specification</p>
+</blockquote>
+    </div>
+    
+
+    
+
+    
+
     
     
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                
+                <td class="name"><code>options</code></td>
+                
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+|
+
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            <td class="description last"><p>String with the entity id to remove or an object providing options:</p>
+<ul>
+<li><code>correlator</code> (<code>String</code>): Transaction id</li>
+<li><code>id</code> (<code>String</code>): Id of the entity to remove</li>
+<li><code>service</code> (<code>String</code>): Service/tenant to use in this operation</li>
+<li><code>servicepath</code> (<code>String</code>): Service path to use in this operation</li>
+</ul></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+	<dt class="tag-since method-doc-label method-doc-details-label">Since:</dt>
+	<dd class="tag-since">
+		<ul class="dummy">
+			<li>1.0</li>
+		</ul>
+	</dd>
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise</span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+        <h5>Examples</h5>
+        
+        <p class="code-caption">Remove entity by Id</p>
+    
+    <pre class="prettyprint"><code>connection.v2.deleteEntity("Spain-Road-A62").then(
+    (response) => {
+        // Entity deleted successfully
+        // response.correlator transaction id associated with the server response
+    }, (error) => {
+        // Error deleting the entity
+        // If the error was reported by Orion, error.correlator will be
+        // filled with the associated transaction id
+    }
+);</code></pre>
+
+        <p class="code-caption">Remove entity by Id and type</p>
+    
+    <pre class="prettyprint"><code>connection.v2.deleteEntity({
+    id: "Spain-Road-A62",
+    type: "Road"
+ }).then(
+    (response) => {
+        // Entity deleted successfully
+        // response.correlator transaction id associated with the server response
+    }, (error) => {
+        // Error deleting the entity
+        // If the error was reported by Orion, error.correlator will be
+        // filled with the associated transaction id
+    }
+);</code></pre>
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id=".%22v2.deleteEntityAttribute%22">v2.deleteEntityAttribute(options)</h4>
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Removes a single attribute from an entity stored in the orion context
+broker server.</p>
+<blockquote>
+<p>This method uses v2 of the FIWARE's NGSI Specification</p>
+</blockquote>
+    </div>
+    
+
+    
+
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                
+                <td class="name"><code>options</code></td>
+                
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            <td class="description last"><p>Object providing information about the attribute to remove and any
+extra options:</p>
+<ul>
+<li><code>attribute</code> (<code>String</code>): Name of the attribute to delete</li>
+<li><code>correlator</code> (<code>String</code>): Transaction id</li>
+<li><code>id</code> (<code>String</code>): Id of the entity to modify</li>
+<li><code>service</code> (<code>String</code>): Service/tenant to use in this operation</li>
+<li><code>servicepath</code> (<code>String</code>): Service path to use in this operation</li>
+</ul></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+	<dt class="tag-since method-doc-label method-doc-details-label">Since:</dt>
+	<dd class="tag-since">
+		<ul class="dummy">
+			<li>1.0</li>
+		</ul>
+	</dd>
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise</span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+        <h5>Examples</h5>
+        
+        <p class="code-caption">Remove an attribute from an entity</p>
+    
+    <pre class="prettyprint"><code>connection.v2.deleteEntityAttribute({
+    id: "Bcn_Welt",
+    attribute: "temperature"
+}).then(
+    (response) => {
+        // Entity attribute deleted successfully
+        // response.correlator transaction id associated with the server response
+    }, (error) => {
+        // Error deleting the entity
+        // If the error was reported by Orion, error.correlator will be
+        // filled with the associated transaction id
+    }
+);</code></pre>
+
+        <p class="code-caption">Remove an attribute from an entity indicating the entity type</p>
+    
+    <pre class="prettyprint"><code>connection.v2.deleteEntityAttribute({
+    id: "Bcn_Welt",
+    type: "Room",
+    attribute: "temperature"
+ }).then(
+    (response) => {
+        // Entity attribute deleted successfully
+        // response.correlator transaction id associated with the server response
+    }, (error) => {
+        // Error deleting the entity
+        // If the error was reported by Orion, error.correlator will be
+        // filled with the associated transaction id
+    }
+);</code></pre>
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id=".%22v2.deleteSubscription%22">v2.deleteSubscription(options)</h4>
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Removes a subscription from the orion context broker server.</p>
+<blockquote>
+<p>This method uses v2 of the FIWARE's NGSI Specification</p>
+</blockquote>
+    </div>
+    
+
+    
+
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                
+                <td class="name"><code>options</code></td>
+                
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+|
+
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            <td class="description last"><p>String with the id of the subscription to remove or an object with
+options:</p>
+<ul>
+<li><code>correlator</code> (<code>String</code>): Transaction id</li>
+<li><code>id</code> (<code>String</code>): Id of the subscription to remove</li>
+<li><code>service</code> (<code>String</code>): Service/tenant to use in this operation</li>
+<li><code>servicepath</code> (<code>String</code>): Service path to use in this operation</li>
+</ul></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+	<dt class="tag-since method-doc-label method-doc-details-label">Since:</dt>
+	<dd class="tag-since">
+		<ul class="dummy">
+			<li>1.0</li>
+		</ul>
+	</dd>
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise</span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+        <h5>Example</h5>
+        
+    <pre class="prettyprint"><code>connection.v2.deleteSubscription("57f7787a5f817988e4eb3dda").then(
+    (response) => {
+        // Subscription deleted successfully
+        // response.correlator transaction id associated with the server response
+    }, (error) => {
+        // Error deleting subscription
+        // If the error was reported by Orion, error.correlator will be
+        // filled with the associated transaction id
+    }
+);</code></pre>
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id=".%22v2.getEntity%22">v2.getEntity(options)</h4>
 </dt>
 <dd>
 
@@ -1369,8 +2004,6 @@ in a single batch operation.</p>
 
         
 
-        
-
         <th class="last">Description</th>
     </tr>
     </thead>
@@ -1380,7 +2013,9 @@ in a single batch operation.</p>
 
         <tr>
             
+                
                 <td class="name"><code>options</code></td>
+                
             
 
             <td class="type">
@@ -1396,15 +2031,13 @@ in a single batch operation.</p>
             
             </td>
 
-            
-
-            
-
             <td class="description last"><p>Object with extra options:</p>
-<pre class="prettyprint source"><code>- `correlator` (`String`): Transaction id
-- `keyValues` (`Boolean`; default: `false`): Use flat attributes
-- `service` (`String`): Service/tenant to use in this operation
-- `servicepath` (`String`): Service path to use in this operation</code></pre></td>
+<ul>
+<li><code>correlator</code> (<code>String</code>): Transaction id</li>
+<li><code>keyValues</code> (<code>Boolean</code>; default: <code>false</code>): Use flat attributes</li>
+<li><code>service</code> (<code>String</code>): Service/tenant to use in this operation</li>
+<li><code>servicepath</code> (<code>String</code>): Service path to use in this operation</li>
+</ul></td>
         </tr>
 
     
@@ -1497,36 +2130,35 @@ in a single batch operation.</p>
         
         <p class="code-caption">Basic usage</p>
     
-    <pre class="sunlight-highlight-javascript">connection.getEntity(&quot;Spain-Road-A62&quot;).then(
-    (response) =&gt; {
+    <pre class="prettyprint"><code>connection.v2.getEntity("Spain-Road-A62").then(
+    (response) => {
         // Entity details retrieved successfully
         // response.entity entity details
         // response.correlator transaction id associated with the server response
-    }, (error) =&gt; {
+    }, (error) => {
         // Error retrieving entity
         // If the error was reported by Orion, error.correlator will be
         // filled with the associated transaction id
     }
-);</pre>
+);</code></pre>
 
         <p class="code-caption">Retrieve a typed entity and using the keyValues option</p>
     
-    <pre class="sunlight-highlight-javascript">connection.v2.getEntity({
-    id: &quot;Spain-Road-A62&quot;,
-    type: &quot;Road&quot;,
+    <pre class="prettyprint"><code>connection.v2.getEntity({
+    id: "Spain-Road-A62",
+    type: "Road",
     keyValues: true
 }).then(
-    (response) =&gt; {
+    (response) => {
         // Entity details retrieved successfully
         // response.entity entity details
         // response.correlator transaction id associated with the server response
-    }, (error) =&gt; {
+    }, (error) => {
         // Error retrieving entity
         // If the error was reported by Orion, error.correlator will be
         // filled with the associated transaction id
     }
-);</pre>
-
+);</code></pre>
 
     
 </dd>
@@ -1535,9 +2167,7 @@ in a single batch operation.</p>
             
 <hr>
 <dt>
-    <h4 class="name" id="getEntityAttribute"><span class="type-signature"></span>getEntityAttribute(options)</h4>
-    
-    
+    <h4 class="name" id=".%22v2.getEntityAttribute%22">v2.getEntityAttribute(options)</h4>
 </dt>
 <dd>
 
@@ -1570,8 +2200,6 @@ in a single batch operation.</p>
 
         
 
-        
-
         <th class="last">Description</th>
     </tr>
     </thead>
@@ -1581,7 +2209,9 @@ in a single batch operation.</p>
 
         <tr>
             
+                
                 <td class="name"><code>options</code></td>
+                
             
 
             <td class="type">
@@ -1594,16 +2224,14 @@ in a single batch operation.</p>
             
             </td>
 
-            
-
-            
-
             <td class="description last"><p>Object with options:</p>
-<pre class="prettyprint source"><code>- `attribute` (`String`): Name of the attribute to query
-- `correlator` (`String`): Transaction id
-- `id` (`String`): Id of the entity to query
-- `service` (`String`): Service/tenant to use in this operation
-- `servicepath` (`String`): Service path to use in this operation</code></pre></td>
+<ul>
+<li><code>attribute</code> (<code>String</code>): Name of the attribute to query</li>
+<li><code>correlator</code> (<code>String</code>): Transaction id</li>
+<li><code>id</code> (<code>String</code>): Id of the entity to query</li>
+<li><code>service</code> (<code>String</code>): Service/tenant to use in this operation</li>
+<li><code>servicepath</code> (<code>String</code>): Service path to use in this operation</li>
+</ul></td>
         </tr>
 
     
@@ -1696,39 +2324,38 @@ in a single batch operation.</p>
         
         <p class="code-caption">Basic usage</p>
     
-    <pre class="sunlight-highlight-javascript">connection.getEntityAttribute({
-    id: &quot;Bcn_Welt&quot;,
-    attribute: &quot;temperature&quot;
+    <pre class="prettyprint"><code>connection.v2.getEntityAttribute({
+    id: "Bcn_Welt",
+    attribute: "temperature"
 }).then(
-    (response) =&gt; {
+    (response) => {
         // Entity details retrieved successfully
         // response.entity entity details
         // response.correlator transaction id associated with the server response
-    }, (error) =&gt; {
+    }, (error) => {
         // Error retrieving entity
         // If the error was reported by Orion, error.correlator will be
         // filled with the associated transaction id
     }
-);</pre>
+);</code></pre>
 
         <p class="code-caption">Get entity attribute using the type option</p>
     
-    <pre class="sunlight-highlight-javascript">connection.v2.getEntityAttribute({
-    id: &quot;Bcn_Welt&quot;,
-    type: &quot;Room&quot;,
-    attribute: &quot;temperature&quot;
+    <pre class="prettyprint"><code>connection.v2.getEntityAttribute({
+    id: "Bcn_Welt",
+    type: "Room",
+    attribute: "temperature"
 }).then(
-    (response) =&gt; {
+    (response) => {
         // Entity details retrieved successfully
         // response.entity entity details
         // response.correlator transaction id associated with the server response
-    }, (error) =&gt; {
+    }, (error) => {
         // Error retrieving entity
         // If the error was reported by Orion, error.correlator will be
         // filled with the associated transaction id
     }
-);</pre>
-
+);</code></pre>
 
     
 </dd>
@@ -1737,9 +2364,7 @@ in a single batch operation.</p>
             
 <hr>
 <dt>
-    <h4 class="name" id="getEntityAttributes"><span class="type-signature"></span>getEntityAttributes(options)</h4>
-    
-    
+    <h4 class="name" id=".%22v2.getEntityAttributes%22">v2.getEntityAttributes(options)</h4>
 </dt>
 <dd>
 
@@ -1772,8 +2397,6 @@ in a single batch operation.</p>
 
         
 
-        
-
         <th class="last">Description</th>
     </tr>
     </thead>
@@ -1783,7 +2406,9 @@ in a single batch operation.</p>
 
         <tr>
             
+                
                 <td class="name"><code>options</code></td>
+                
             
 
             <td class="type">
@@ -1799,16 +2424,14 @@ in a single batch operation.</p>
             
             </td>
 
-            
-
-            
-
             <td class="description last"><p>String with the id of the entity to query or an object with extra
-    options:</p>
-<pre class="prettyprint source"><code>- `correlator` (`String`): Transaction id
-- `keyValues` (`Boolean`; default: `false`): Use flat attributes
-- `service` (`String`): Service/tenant to use in this operation
-- `servicepath` (`String`): Service path to use in this operation</code></pre></td>
+options:</p>
+<ul>
+<li><code>correlator</code> (<code>String</code>): Transaction id</li>
+<li><code>keyValues</code> (<code>Boolean</code>; default: <code>false</code>): Use flat attributes</li>
+<li><code>service</code> (<code>String</code>): Service/tenant to use in this operation</li>
+<li><code>servicepath</code> (<code>String</code>): Service path to use in this operation</li>
+</ul></td>
         </tr>
 
     
@@ -1901,36 +2524,35 @@ in a single batch operation.</p>
         
         <p class="code-caption">Basic usage</p>
     
-    <pre class="sunlight-highlight-javascript">connection.getEntityAttributes(&quot;Spain-Road-A62&quot;).then(
-    (response) =&gt; {
+    <pre class="prettyprint"><code>connection.v2.getEntityAttributes("Spain-Road-A62").then(
+    (response) => {
         // Entity attributes retrieved successfully
         // response.attributes entity attributes
         // response.correlator transaction id associated with the server response
-    }, (error) =&gt; {
+    }, (error) => {
         // Error retrieving the attributes of the entity
         // If the error was reported by Orion, error.correlator will be
         // filled with the associated transaction id
     }
-);</pre>
+);</code></pre>
 
         <p class="code-caption">Retrieve a typed entity and using the keyValues option</p>
     
-    <pre class="sunlight-highlight-javascript">connection.v2.getEntityAttributes({
-    id: &quot;Spain-Road-A62&quot;,
-    type: &quot;Road&quot;,
+    <pre class="prettyprint"><code>connection.v2.getEntityAttributes({
+    id: "Spain-Road-A62",
+    type: "Road",
     keyValues: true
 }).then(
-    (response) =&gt; {
+    (response) => {
         // Entity attributes retrieved successfully
         // response.attributes entity attributes
         // response.correlator transaction id associated with the server response
-    }, (error) =&gt; {
+    }, (error) => {
         // Error retrieving the attributes of the entity
         // If the error was reported by Orion, error.correlator will be
         // filled with the associated transaction id
     }
-);</pre>
-
+);</code></pre>
 
     
 </dd>
@@ -1939,9 +2561,7 @@ in a single batch operation.</p>
             
 <hr>
 <dt>
-    <h4 class="name" id="getEntityAttributeValue"><span class="type-signature"></span>getEntityAttributeValue(options)</h4>
-    
-    
+    <h4 class="name" id=".%22v2.getEntityAttributeValue%22">v2.getEntityAttributeValue(options)</h4>
 </dt>
 <dd>
 
@@ -1974,8 +2594,6 @@ in a single batch operation.</p>
 
         
 
-        
-
         <th class="last">Description</th>
     </tr>
     </thead>
@@ -1985,7 +2603,9 @@ in a single batch operation.</p>
 
         <tr>
             
+                
                 <td class="name"><code>options</code></td>
+                
             
 
             <td class="type">
@@ -1998,16 +2618,14 @@ in a single batch operation.</p>
             
             </td>
 
-            
-
-            
-
             <td class="description last"><p>Object with extra options:</p>
-<pre class="prettyprint source"><code>- `attribute` (`String`): Name of the attribute to query
-- `correlator` (`String`): Transaction id
-- `id` (`String`): Id of the entity to query
-- `service` (`String`): Service/tenant to use in this operation
-- `servicepath` (`String`): Service path to use in this operation</code></pre></td>
+<ul>
+<li><code>attribute</code> (<code>String</code>): Name of the attribute to query</li>
+<li><code>correlator</code> (<code>String</code>): Transaction id</li>
+<li><code>id</code> (<code>String</code>): Id of the entity to query</li>
+<li><code>service</code> (<code>String</code>): Service/tenant to use in this operation</li>
+<li><code>servicepath</code> (<code>String</code>): Service path to use in this operation</li>
+</ul></td>
         </tr>
 
     
@@ -2100,39 +2718,38 @@ in a single batch operation.</p>
         
         <p class="code-caption">Basic usage</p>
     
-    <pre class="sunlight-highlight-javascript">connection.getEntityAttributeValue({
-    id: &quot;Bcn_Welt&quot;,
-    attribute: &quot;temperature&quot;
+    <pre class="prettyprint"><code>connection.v2.getEntityAttributeValue({
+    id: "Bcn_Welt",
+    attribute: "temperature"
 }).then(
-    (response) =&gt; {
+    (response) => {
         // Entity value retrieved successfully
         // response.value entity value
         // response.correlator transaction id associated with the server response
-    }, (error) =&gt; {
+    }, (error) => {
         // Error retrieving attribute value
         // If the error was reported by Orion, error.correlator will be
         // filled with the associated transaction id
     }
-);</pre>
+);</code></pre>
 
         <p class="code-caption">Get attribute value from a typed entity</p>
     
-    <pre class="sunlight-highlight-javascript">connection.v2.getEntityAttributeValue({
-    id: &quot;Bcn_Welt&quot;,
-    type: &quot;Room&quot;,
-    attribute: &quot;temperature&quot;
+    <pre class="prettyprint"><code>connection.v2.getEntityAttributeValue({
+    id: "Bcn_Welt",
+    type: "Room",
+    attribute: "temperature"
 }).then(
-    (response) =&gt; {
+    (response) => {
         // Entity value retrieved successfully
         // response.value entity value
         // response.correlator transaction id associated with the server response
-    }, (error) =&gt; {
+    }, (error) => {
         // Error retrieving attribute value
         // If the error was reported by Orion, error.correlator will be
         // filled with the associated transaction id
     }
-);</pre>
-
+);</code></pre>
 
     
 </dd>
@@ -2141,9 +2758,7 @@ in a single batch operation.</p>
             
 <hr>
 <dt>
-    <h4 class="name" id="getSubscription"><span class="type-signature"></span>getSubscription(options)</h4>
-    
-    
+    <h4 class="name" id=".%22v2.getSubscription%22">v2.getSubscription(options)</h4>
 </dt>
 <dd>
 
@@ -2176,8 +2791,6 @@ in a single batch operation.</p>
 
         
 
-        
-
         <th class="last">Description</th>
     </tr>
     </thead>
@@ -2187,7 +2800,9 @@ in a single batch operation.</p>
 
         <tr>
             
+                
                 <td class="name"><code>options</code></td>
+                
             
 
             <td class="type">
@@ -2203,14 +2818,12 @@ in a single batch operation.</p>
             
             </td>
 
-            
-
-            
-
             <td class="description last"><p>Object with extra options:</p>
-<pre class="prettyprint source"><code>- `correlator` (`String`): Transaction id
-- `service` (`String`): Service/tenant to use in this operation
-- `servicepath` (`String`): Service path to use in this operation</code></pre></td>
+<ul>
+<li><code>correlator</code> (<code>String</code>): Transaction id</li>
+<li><code>service</code> (<code>String</code>): Service/tenant to use in this operation</li>
+<li><code>servicepath</code> (<code>String</code>): Service path to use in this operation</li>
+</ul></td>
         </tr>
 
     
@@ -2303,18 +2916,17 @@ in a single batch operation.</p>
         
         <p class="code-caption">Basic usage</p>
     
-    <pre class="sunlight-highlight-javascript">connection.getSubscription(&quot;abcdef&quot;).then(
-    (response) =&gt; {
+    <pre class="prettyprint"><code>connection.v2.getSubscription("abcdef").then(
+    (response) => {
         // Subscription details retrieved successfully
         // response.subscription subscription details
         // response.correlator transaction id associated with the server response
-    }, (error) =&gt; {
+    }, (error) => {
         // Error retrieving subscription
         // If the error was reported by Orion, error.correlator will be
         // filled with the associated transaction id
     }
-);</pre>
-
+);</code></pre>
 
     
 </dd>
@@ -2323,9 +2935,7 @@ in a single batch operation.</p>
             
 <hr>
 <dt>
-    <h4 class="name" id="getType"><span class="type-signature"></span>getType(options)</h4>
-    
-    
+    <h4 class="name" id=".%22v2.getType%22">v2.getType(options)</h4>
 </dt>
 <dd>
 
@@ -2358,8 +2968,6 @@ in a single batch operation.</p>
 
         
 
-        
-
         <th class="last">Description</th>
     </tr>
     </thead>
@@ -2369,7 +2977,9 @@ in a single batch operation.</p>
 
         <tr>
             
+                
                 <td class="name"><code>options</code></td>
+                
             
 
             <td class="type">
@@ -2385,14 +2995,12 @@ in a single batch operation.</p>
             
             </td>
 
-            
-
-            
-
             <td class="description last"><p>Object with extra options:</p>
-<pre class="prettyprint source"><code>- `correlator` (`String`): Transaction id
-- `service` (`String`): Service/tenant to use in this operation
-- `servicepath` (`String`): Service path to use in this operation</code></pre></td>
+<ul>
+<li><code>correlator</code> (<code>String</code>): Transaction id</li>
+<li><code>service</code> (<code>String</code>): Service/tenant to use in this operation</li>
+<li><code>servicepath</code> (<code>String</code>): Service path to use in this operation</li>
+</ul></td>
         </tr>
 
     
@@ -2485,18 +3093,17 @@ in a single batch operation.</p>
         
         <p class="code-caption">Basic usage</p>
     
-    <pre class="sunlight-highlight-javascript">connection.getType(&quot;Room&quot;).then(
-    (response) =&gt; {
+    <pre class="prettyprint"><code>connection.v2.getType("Room").then(
+    (response) => {
         // Type details retrieved successfully
         // response.type type details
         // response.correlator transaction id associated with the server response
-    }, (error) =&gt; {
+    }, (error) => {
         // Error retrieving type
         // If the error was reported by Orion, error.correlator will be
         // filled with the associated transaction id
     }
-);</pre>
-
+);</code></pre>
 
     
 </dd>
@@ -2505,9 +3112,227 @@ in a single batch operation.</p>
             
 <hr>
 <dt>
-    <h4 class="name" id="listSubscriptions"><span class="type-signature"></span>listSubscriptions( [options])</h4>
+    <h4 class="name" id=".%22v2.listEntities%22">v2.listEntities([options])</h4>
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Retrieves the available entities using pagination.</p>
+<blockquote>
+<p>This method uses v2 of the FIWARE's NGSI Specification</p>
+</blockquote>
+    </div>
+    
+
+    
+
+    
+
     
     
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                
+                <td class="name">[<code>options</code>]</td>
+                
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            <td class="description last"><p>Object with extra options:</p>
+<ul>
+<li><code>attrs</code> (<code>String</code>): Comma-separated list of attribute names whose data
+are to be included in the response. The attributes are retrieved in the
+order specified by this parameter. If this parameter is not included,
+the attributes are retrieved in arbitrary order.</li>
+<li><code>correlator</code> (<code>String</code>): Transaction id</li>
+<li><code>count</code> (<code>Boolean</code>; default: <code>false</code>): Request total count</li>
+<li><code>id</code> (<code>String</code>): A comma-separated list of entity ids to retrieve</li>
+<li><code>idPattern</code> (<code>String</code>): A correctly formated regular expression.
+Retrieve entities whose ID matches the regular expression. Incompatible
+with the <code>id</code> option</li>
+<li><code>limit</code> (<code>Number</code>; default: <code>20</code>): This option allow you to specify
+the maximum number of entities you want to receive from the server</li>
+<li><code>offset</code> (<code>Number</code>; default: <code>0</code>): Allows you to skip a given number of
+elements at the beginning</li>
+<li><code>metadata</code> (<code>String</code>): A comma-separated list of metadata names to
+include in the response</li>
+<li><code>mq</code> (<code>String</code>): A query expression for attribute metadata, composed of
+a list of statements separated by semicolons (<code>;</code>)</li>
+<li><code>orderBy</code> (<code>String</code>): Criteria for ordering results</li>
+<li><code>q</code> (<code>String</code>): A query expression, composed of a list of statements
+separated by semicolons (<code>;</code>)</li>
+<li><code>service</code> (<code>String</code>): Service/tenant to use in this operation</li>
+<li><code>servicepath</code> (<code>String</code>): Service path to use in this operation</li>
+<li><code>type</code> (<code>String</code>): A comma-separated list of entity types to retrieve</li>
+<li><code>typePattern</code> (<code>String</code>): A correctly formated regular expression.
+Retrieve entities whose type matches the regular expression.
+Incompatible with the <code>type</code> option.</li>
+<li><code>unique</code> (<code>Boolean</code>): Represent entities as an array of non-repeated
+attribute values.</li>
+<li><code>values</code> (<code>Boolean</code>): Represent entities as an array of attribute
+values</li>
+</ul></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+	<dt class="tag-since method-doc-label method-doc-details-label">Since:</dt>
+	<dd class="tag-since">
+		<ul class="dummy">
+			<li>1.0</li>
+		</ul>
+	</dd>
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise</span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+        <h5>Examples</h5>
+        
+        <p class="code-caption">Retrieve first 20 entities from the Context Broker</p>
+    
+    <pre class="prettyprint"><code>connection.v2.listEntities().then(
+    (response) => {
+        // Entities retrieved successfully
+        // response.correlator transaction id associated with the server response
+        // response.limit contains the used page size
+        // response.results is an array with the retrieved entities
+        // response.offset contains the offset used in the request
+    }, (error) => {
+        // Error retrieving entities
+        // If the error was reported by Orion, error.correlator will be
+        // filled with the associated transaction id
+    }
+);</code></pre>
+
+        <p class="code-caption">Retrieve second page from the Context Broker requesting pagination details</p>
+    
+    <pre class="prettyprint"><code>connection.v2.listEntities({offset: 20, count: true}).then(
+    (response) => {
+        // Entities retrieved successfully
+        // response.results is an array with the retrieved entities
+        // response.correlator transaction id associated with the server response
+        // response.count contains the number of entities
+        // response.offset contains the offset used in the request
+    }, (error) => {
+        // Error retrieving entities
+        // If the error was reported by Orion, error.correlator will be
+        // filled with the associated transaction id
+    }
+);</code></pre>
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id=".%22v2.listSubscriptions%22">v2.listSubscriptions([options])</h4>
 </dt>
 <dd>
 
@@ -2539,10 +3364,6 @@ in a single batch operation.</p>
         <th>Type</th>
 
         
-        <th>Argument</th>
-        
-
-        
 
         <th class="last">Description</th>
     </tr>
@@ -2553,7 +3374,9 @@ in a single batch operation.</p>
 
         <tr>
             
-                <td class="name"><code>options</code></td>
+                
+                <td class="name">[<code>options</code>]</td>
+                
             
 
             <td class="type">
@@ -2566,30 +3389,18 @@ in a single batch operation.</p>
             
             </td>
 
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-
             <td class="description last"><p>Object with extra options:</p>
-<pre class="prettyprint source"><code>- `correlator` (`String`): Transaction id
-- `count` (`Boolean`; default: `false`): request total count
-- `limit` (`Number`; default: `20`): This option allow you to specify
-  the maximum number of subscriptions you want to receive from the
-  server
-- `offset` (`Number`; default: `0`): Allows you to skip a given
-  number of elements at the beginning
-- `service` (`String`): Service/tenant to use in this operation
-- `servicepath` (`String`): Service path to use in this operation</code></pre></td>
+<ul>
+<li><code>correlator</code> (<code>String</code>): Transaction id</li>
+<li><code>count</code> (<code>Boolean</code>; default: <code>false</code>): request total count</li>
+<li><code>limit</code> (<code>Number</code>; default: <code>20</code>): This option allow you to specify
+the maximum number of subscriptions you want to receive from the
+server</li>
+<li><code>offset</code> (<code>Number</code>; default: <code>0</code>): Allows you to skip a given
+number of elements at the beginning</li>
+<li><code>service</code> (<code>String</code>): Service/tenant to use in this operation</li>
+<li><code>servicepath</code> (<code>String</code>): Service path to use in this operation</li>
+</ul></td>
         </tr>
 
     
@@ -2682,34 +3493,33 @@ in a single batch operation.</p>
         
         <p class="code-caption">Retrieve first 20 subscriptions from the Context Broker</p>
     
-    <pre class="sunlight-highlight-javascript">connection.listSubscriptions().then(
-    (response) =&gt; {
+    <pre class="prettyprint"><code>connection.v2.listSubscriptions().then(
+    (response) => {
         // Subscriptions retrieved successfully
         // response.results is an array with the retrieved subscriptions
-    }, (error) =&gt; {
+    }, (error) => {
         // Error retrieving subscriptions
         // If the error was reported by Orion, error.correlator will be
         // filled with the associated transaction id
     }
-);</pre>
+);</code></pre>
 
         <p class="code-caption">Retrieve second page from the Context Broker requesting pagination details</p>
     
-    <pre class="sunlight-highlight-javascript">connection.v2.listSubscriptions({offset: 20, details: true}).then(
-    (response) =&gt; {
+    <pre class="prettyprint"><code>connection.v2.listSubscriptions({offset: 20, details: true}).then(
+    (response) => {
         // Subscriptions retrieved successfully
         // response.correlator transaction id associated with the server response
         // response.limit contains the used page size
         // response.results is an array with the retrieved subscriptions
         // response.count contains the number of available subscriptions
         // response.offset contains the offset used in the request
-    }, (error) =&gt; {
+    }, (error) => {
         // Error retrieving subscriptions
         // If the error was reported by Orion, error.correlator will be
         // filled with the associated transaction id
     }
-);</pre>
-
+);</code></pre>
 
     
 </dd>
@@ -2718,9 +3528,7 @@ in a single batch operation.</p>
             
 <hr>
 <dt>
-    <h4 class="name" id="listTypes"><span class="type-signature"></span>listTypes( [options])</h4>
-    
-    
+    <h4 class="name" id=".%22v2.listTypes%22">v2.listTypes([options])</h4>
 </dt>
 <dd>
 
@@ -2752,10 +3560,6 @@ in a single batch operation.</p>
         <th>Type</th>
 
         
-        <th>Argument</th>
-        
-
-        
 
         <th class="last">Description</th>
     </tr>
@@ -2766,7 +3570,9 @@ in a single batch operation.</p>
 
         <tr>
             
-                <td class="name"><code>options</code></td>
+                
+                <td class="name">[<code>options</code>]</td>
+                
             
 
             <td class="type">
@@ -2779,30 +3585,18 @@ in a single batch operation.</p>
             
             </td>
 
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-
             <td class="description last"><p>Object with extra options:</p>
-<pre class="prettyprint source"><code>- `correlator` (`String`): Transaction id
-- `count` (`Boolean`; default: `false`): request total count
-- `limit` (`Number`; default: `20`): This option allow you to specify
-  the maximum number of subscriptions you want to receive from the
-  server
-- `offset` (`Number`; default: `0`): Allows you to skip a given
-  number of elements at the beginning
-- `service` (`String`): Service/tenant to use in this operation
-- `servicepath` (`String`): Service path to use in this operation</code></pre></td>
+<ul>
+<li><code>correlator</code> (<code>String</code>): Transaction id</li>
+<li><code>count</code> (<code>Boolean</code>; default: <code>false</code>): request total count</li>
+<li><code>limit</code> (<code>Number</code>; default: <code>20</code>): This option allow you to specify
+the maximum number of subscriptions you want to receive from the
+server</li>
+<li><code>offset</code> (<code>Number</code>; default: <code>0</code>): Allows you to skip a given
+number of elements at the beginning</li>
+<li><code>service</code> (<code>String</code>): Service/tenant to use in this operation</li>
+<li><code>servicepath</code> (<code>String</code>): Service path to use in this operation</li>
+</ul></td>
         </tr>
 
     
@@ -2895,34 +3689,33 @@ in a single batch operation.</p>
         
         <p class="code-caption">Retrieve first 20 subscriptions from the Context Broker</p>
     
-    <pre class="sunlight-highlight-javascript">connection.listTypes().then(
-    (response) =&gt; {
+    <pre class="prettyprint"><code>connection.v2.listTypes().then(
+    (response) => {
         // Types retrieved successfully
         // response.results is an array with the retrieved subscriptions
-    }, (error) =&gt; {
+    }, (error) => {
         // Error retrieving available types
         // If the error was reported by Orion, error.correlator will be
         // filled with the associated transaction id
     }
-);</pre>
+);</code></pre>
 
         <p class="code-caption">Retrieve second page from the Context Broker requesting pagination details</p>
     
-    <pre class="sunlight-highlight-javascript">connection.v2.listTypes({offset: 20, count: true}).then(
-    (response) =&gt; {
+    <pre class="prettyprint"><code>connection.v2.listTypes({offset: 20, count: true}).then(
+    (response) => {
         // Types retrieved successfully
         // response.correlator transaction id associated with the server response
         // response.limit contains the used page size
         // response.results is an array with the retrieved subscriptions
         // response.count contains the number of available subscriptions
         // response.offset contains the offset used in the request
-    }, (error) =&gt; {
+    }, (error) => {
         // Error retrieving available types
         // If the error was reported by Orion, error.correlator will be
         // filled with the associated transaction id
     }
-);</pre>
-
+);</code></pre>
 
     
 </dd>
@@ -2931,9 +3724,7 @@ in a single batch operation.</p>
             
 <hr>
 <dt>
-    <h4 class="name" id="replaceEntityAttribute"><span class="type-signature"></span>replaceEntityAttribute(changes [, options])</h4>
-    
-    
+    <h4 class="name" id=".%22v2.replaceEntityAttribute%22">v2.replaceEntityAttribute(changes [, options])</h4>
 </dt>
 <dd>
 
@@ -2965,10 +3756,6 @@ in a single batch operation.</p>
         <th>Type</th>
 
         
-        <th>Argument</th>
-        
-
-        
 
         <th class="last">Description</th>
     </tr>
@@ -2979,7 +3766,9 @@ in a single batch operation.</p>
 
         <tr>
             
+                
                 <td class="name"><code>changes</code></td>
+                
             
 
             <td class="type">
@@ -2991,18 +3780,6 @@ in a single batch operation.</p>
 
             
             </td>
-
-            
-                <td class="attributes">
-                
-
-                
-
-                
-                </td>
-            
-
-            
 
             <td class="description last"><p>Object with the new values for the attribute</p></td>
         </tr>
@@ -3011,7 +3788,9 @@ in a single batch operation.</p>
 
         <tr>
             
-                <td class="name"><code>options</code></td>
+                
+                <td class="name">[<code>options</code>]</td>
+                
             
 
             <td class="type">
@@ -3024,26 +3803,14 @@ in a single batch operation.</p>
             
             </td>
 
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-
             <td class="description last"><p>Object with options:</p>
-<pre class="prettyprint source"><code>- `attribute` (`String`): Name of the attribute to modify
-- `correlator` (`String`): Transaction id
-- `id` (`String`): Id of the entity to modify
-- `service` (`String`): Service/tenant to use in this operation
-- `servicepath` (`String`): Service path to use in this operation</code></pre></td>
+<ul>
+<li><code>attribute</code> (<code>String</code>): Name of the attribute to modify</li>
+<li><code>correlator</code> (<code>String</code>): Transaction id</li>
+<li><code>id</code> (<code>String</code>): Id of the entity to modify</li>
+<li><code>service</code> (<code>String</code>): Service/tenant to use in this operation</li>
+<li><code>servicepath</code> (<code>String</code>): Service path to use in this operation</li>
+</ul></td>
         </tr>
 
     
@@ -3136,52 +3903,51 @@ in a single batch operation.</p>
         
         <p class="code-caption">Basic usage</p>
     
-    <pre class="sunlight-highlight-javascript">connection.replaceEntityAttribute({
+    <pre class="prettyprint"><code>connection.v2.replaceEntityAttribute({
     value: 25,
     metadata: {
-        &quot;unitCode&quot;: {
-            &quot;value&quot;: &quot;CEL&quot;
+        "unitCode": {
+            "value": "CEL"
         }
     }
 }, {
-    id: &quot;Bcn_Welt&quot;,
-    attribute: &quot;temperature&quot;
+    id: "Bcn_Welt",
+    attribute: "temperature"
 }).then(
-    (response) =&gt; {
+    (response) => {
         // Entity attribute replaced successfully
         // response.attribute attribute details
         // response.correlator transaction id associated with the server response
-    }, (error) =&gt; {
+    }, (error) => {
         // Error replacing entity attribute
         // If the error was reported by Orion, error.correlator will be
         // filled with the associated transaction id
     }
-);</pre>
+);</code></pre>
 
         <p class="code-caption">Simple usage</p>
     
-    <pre class="sunlight-highlight-javascript">connection.v2.replaceEntityAttribute({
-    id: &quot;Bcn_Welt&quot;,
-    attribute: &quot;temperature&quot;
+    <pre class="prettyprint"><code>connection.v2.replaceEntityAttribute({
+    id: "Bcn_Welt",
+    attribute: "temperature"
     value: 25,
     metadata: {
-        &quot;unitCode&quot;: {
-            &quot;value&quot;: &quot;CEL&quot;
+        "unitCode": {
+            "value": "CEL"
         }
     }
 }).then(
-    (response) =&gt; {
+    (response) => {
         // Entity attribute replaced successfully
         // response.attribute attribute details
         // response.correlator transaction id associated with the server response
-    }, (error) =&gt; {
+    }, (error) => {
         // Error replacing entity attribute
         // If the error was reported by Orion, error.correlator will be
         // filled with the associated transaction id
         // Entity details retrieved successfully
     }
-);</pre>
-
+);</code></pre>
 
     
 </dd>
@@ -3190,9 +3956,7 @@ in a single batch operation.</p>
             
 <hr>
 <dt>
-    <h4 class="name" id="replaceEntityAttributes"><span class="type-signature"></span>replaceEntityAttributes(entity [, options])</h4>
-    
-    
+    <h4 class="name" id=".%22v2.replaceEntityAttributes%22">v2.replaceEntityAttributes(entity [, options])</h4>
 </dt>
 <dd>
 
@@ -3224,10 +3988,6 @@ in a single batch operation.</p>
         <th>Type</th>
 
         
-        <th>Argument</th>
-        
-
-        
 
         <th class="last">Description</th>
     </tr>
@@ -3238,7 +3998,9 @@ in a single batch operation.</p>
 
         <tr>
             
+                
                 <td class="name"><code>entity</code></td>
+                
             
 
             <td class="type">
@@ -3250,18 +4012,6 @@ in a single batch operation.</p>
 
             
             </td>
-
-            
-                <td class="attributes">
-                
-
-                
-
-                
-                </td>
-            
-
-            
 
             <td class="description last"></td>
         </tr>
@@ -3270,7 +4020,9 @@ in a single batch operation.</p>
 
         <tr>
             
-                <td class="name"><code>options</code></td>
+                
+                <td class="name">[<code>options</code>]</td>
+                
             
 
             <td class="type">
@@ -3283,25 +4035,13 @@ in a single batch operation.</p>
             
             </td>
 
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-
             <td class="description last"><p>Object with extra options:</p>
-<pre class="prettyprint source"><code>- `correlator` (`String`): Transaction id
-- `keyValues` (`Boolean`; default: `false`): Use flat attributes
-- `service` (`String`): Service/tenant to use in this operation
-- `servicepath` (`String`): Service path to use in this operation</code></pre></td>
+<ul>
+<li><code>correlator</code> (<code>String</code>): Transaction id</li>
+<li><code>keyValues</code> (<code>Boolean</code>; default: <code>false</code>): Use flat attributes</li>
+<li><code>service</code> (<code>String</code>): Service/tenant to use in this operation</li>
+<li><code>servicepath</code> (<code>String</code>): Service path to use in this operation</li>
+</ul></td>
         </tr>
 
     
@@ -3394,58 +4134,57 @@ in a single batch operation.</p>
         
         <p class="code-caption">Basic usage</p>
     
-    <pre class="sunlight-highlight-javascript">connection.replaceEntityAttributes({
-    &quot;id&quot;: &quot;Spain-Road-A62&quot;,
-    &quot;type&quot;: &quot;Road&quot;,
-    &quot;name&quot;: {&quot;value&quot;: &quot;A-62&quot;},
-    &quot;alternateName&quot;: {&quot;value&quot;: &quot;E-80&quot;},
-    &quot;description&quot;: {&quot;value&quot;: &quot;Autovía de Castilla&quot;},
-    &quot;roadClass&quot;: {&quot;value&quot;: &quot;motorway&quot;},
-    &quot;length&quot;: {&quot;value&quot;: 355},
-    &quot;refRoadSegment&quot;: {
-        &quot;value&quot;: [
-            &quot;Spain-RoadSegment-A62-0-355-forwards&quot;,
-            &quot;Spain-RoadSegment-A62-0-355-backwards&quot;
+    <pre class="prettyprint"><code>connection.v2.replaceEntityAttributes({
+    "id": "Spain-Road-A62",
+    "type": "Road",
+    "name": {"value": "A-62"},
+    "alternateName": {"value": "E-80"},
+    "description": {"value": "Autovía de Castilla"},
+    "roadClass": {"value": "motorway"},
+    "length": {"value": 355},
+    "refRoadSegment": {
+        "value": [
+            "Spain-RoadSegment-A62-0-355-forwards",
+            "Spain-RoadSegment-A62-0-355-backwards"
         ]
      },
-    &quot;responsible&quot;: {&quot;value&quot;: &quot;Ministerio de Fomento - Gobierno de España&quot;}
+    "responsible": {"value": "Ministerio de Fomento - Gobierno de España"}
 }).then(
-    (response) =&gt; {
+    (response) => {
         // Entity attributes replaced successfully
         // response.correlator transaction id associated with the server response
-    }, (error) =&gt; {
+    }, (error) => {
         // Error replacing the attributes of the entity
         // If the error was reported by Orion, error.correlator will be
         // filled with the associated transaction id
     }
-);</pre>
+);</code></pre>
 
         <p class="code-caption">Using the keyValues option</p>
     
-    <pre class="sunlight-highlight-javascript">connection.v2.replaceEntityAttributes({
-    &quot;id&quot;: &quot;Spain-Road-A62&quot;,
-    &quot;type&quot;: &quot;Road&quot;,
-    &quot;name&quot;: &quot;A-62&quot;,
-    &quot;alternateName&quot;: &quot;E-80&quot;,
-    &quot;description&quot;: &quot;Autovía de Castilla&quot;,
-    &quot;roadClass&quot;: &quot;motorway&quot;,
-    &quot;length&quot;: 355,
-    &quot;refRoadSegment&quot;: [
-        &quot;Spain-RoadSegment-A62-0-355-forwards&quot;,
-        &quot;Spain-RoadSegment-A62-0-355-backwards&quot;
+    <pre class="prettyprint"><code>connection.v2.replaceEntityAttributes({
+    "id": "Spain-Road-A62",
+    "type": "Road",
+    "name": "A-62",
+    "alternateName": "E-80",
+    "description": "Autovía de Castilla",
+    "roadClass": "motorway",
+    "length": 355,
+    "refRoadSegment": [
+        "Spain-RoadSegment-A62-0-355-forwards",
+        "Spain-RoadSegment-A62-0-355-backwards"
     ],
-    &quot;responsible&quot;: &quot;Ministerio de Fomento - Gobierno de España&quot;
+    "responsible": "Ministerio de Fomento - Gobierno de España"
 }, {keyValues: true}).then(
-    (response) =&gt; {
+    (response) => {
         // Entity attributes replaced successfully
         // response.correlator transaction id associated with the server response
-    }, (error) =&gt; {
+    }, (error) => {
         // Error replacing the attributes of the entity
         // If the error was reported by Orion, error.correlator will be
         // filled with the associated transaction id
     }
-);</pre>
-
+);</code></pre>
 
     
 </dd>
@@ -3454,9 +4193,7 @@ in a single batch operation.</p>
             
 <hr>
 <dt>
-    <h4 class="name" id="replaceEntityAttributeValue"><span class="type-signature"></span>replaceEntityAttributeValue(options)</h4>
-    
-    
+    <h4 class="name" id=".%22v2.replaceEntityAttributeValue%22">v2.replaceEntityAttributeValue(options)</h4>
 </dt>
 <dd>
 
@@ -3489,8 +4226,6 @@ in a single batch operation.</p>
 
         
 
-        
-
         <th class="last">Description</th>
     </tr>
     </thead>
@@ -3500,7 +4235,9 @@ in a single batch operation.</p>
 
         <tr>
             
+                
                 <td class="name"><code>options</code></td>
+                
             
 
             <td class="type">
@@ -3513,17 +4250,15 @@ in a single batch operation.</p>
             
             </td>
 
-            
-
-            
-
             <td class="description last"><p>Object with options:</p>
-<pre class="prettyprint source"><code>- `attribute` (`String`): Name of the attribute to query
-- `correlator` (`String`): Transaction id
-- `id` (`String`): Id of the entity to query
-- `service` (`String`): Service/tenant to use in this operation
-- `servicepath` (`String`): Service path to use in this operation
-- `value` (`String`|`Boolean`|`Number`|`Object`|`Array`) new value</code></pre></td>
+<ul>
+<li><code>attribute</code> (<code>String</code>): Name of the attribute to query</li>
+<li><code>correlator</code> (<code>String</code>): Transaction id</li>
+<li><code>id</code> (<code>String</code>): Id of the entity to query</li>
+<li><code>service</code> (<code>String</code>): Service/tenant to use in this operation</li>
+<li><code>servicepath</code> (<code>String</code>): Service path to use in this operation</li>
+<li><code>value</code> (<code>String</code>|<code>Boolean</code>|<code>Number</code>|<code>Object</code>|<code>Array</code>) new value</li>
+</ul></td>
         </tr>
 
     
@@ -3616,41 +4351,40 @@ in a single batch operation.</p>
         
         <p class="code-caption">Basic usage</p>
     
-    <pre class="sunlight-highlight-javascript">connection.replaceEntityAttributeValue({
-    id: &quot;Bcn_Welt&quot;,
-    attribute: &quot;temperature&quot;,
+    <pre class="prettyprint"><code>connection.v2.replaceEntityAttributeValue({
+    id: "Bcn_Welt",
+    attribute: "temperature",
     value: 21
 }).then(
-    (response) =&gt; {
+    (response) => {
         // Entity value replaced successfully
         // response.value entity value
         // response.correlator transaction id associated with the server response
-    }, (error) =&gt; {
+    }, (error) => {
         // Error replacing attribute value
         // If the error was reported by Orion, error.correlator will be
         // filled with the associated transaction id
     }
-);</pre>
+);</code></pre>
 
         <p class="code-caption">Get attribute value from a typed entity</p>
     
-    <pre class="sunlight-highlight-javascript">connection.v2.replaceEntityAttributeValue({
-    id: &quot;Bcn_Welt&quot;,
-    type: &quot;Room&quot;,
-    attribute: &quot;temperature&quot;,
+    <pre class="prettyprint"><code>connection.v2.replaceEntityAttributeValue({
+    id: "Bcn_Welt",
+    type: "Room",
+    attribute: "temperature",
     value: 21
 }).then(
-    (response) =&gt; {
+    (response) => {
         // Entity value replaced successfully
         // response.value entity value
         // response.correlator transaction id associated with the server response
-    }, (error) =&gt; {
+    }, (error) => {
         // Error replacing attribute value
         // If the error was reported by Orion, error.correlator will be
         // filled with the associated transaction id
     }
-);</pre>
-
+);</code></pre>
 
     
 </dd>
@@ -3659,9 +4393,7 @@ in a single batch operation.</p>
             
 <hr>
 <dt>
-    <h4 class="name" id="updateEntityAttributes"><span class="type-signature"></span>updateEntityAttributes(changes [, options])</h4>
-    
-    
+    <h4 class="name" id=".%22v2.updateEntityAttributes%22">v2.updateEntityAttributes(changes [, options])</h4>
 </dt>
 <dd>
 
@@ -3693,10 +4425,6 @@ in a single batch operation.</p>
         <th>Type</th>
 
         
-        <th>Argument</th>
-        
-
-        
 
         <th class="last">Description</th>
     </tr>
@@ -3707,7 +4435,9 @@ in a single batch operation.</p>
 
         <tr>
             
+                
                 <td class="name"><code>changes</code></td>
+                
             
 
             <td class="type">
@@ -3719,18 +4449,6 @@ in a single batch operation.</p>
 
             
             </td>
-
-            
-                <td class="attributes">
-                
-
-                
-
-                
-                </td>
-            
-
-            
 
             <td class="description last"></td>
         </tr>
@@ -3739,7 +4457,9 @@ in a single batch operation.</p>
 
         <tr>
             
-                <td class="name"><code>options</code></td>
+                
+                <td class="name">[<code>options</code>]</td>
+                
             
 
             <td class="type">
@@ -3752,25 +4472,13 @@ in a single batch operation.</p>
             
             </td>
 
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-
             <td class="description last"><p>Object with extra options:</p>
-<pre class="prettyprint source"><code>- `correlator` (`String`): Transaction id
-- `keyValues` (`Boolean`; default: `false`): Use flat attributes
-- `service` (`String`): Service/tenant to use in this operation
-- `servicepath` (`String`): Service path to use in this operation</code></pre></td>
+<ul>
+<li><code>correlator</code> (<code>String</code>): Transaction id</li>
+<li><code>keyValues</code> (<code>Boolean</code>; default: <code>false</code>): Use flat attributes</li>
+<li><code>service</code> (<code>String</code>): Service/tenant to use in this operation</li>
+<li><code>servicepath</code> (<code>String</code>): Service path to use in this operation</li>
+</ul></td>
         </tr>
 
     
@@ -3863,44 +4571,43 @@ in a single batch operation.</p>
         
         <p class="code-caption">Basic attribute update</p>
     
-    <pre class="sunlight-highlight-javascript">connection.v2.appendEntityAttributes({
-    &quot;id&quot;: &quot;sensor&quot;,
-    &quot;temperature&quot;: {
-        &quot;value&quot;: 31.5
+    <pre class="prettyprint"><code>connection.v2.updateEntityAttributes({
+    "id": "sensor",
+    "temperature": {
+        "value": 31.5
     },
-    &quot;humidity&quot;: {
-        &quot;value&quot;: 50.2
+    "humidity": {
+        "value": 50.2
     }
 }).then(
-    (response) =&gt; {
+    (response) => {
         // Attributes updated successfully
         // response.correlator transaction id associated with the server response
-    }, (error) =&gt; {
+    }, (error) => {
         // Error updating the attributes of the entity
         // If the error was reported by Orion, error.correlator will be
         // filled with the associated transaction id
     }
-);</pre>
+);</code></pre>
 
         <p class="code-caption">Update some attributes using the keyValues option</p>
     
-    <pre class="sunlight-highlight-javascript">connection.v2.updateEntityAttributes({
-    &quot;id&quot;: &quot;sensor&quot;,
-    &quot;temperature&quot;: 31.5
-    &quot;humidity&quot;: 50.2
+    <pre class="prettyprint"><code>connection.v2.updateEntityAttributes({
+    "id": "sensor",
+    "temperature": 31.5
+    "humidity": 50.2
 }, {
     keyValues: true
 }).then(
-    (response) =&gt; {
+    (response) => {
         // Attributes updated successfully
         // response.correlator transaction id associated with the server response
-    }, (error) =&gt; {
+    }, (error) => {
         // Error updating the attributes of the entity
         // If the error was reported by Orion, error.correlator will be
         // filled with the associated transaction id
     }
-);</pre>
-
+);</code></pre>
 
     
 </dd>
@@ -3909,9 +4616,7 @@ in a single batch operation.</p>
             
 <hr>
 <dt>
-    <h4 class="name" id="updateSubscription"><span class="type-signature"></span>updateSubscription(changes [, options])</h4>
-    
-    
+    <h4 class="name" id=".%22v2.updateSubscription%22">v2.updateSubscription(changes [, options])</h4>
 </dt>
 <dd>
 
@@ -3943,10 +4648,6 @@ in a single batch operation.</p>
         <th>Type</th>
 
         
-        <th>Argument</th>
-        
-
-        
 
         <th class="last">Description</th>
     </tr>
@@ -3957,7 +4658,9 @@ in a single batch operation.</p>
 
         <tr>
             
+                
                 <td class="name"><code>changes</code></td>
+                
             
 
             <td class="type">
@@ -3969,18 +4672,6 @@ in a single batch operation.</p>
 
             
             </td>
-
-            
-                <td class="attributes">
-                
-
-                
-
-                
-                </td>
-            
-
-            
 
             <td class="description last"></td>
         </tr>
@@ -3989,7 +4680,9 @@ in a single batch operation.</p>
 
         <tr>
             
-                <td class="name"><code>options</code></td>
+                
+                <td class="name">[<code>options</code>]</td>
+                
             
 
             <td class="type">
@@ -4002,24 +4695,12 @@ in a single batch operation.</p>
             
             </td>
 
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-
             <td class="description last"><p>Object with extra options:</p>
-<pre class="prettyprint source"><code>- `correlator` (`String`): Transaction id
-- `service` (`String`): Service/tenant to use in this operation
-- `servicepath` (`String`): Service path to use in this operation</code></pre></td>
+<ul>
+<li><code>correlator</code> (<code>String</code>): Transaction id</li>
+<li><code>service</code> (<code>String</code>): Service/tenant to use in this operation</li>
+<li><code>servicepath</code> (<code>String</code>): Service path to use in this operation</li>
+</ul></td>
         </tr>
 
     
@@ -4112,38 +4793,37 @@ in a single batch operation.</p>
         
         <p class="code-caption">Update subscription expiration time</p>
     
-    <pre class="sunlight-highlight-javascript">connection.v2.updateSubscription({
-    &quot;id&quot;: &quot;abcdef&quot;,
-    &quot;expires&quot;: &quot;2016-04-05T14:00:00.00Z&quot;
+    <pre class="prettyprint"><code>connection.v2.updateSubscription({
+    "id": "abcdef",
+    "expires": "2016-04-05T14:00:00.00Z"
 }).then(
-    (response) =&gt; {
+    (response) => {
         // Subscription updated successfully
         // response.correlator transaction id associated with the server response
-    }, (error) =&gt; {
+    }, (error) => {
         // Error updating subscription
         // If the error was reported by Orion, error.correlator will be
         // filled with the associated transaction id
     }
-);</pre>
+);</code></pre>
 
         <p class="code-caption">Use a custom service path for the update operation</p>
     
-    <pre class="sunlight-highlight-javascript">connection.v2.updateSubscription({
-    &quot;id&quot;: &quot;abcdef&quot;,
-    &quot;expires&quot;: &quot;2016-04-05T14:00:00.00Z&quot;
+    <pre class="prettyprint"><code>connection.v2.updateSubscription({
+    "id": "abcdef",
+    "expires": "2016-04-05T14:00:00.00Z"
 }, {
-    servicepath: &quot;/Spain/Madrid&quot;
+    servicepath: "/Spain/Madrid"
 }).then(
-    (response) =&gt; {
+    (response) => {
         // Subscription updated successfully
         // response.correlator transaction id associated with the server response
-    }, (error) =&gt; {
+    }, (error) => {
         // Error updating subscription
         // If the error was reported by Orion, error.correlator will be
         // filled with the associated transaction id
     }
-);</pre>
-
+);</code></pre>
 
     
 </dd>
@@ -4198,9 +4878,8 @@ in a single batch operation.</p>
 <span class="jsdoc-message">
 	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.3</a>
 	
-		on 2017-02-22T11:10:50+01:00
-	
-	using the <a href="https://github.com/docstrap/docstrap">DocStrap template</a>.
+		on 2017-02-22T18:03:20+01:00
+	.
 </span>
 </footer>
 
@@ -4236,7 +4915,6 @@ $( function () {
 		if ( lang ) {
 
 			$this
-			.addClass( "sunlight-highlight-" + lang )
 			.addClass( "linenums" )
 			.html( example.html() );
 
@@ -4256,7 +4934,7 @@ $( function () {
 		anchorName  : function ( i, heading, prefix ) {
 			return $( heading ).attr( "id" ) || ( prefix + i );
 		},
-		selectors   : "#toc-content h1,#toc-content h2,#toc-content h3,#toc-content h4",
+		selectors   : "#toc-content h1,#toc-content h2,#toc-content h3,#toc-content h4:not(.toc-ignore)",
 		showAndHide : false,
 		smoothScrolling: true
 	} );
@@ -4288,5 +4966,7 @@ $( function () {
     </script>
 
 
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
 </body>
 </html>
