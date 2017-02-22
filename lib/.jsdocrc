@@ -1,4 +1,7 @@
 {
+    "opts": {
+        "template": "./jsdoctemplate"
+    },
     "plugins": [
         "plugins/markdown"
     ]
