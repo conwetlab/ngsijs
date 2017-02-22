@@ -35,21 +35,17 @@
  *
  */
 
+const uuid = require('uuid/v1');
+
 var connections = {};
 var callbacks = {};
 
-var createConnection = function createConnection() {
-    var id_base, id, inc = 2;
-
-    id_base = (new Date()).toLocaleTimeString();
-    id = id_base + "-1";
-    while (id in connections) {
-        id = id_base + "-" + inc++;
-    }
-
+var createConnection = function createConnection(origin) {
+    var id = uuid();
     var connection = {
         id: id,
         client_ip: null,
+        origin: origin,
         reconnection_count: 0,
         response: null,
         callbacks: {}
@@ -61,22 +57,12 @@ var createConnection = function createConnection() {
 };
 
 var createCallback = function createCallback(connection) {
-    var local_id, id_base, id, inc = 2;
-
-    id_base = (new Date()).toLocaleTimeString();
-    local_id = id_base + "-1";
-    while (local_id in connection.callbacks) {
-        local_id = id_base + "-" + inc++;
-    }
-
-    id = connection.id + ':' + local_id;
-    callback_info = connection.callbacks[local_id] = {
+    var id = uuid();
+    callback_info = callbacks[id] = connection.callbacks[id] = {
         id: id,
-        local_id: local_id,
         connection: connection,
         notification_counter: 0
     };
-    callbacks[id] = callback_info;
 
     console.log('Created callback with id: ' + id);
     return callback_info;
@@ -85,7 +71,7 @@ var createCallback = function createCallback(connection) {
 var removeCallback = function removeCallback(id) {
     var callback_info = callbacks[id];
 
-    delete callback_info.connection.callbacks[callback_info.local_id];
+    delete callback_info.connection.callbacks[id];
     delete callbacks[id];
     callback_info.connection = null;
 
@@ -161,16 +147,19 @@ exports.list_eventsources = function list_eventsources(req, res) {
 };
 
 exports.create_eventsource = function create_eventsource(req, res) {
-    var origin, connection = createConnection();
+
+    var origin = req.header('Origin');
+    if (origin == null) {
+        res.send(412);
+    }
+
+    connection = createConnection(origin);
 
     url = build_absolute_url(req, '/eventsource/' + connection.id);
 
     res.header('Cache-Control', 'no-cache');
     res.header('Connection', 'keep-alive');
-    origin = req.header('Origin');
-    if (origin != null) {
-        res.header('Access-Control-Allow-Origin', origin);
-    }
+    res.header('Access-Control-Allow-Origin', origin);
     res.location(url);
     res.send(201, JSON.stringify({
         connection_id: connection.id,
@@ -181,18 +170,21 @@ exports.create_eventsource = function create_eventsource(req, res) {
 exports.eventsource = function eventsource(req, res) {
     var origin, connection = connections[req.params.id];
 
+    origin = req.header('Origin');
+    if (origin == null) {
+        res.send(412);
+    }
+    res.header('Access-Control-Allow-Origin', origin);
+    if (connection == null) {
+        return res.send(404);
+    }
+
+    if (origin !== connection.origin) {
+        return res.send(403);
+    }
     res.header('Cache-Control', 'no-cache');
     res.header('Connection', 'keep-alive');
-    origin = req.header('Origin');
-    if (origin != null) {
-        res.header('Access-Control-Allow-Origin', origin);
-    }
     req.socket.setTimeout(0);
-
-    if (connection == null) {
-        res.send(404);
-        return;
-    }
 
     if (connection.response != null) {
         console.log('A client is currently connected to this eventsource. Closing connection with the old client (' + connection.client_ip + ').');
@@ -225,9 +217,15 @@ exports.eventsource = function eventsource(req, res) {
 exports.delete_eventsource = function delete_eventsource(req, res) {
     var origin, connection = connections[req.params.id];
 
+    origin = req.header('Origin');
+    if (origin != null) {
+        res.header('Access-Control-Allow-Origin', origin);
+    }
     if (connection == null) {
-        res.send(404);
-        return;
+        return res.send(404);
+    }
+    if (origin !== connection.origin) {
+        return res.send(403);
     }
 
     console.log('Deleting subscription ' + req.params.id);
@@ -245,7 +243,7 @@ exports.delete_eventsource = function delete_eventsource(req, res) {
 
     for (var callback_id in connection.callbacks) {
         console.log('Deleting callback ' + callback_id);
-        delete callbacks[connection.id + ':' + callback_id];
+        delete callbacks[callback_id];
     }
 
     res.send(204);
