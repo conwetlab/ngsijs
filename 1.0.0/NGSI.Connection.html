@@ -1,0 +1,4051 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Class: Connection</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Class: Connection</h1>
+
+    
+
+
+
+
+<section>
+
+<header>
+    
+        <h2>
+            <span class="ancestors"><a href="NGSI.html">NGSI</a>.</span>Connection</h2>
+        
+    
+</header>
+
+<article>
+    <div class="container-overview">
+    
+        
+
+    
+
+    <h4 class="name" id="Connection"><span class="type-signature"></span>new Connection<span class="signature">(url, options)</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+<div class="description">
+    <p>Creates a new NGSI Connection.</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>url</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+|
+
+<span class="param-type">URL</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>URL of the context broker</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>options</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="NGSI.js.html">NGSI.js</a>, <a href="NGSI.js.html#line1373">line 1373</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Examples</h5>
+    
+        <p class="code-caption">Basic usage</p>
+    
+    <pre class="prettyprint"><code>var connection = new NGSI.Connection("https://orion.example.com");</code></pre>
+
+        <p class="code-caption">Using the FIWARE Lab's instance</p>
+    
+    <pre class="prettyprint"><code>var connection = new NGSI.Connection("http://orion.lab.fiware.org", {
+    requestHeaders: {
+        "X-Auth-Token": token
+    }
+});</code></pre>
+
+
+
+    
+    </div>
+
+    
+
+    
+
+    
+
+     
+
+    
+
+    
+
+    
+        <h3 class="subsection-title">Methods</h3>
+
+        
+            
+
+    
+
+    <h4 class="name" id="appendEntityAttributes"><span class="type-signature"></span>appendEntityAttributes<span class="signature">(changes, options<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {Promise}</span></h4>
+
+    
+
+
+
+<div class="description">
+    <p>Updates or appends attributes to an entity.</p>
+<blockquote>
+<p>This method uses v2 of the FIWARE's NGSI Specification</p>
+</blockquote>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>changes</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>options</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>Object with extra options:</p>
+<pre class="prettyprint source"><code>- `correlator` (`String`): transaction id
+- `keyValues` (`Boolean`; default: `false`): Use flat attributes
+- `strict` (`Boolean`; default: `false`): Force strict append semantics
+- `service` (`String`): Service/tenant to use in this operation
+- `servicepath` (`String`): Service path to use in this operation</code></pre></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+    <dt class="tag-since">Since:</dt>
+    <dd class="tag-since"><ul class="dummy"><li>1.0</li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="NGSI.js.html">NGSI.js</a>, <a href="NGSI.js.html#line2258">line 2258</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+    <h5>Examples</h5>
+    
+        <p class="code-caption">Append or update the temperature attribute</p>
+    
+    <pre class="prettyprint"><code>connection.v2.appendEntityAttributes({
+    "id": "Bcn-Welt",
+    "temperature": {
+        "value": 31.5
+    }
+}).then(
+    (response) => {
+        // Attributes appended successfully
+        // response.correlator transaction id associated with the server response
+    }, (error) => {
+        // Error appending the attributes to the entity
+        // If the error was reported by Orion, error.correlator will be
+        // filled with the associated transaction id
+    }
+);</code></pre>
+
+        <p class="code-caption">Append the temperature attribute</p>
+    
+    <pre class="prettyprint"><code>connection.v2.appendEntityAttributes({
+    "id": "Bcn-Welt",
+    "temperature": 31.5
+}, {
+    strict: true,
+    keyValues: true
+}).then(
+    (response) => {
+        // Attributes appended successfully
+        // response.correlator transaction id associated with the server response
+    }, (error) => {
+        // Error appending the attributes to the entity
+        // If the error was reported by Orion, error.correlator will be
+        // filled with the associated transaction id
+    }
+);</code></pre>
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="batchUpdate"><span class="type-signature"></span>batchUpdate<span class="signature">(changes, options<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {Promise}</span></h4>
+
+    
+
+
+
+<div class="description">
+    <p>This operation allows to create, update and/or delete several entities
+in a single batch operation.</p>
+<blockquote>
+<p>This method uses v2 of the FIWARE's NGSI Specification</p>
+</blockquote>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>changes</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>options</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>Object with extra options:</p>
+<pre class="prettyprint source"><code>- `correlator` (`String`): Transaction id
+- `keyValues` (`Boolean`; default: `false`): Use flat attributes
+- `service` (`String`): Service/tenant to use in this operation
+- `servicepath` (`String`): Service path to use in this operation</code></pre></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+    <dt class="tag-since">Since:</dt>
+    <dd class="tag-since"><ul class="dummy"><li>1.0</li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="NGSI.js.html">NGSI.js</a>, <a href="NGSI.js.html#line3827">line 3827</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+    <h5>Example</h5>
+    
+        <p class="code-caption">Basic usage</p>
+    
+    <pre class="prettyprint"><code>connection.v2.batchUpdate({
+   "actionType": "APPEND",
+   "entities": [
+       {
+           "type": "Room",
+           "id": "Bcn-Welt",
+           "temperature": {
+               "value": 21.7
+           },
+           "humidity": {
+               "value": 60
+           }
+       },
+       {
+           "type": "Room",
+           "id": "Mad_Aud",
+           "temperature": {
+               "value": 22.9
+           },
+           "humidity": {
+               "value": 85
+           }
+       }
+   ]
+}).then(
+    (response) => {
+        // Attributes appended successfully
+        // response.correlator transaction id associated with the server response
+    }, (error) => {
+        // Error appending attributes to the entities
+        // If the error was reported by Orion, error.correlator will be
+        // filled with the associated transaction id
+    }
+);</code></pre>
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="createEntity"><span class="type-signature"></span>createEntity<span class="signature">(entity, options<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {Promise}</span></h4>
+
+    
+
+
+
+<div class="description">
+    <p>Creates a new entity.</p>
+<blockquote>
+<p>This method uses v2 of the FIWARE's NGSI Specification</p>
+</blockquote>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>entity</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>values to be used for creating the new entity</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>options</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>Object with extra options:</p>
+<pre class="prettyprint source"><code>- `correlator` (`String`): Transaction id
+- `keyValues` (`Boolean`; default: `false`): Use flat attributes
+- `service` (`String`): Service/tenant to use in this operation
+- `servicepath` (`String`): Service path to use in this operation</code></pre></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+    <dt class="tag-since">Since:</dt>
+    <dd class="tag-since"><ul class="dummy"><li>1.0</li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="NGSI.js.html">NGSI.js</a>, <a href="NGSI.js.html#line1954">line 1954</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+    <h5>Examples</h5>
+    
+        <p class="code-caption">Basic usage</p>
+    
+    <pre class="prettyprint"><code>connection.createEntity({
+    "id": "Spain-Road-A62",
+    "type": "Road",
+    "name": {"value": "A-62"},
+    "alternateName": {"value": "E-80"},
+    "description": {"value": "Autovía de Castilla"},
+    "roadClass": {"value": "motorway"},
+    "length": {"value": 355},
+    "refRoadSegment": {
+        "value": [
+            "Spain-RoadSegment-A62-0-355-forwards",
+            "Spain-RoadSegment-A62-0-355-backwards"
+        ]
+     },
+    "responsible": {"value": "Ministerio de Fomento - Gobierno de España"}
+}).then(
+    (response) => {
+        // Entity created successfully
+        // response.correlator transaction id associated with the server response
+    }, (error) => {
+        // Error creating the entity
+        // If the error was reported by Orion, error.correlator will be
+        // filled with the associated transaction id
+    }
+);</code></pre>
+
+        <p class="code-caption">Using the keyValues option</p>
+    
+    <pre class="prettyprint"><code>connection.createEntity({
+    "id": "Spain-Road-A62",
+    "type": "Road",
+    "name": "A-62",
+    "alternateName": "E-80",
+    "description": "Autovía de Castilla",
+    "roadClass": "motorway",
+    "length": 355,
+    "refRoadSegment": [
+        "Spain-RoadSegment-A62-0-355-forwards",
+        "Spain-RoadSegment-A62-0-355-backwards"
+    ],
+    "responsible": "Ministerio de Fomento - Gobierno de España"
+}, {keyValues: true}).then(
+    (response) => {
+        // Entity created successfully
+        // response.correlator transaction id associated with the server response
+    }, (error) => {
+        // Error creating the entity
+        // If the error was reported by Orion, error.correlator will be
+        // filled with the associated transaction id
+    }
+);</code></pre>
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="createSubscription"><span class="type-signature"></span>createSubscription<span class="signature">(subscription, options<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {Promise}</span></h4>
+
+    
+
+
+
+<div class="description">
+    <p>Creates a new subscription.</p>
+<blockquote>
+<p>This method uses v2 of the FIWARE's NGSI Specification</p>
+</blockquote>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>subscription</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>values to be used for creating it</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>options</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>Object with extra options:</p>
+<pre class="prettyprint source"><code>- `correlator` (`String`): Transaction id
+- `service` (`String`): Service/tenant to use in this operation
+- `servicepath` (`String`): Service path to use in this operation</code></pre></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+    <dt class="tag-since">Since:</dt>
+    <dd class="tag-since"><ul class="dummy"><li>1.0</li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="NGSI.js.html">NGSI.js</a>, <a href="NGSI.js.html#line3437">line 3437</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+    <h5>Examples</h5>
+    
+        <p class="code-caption">Basic usage</p>
+    
+    <pre class="prettyprint"><code>connection.createSubscription({
+   "description": "One subscription to rule them all",
+   "subject": {
+       "entities": [
+           {
+               "idPattern": ".*",
+               "type": "Room"
+           }
+       ],
+       "condition": {
+           "attrs": [
+               "temperature"
+           ],
+           "expression": {
+               "q": "temperature>40"
+           }
+       }
+   },
+   "notification": {
+       "http": {
+           "url": "http://localhost:1234"
+       },
+       "attrs": [
+           "temperature",
+           "humidity"
+       ]
+   },
+   "expires": "2016-04-05T14:00:00.00Z",
+   "throttling": 5
+}).then(
+    (response) => {
+        // Subscription created successfully
+        // response.correlator transaction id associated with the server response
+    }, (error) => {
+        // Error creating the subscription
+        // If the error was reported by Orion, error.correlator will be
+        // filled with the associated transaction id
+    }
+);</code></pre>
+
+        <p class="code-caption">Creating a subscription using a callback</p>
+    
+    <pre class="prettyprint"><code>connection.createSubscription({
+   "description": "One subscription to rule them all",
+   "subject": {
+       "entities": [
+           {
+               "idPattern": ".*",
+               "type": "Room"
+           }
+       ],
+       "condition": {
+           "attrs": [
+               "temperature"
+           ],
+           "expression": {
+               "q": "temperature>40"
+           }
+       }
+   },
+   "notification": {
+       "callback": function () {
+       },
+       "attrs": [
+           "temperature",
+           "humidity"
+       ]
+   },
+   "expires": "2016-04-05T14:00:00.00Z",
+   "throttling": 5
+}).then(
+    (response) => {
+        // Subscription created successfully
+        // response.correlator transaction id associated with the server response
+    }, (error) => {
+        // Error creating the subscription
+        // If the error was reported by Orion, error.correlator will be
+        // filled with the associated transaction id
+    }
+);</code></pre>
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="getEntity"><span class="type-signature"></span>getEntity<span class="signature">(options)</span><span class="type-signature"> &rarr; {Promise}</span></h4>
+
+    
+
+
+
+<div class="description">
+    <p>Gets all the details of an entity.</p>
+<blockquote>
+<p>This method uses v2 of the FIWARE's NGSI Specification</p>
+</blockquote>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>options</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+|
+
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Object with extra options:</p>
+<pre class="prettyprint source"><code>- `correlator` (`String`): Transaction id
+- `keyValues` (`Boolean`; default: `false`): Use flat attributes
+- `service` (`String`): Service/tenant to use in this operation
+- `servicepath` (`String`): Service path to use in this operation</code></pre></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+    <dt class="tag-since">Since:</dt>
+    <dd class="tag-since"><ul class="dummy"><li>1.0</li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="NGSI.js.html">NGSI.js</a>, <a href="NGSI.js.html#line2063">line 2063</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+    <h5>Examples</h5>
+    
+        <p class="code-caption">Basic usage</p>
+    
+    <pre class="prettyprint"><code>connection.getEntity("Spain-Road-A62").then(
+    (response) => {
+        // Entity details retrieved successfully
+        // response.entity entity details
+        // response.correlator transaction id associated with the server response
+    }, (error) => {
+        // Error retrieving entity
+        // If the error was reported by Orion, error.correlator will be
+        // filled with the associated transaction id
+    }
+);</code></pre>
+
+        <p class="code-caption">Retrieve a typed entity and using the keyValues option</p>
+    
+    <pre class="prettyprint"><code>connection.v2.getEntity({
+    id: "Spain-Road-A62",
+    type: "Road",
+    keyValues: true
+}).then(
+    (response) => {
+        // Entity details retrieved successfully
+        // response.entity entity details
+        // response.correlator transaction id associated with the server response
+    }, (error) => {
+        // Error retrieving entity
+        // If the error was reported by Orion, error.correlator will be
+        // filled with the associated transaction id
+    }
+);</code></pre>
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="getEntityAttribute"><span class="type-signature"></span>getEntityAttribute<span class="signature">(options)</span><span class="type-signature"> &rarr; {Promise}</span></h4>
+
+    
+
+
+
+<div class="description">
+    <p>Gets the details about an entity attribute.</p>
+<blockquote>
+<p>This method uses v2 of the FIWARE's NGSI Specification</p>
+</blockquote>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>options</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Object with options:</p>
+<pre class="prettyprint source"><code>- `attribute` (`String`): Name of the attribute to query
+- `correlator` (`String`): Transaction id
+- `id` (`String`): Id of the entity to query
+- `service` (`String`): Service/tenant to use in this operation
+- `servicepath` (`String`): Service path to use in this operation</code></pre></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+    <dt class="tag-since">Since:</dt>
+    <dd class="tag-since"><ul class="dummy"><li>1.0</li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="NGSI.js.html">NGSI.js</a>, <a href="NGSI.js.html#line2654">line 2654</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+    <h5>Examples</h5>
+    
+        <p class="code-caption">Basic usage</p>
+    
+    <pre class="prettyprint"><code>connection.getEntityAttribute({
+    id: "Bcn_Welt",
+    attribute: "temperature"
+}).then(
+    (response) => {
+        // Entity details retrieved successfully
+        // response.entity entity details
+        // response.correlator transaction id associated with the server response
+    }, (error) => {
+        // Error retrieving entity
+        // If the error was reported by Orion, error.correlator will be
+        // filled with the associated transaction id
+    }
+);</code></pre>
+
+        <p class="code-caption">Get entity attribute using the type option</p>
+    
+    <pre class="prettyprint"><code>connection.v2.getEntityAttribute({
+    id: "Bcn_Welt",
+    type: "Room",
+    attribute: "temperature"
+}).then(
+    (response) => {
+        // Entity details retrieved successfully
+        // response.entity entity details
+        // response.correlator transaction id associated with the server response
+    }, (error) => {
+        // Error retrieving entity
+        // If the error was reported by Orion, error.correlator will be
+        // filled with the associated transaction id
+    }
+);</code></pre>
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="getEntityAttributes"><span class="type-signature"></span>getEntityAttributes<span class="signature">(options)</span><span class="type-signature"> &rarr; {Promise}</span></h4>
+
+    
+
+
+
+<div class="description">
+    <p>Gets all the attributes of an entity.</p>
+<blockquote>
+<p>This method uses v2 of the FIWARE's NGSI Specification</p>
+</blockquote>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>options</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+|
+
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>String with the id of the entity to query or an object with extra
+    options:</p>
+<pre class="prettyprint source"><code>- `correlator` (`String`): Transaction id
+- `keyValues` (`Boolean`; default: `false`): Use flat attributes
+- `service` (`String`): Service/tenant to use in this operation
+- `servicepath` (`String`): Service path to use in this operation</code></pre></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+    <dt class="tag-since">Since:</dt>
+    <dd class="tag-since"><ul class="dummy"><li>1.0</li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="NGSI.js.html">NGSI.js</a>, <a href="NGSI.js.html#line2160">line 2160</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+    <h5>Examples</h5>
+    
+        <p class="code-caption">Basic usage</p>
+    
+    <pre class="prettyprint"><code>connection.getEntityAttributes("Spain-Road-A62").then(
+    (response) => {
+        // Entity attributes retrieved successfully
+        // response.attributes entity attributes
+        // response.correlator transaction id associated with the server response
+    }, (error) => {
+        // Error retrieving the attributes of the entity
+        // If the error was reported by Orion, error.correlator will be
+        // filled with the associated transaction id
+    }
+);</code></pre>
+
+        <p class="code-caption">Retrieve a typed entity and using the keyValues option</p>
+    
+    <pre class="prettyprint"><code>connection.v2.getEntityAttributes({
+    id: "Spain-Road-A62",
+    type: "Road",
+    keyValues: true
+}).then(
+    (response) => {
+        // Entity attributes retrieved successfully
+        // response.attributes entity attributes
+        // response.correlator transaction id associated with the server response
+    }, (error) => {
+        // Error retrieving the attributes of the entity
+        // If the error was reported by Orion, error.correlator will be
+        // filled with the associated transaction id
+    }
+);</code></pre>
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="getEntityAttributeValue"><span class="type-signature"></span>getEntityAttributeValue<span class="signature">(options)</span><span class="type-signature"> &rarr; {Promise}</span></h4>
+
+    
+
+
+
+<div class="description">
+    <p>Gets the value of an entity attribute.</p>
+<blockquote>
+<p>This method uses v2 of the FIWARE's NGSI Specification</p>
+</blockquote>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>options</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Object with extra options:</p>
+<pre class="prettyprint source"><code>- `attribute` (`String`): Name of the attribute to query
+- `correlator` (`String`): Transaction id
+- `id` (`String`): Id of the entity to query
+- `service` (`String`): Service/tenant to use in this operation
+- `servicepath` (`String`): Service path to use in this operation</code></pre></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+    <dt class="tag-since">Since:</dt>
+    <dd class="tag-since"><ul class="dummy"><li>1.0</li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="NGSI.js.html">NGSI.js</a>, <a href="NGSI.js.html#line2968">line 2968</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+    <h5>Examples</h5>
+    
+        <p class="code-caption">Basic usage</p>
+    
+    <pre class="prettyprint"><code>connection.getEntityAttributeValue({
+    id: "Bcn_Welt",
+    attribute: "temperature"
+}).then(
+    (response) => {
+        // Entity value retrieved successfully
+        // response.value entity value
+        // response.correlator transaction id associated with the server response
+    }, (error) => {
+        // Error retrieving attribute value
+        // If the error was reported by Orion, error.correlator will be
+        // filled with the associated transaction id
+    }
+);</code></pre>
+
+        <p class="code-caption">Get attribute value from a typed entity</p>
+    
+    <pre class="prettyprint"><code>connection.v2.getEntityAttributeValue({
+    id: "Bcn_Welt",
+    type: "Room",
+    attribute: "temperature"
+}).then(
+    (response) => {
+        // Entity value retrieved successfully
+        // response.value entity value
+        // response.correlator transaction id associated with the server response
+    }, (error) => {
+        // Error retrieving attribute value
+        // If the error was reported by Orion, error.correlator will be
+        // filled with the associated transaction id
+    }
+);</code></pre>
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="getSubscription"><span class="type-signature"></span>getSubscription<span class="signature">(options)</span><span class="type-signature"> &rarr; {Promise}</span></h4>
+
+    
+
+
+
+<div class="description">
+    <p>Gets all the details of a subscription.</p>
+<blockquote>
+<p>This method uses v2 of the FIWARE's NGSI Specification</p>
+</blockquote>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>options</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+|
+
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Object with extra options:</p>
+<pre class="prettyprint source"><code>- `correlator` (`String`): Transaction id
+- `service` (`String`): Service/tenant to use in this operation
+- `servicepath` (`String`): Service path to use in this operation</code></pre></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+    <dt class="tag-since">Since:</dt>
+    <dd class="tag-since"><ul class="dummy"><li>1.0</li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="NGSI.js.html">NGSI.js</a>, <a href="NGSI.js.html#line3613">line 3613</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+    <h5>Example</h5>
+    
+        <p class="code-caption">Basic usage</p>
+    
+    <pre class="prettyprint"><code>connection.getSubscription("abcdef").then(
+    (response) => {
+        // Subscription details retrieved successfully
+        // response.subscription subscription details
+        // response.correlator transaction id associated with the server response
+    }, (error) => {
+        // Error retrieving subscription
+        // If the error was reported by Orion, error.correlator will be
+        // filled with the associated transaction id
+    }
+);</code></pre>
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="getType"><span class="type-signature"></span>getType<span class="signature">(options)</span><span class="type-signature"> &rarr; {Promise}</span></h4>
+
+    
+
+
+
+<div class="description">
+    <p>Gets all the details about an entity type.</p>
+<blockquote>
+<p>This method uses v2 of the FIWARE's NGSI Specification</p>
+</blockquote>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>options</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+|
+
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Object with extra options:</p>
+<pre class="prettyprint source"><code>- `correlator` (`String`): Transaction id
+- `service` (`String`): Service/tenant to use in this operation
+- `servicepath` (`String`): Service path to use in this operation</code></pre></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+    <dt class="tag-since">Since:</dt>
+    <dd class="tag-since"><ul class="dummy"><li>1.0</li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="NGSI.js.html">NGSI.js</a>, <a href="NGSI.js.html#line3273">line 3273</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+    <h5>Example</h5>
+    
+        <p class="code-caption">Basic usage</p>
+    
+    <pre class="prettyprint"><code>connection.getType("Room").then(
+    (response) => {
+        // Type details retrieved successfully
+        // response.type type details
+        // response.correlator transaction id associated with the server response
+    }, (error) => {
+        // Error retrieving type
+        // If the error was reported by Orion, error.correlator will be
+        // filled with the associated transaction id
+    }
+);</code></pre>
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="listSubscriptions"><span class="type-signature"></span>listSubscriptions<span class="signature">(options<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {Promise}</span></h4>
+
+    
+
+
+
+<div class="description">
+    <p>Retrieves the available subscriptions (using pagination).</p>
+<blockquote>
+<p>This method uses v2 of the FIWARE's NGSI Specification</p>
+</blockquote>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>options</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>Object with extra options:</p>
+<pre class="prettyprint source"><code>- `correlator` (`String`): Transaction id
+- `count` (`Boolean`; default: `false`): request total count
+- `limit` (`Number`; default: `20`): This option allow you to specify
+  the maximum number of subscriptions you want to receive from the
+  server
+- `offset` (`Number`; default: `0`): Allows you to skip a given
+  number of elements at the beginning
+- `service` (`String`): Service/tenant to use in this operation
+- `servicepath` (`String`): Service path to use in this operation</code></pre></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+    <dt class="tag-since">Since:</dt>
+    <dd class="tag-since"><ul class="dummy"><li>1.0</li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="NGSI.js.html">NGSI.js</a>, <a href="NGSI.js.html#line3342">line 3342</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+    <h5>Examples</h5>
+    
+        <p class="code-caption">Retrieve first 20 subscriptions from the Context Broker</p>
+    
+    <pre class="prettyprint"><code>connection.listSubscriptions().then(
+    (response) => {
+        // Subscriptions retrieved successfully
+        // response.results is an array with the retrieved subscriptions
+    }, (error) => {
+        // Error retrieving subscriptions
+        // If the error was reported by Orion, error.correlator will be
+        // filled with the associated transaction id
+    }
+);</code></pre>
+
+        <p class="code-caption">Retrieve second page from the Context Broker requesting pagination details</p>
+    
+    <pre class="prettyprint"><code>connection.v2.listSubscriptions({offset: 20, details: true}).then(
+    (response) => {
+        // Subscriptions retrieved successfully
+        // response.correlator transaction id associated with the server response
+        // response.limit contains the used page size
+        // response.results is an array with the retrieved subscriptions
+        // response.count contains the number of available subscriptions
+        // response.offset contains the offset used in the request
+    }, (error) => {
+        // Error retrieving subscriptions
+        // If the error was reported by Orion, error.correlator will be
+        // filled with the associated transaction id
+    }
+);</code></pre>
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="listTypes"><span class="type-signature"></span>listTypes<span class="signature">(options<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {Promise}</span></h4>
+
+    
+
+
+
+<div class="description">
+    <p>Retrieves the available types (using pagination).</p>
+<blockquote>
+<p>This method uses v2 of the FIWARE's NGSI Specification</p>
+</blockquote>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>options</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>Object with extra options:</p>
+<pre class="prettyprint source"><code>- `correlator` (`String`): Transaction id
+- `count` (`Boolean`; default: `false`): request total count
+- `limit` (`Number`; default: `20`): This option allow you to specify
+  the maximum number of subscriptions you want to receive from the
+  server
+- `offset` (`Number`; default: `0`): Allows you to skip a given
+  number of elements at the beginning
+- `service` (`String`): Service/tenant to use in this operation
+- `servicepath` (`String`): Service path to use in this operation</code></pre></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+    <dt class="tag-since">Since:</dt>
+    <dd class="tag-since"><ul class="dummy"><li>1.0</li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="NGSI.js.html">NGSI.js</a>, <a href="NGSI.js.html#line3176">line 3176</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+    <h5>Examples</h5>
+    
+        <p class="code-caption">Retrieve first 20 subscriptions from the Context Broker</p>
+    
+    <pre class="prettyprint"><code>connection.listTypes().then(
+    (response) => {
+        // Types retrieved successfully
+        // response.results is an array with the retrieved subscriptions
+    }, (error) => {
+        // Error retrieving available types
+        // If the error was reported by Orion, error.correlator will be
+        // filled with the associated transaction id
+    }
+);</code></pre>
+
+        <p class="code-caption">Retrieve second page from the Context Broker requesting pagination details</p>
+    
+    <pre class="prettyprint"><code>connection.v2.listTypes({offset: 20, count: true}).then(
+    (response) => {
+        // Types retrieved successfully
+        // response.correlator transaction id associated with the server response
+        // response.limit contains the used page size
+        // response.results is an array with the retrieved subscriptions
+        // response.count contains the number of available subscriptions
+        // response.offset contains the offset used in the request
+    }, (error) => {
+        // Error retrieving available types
+        // If the error was reported by Orion, error.correlator will be
+        // filled with the associated transaction id
+    }
+);</code></pre>
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="replaceEntityAttribute"><span class="type-signature"></span>replaceEntityAttribute<span class="signature">(changes, options<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {Promise}</span></h4>
+
+    
+
+
+
+<div class="description">
+    <p>Update the details about an entity attribute.</p>
+<blockquote>
+<p>This method uses v2 of the FIWARE's NGSI Specification</p>
+</blockquote>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>changes</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>Object with the new values for the attribute</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>options</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>Object with options:</p>
+<pre class="prettyprint source"><code>- `attribute` (`String`): Name of the attribute to modify
+- `correlator` (`String`): Transaction id
+- `id` (`String`): Id of the entity to modify
+- `service` (`String`): Service/tenant to use in this operation
+- `servicepath` (`String`): Service path to use in this operation</code></pre></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+    <dt class="tag-since">Since:</dt>
+    <dd class="tag-since"><ul class="dummy"><li>1.0</li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="NGSI.js.html">NGSI.js</a>, <a href="NGSI.js.html#line2756">line 2756</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+    <h5>Examples</h5>
+    
+        <p class="code-caption">Basic usage</p>
+    
+    <pre class="prettyprint"><code>connection.replaceEntityAttribute({
+    value: 25,
+    metadata: {
+        "unitCode": {
+            "value": "CEL"
+        }
+    }
+}, {
+    id: "Bcn_Welt",
+    attribute: "temperature"
+}).then(
+    (response) => {
+        // Entity attribute replaced successfully
+        // response.attribute attribute details
+        // response.correlator transaction id associated with the server response
+    }, (error) => {
+        // Error replacing entity attribute
+        // If the error was reported by Orion, error.correlator will be
+        // filled with the associated transaction id
+    }
+);</code></pre>
+
+        <p class="code-caption">Simple usage</p>
+    
+    <pre class="prettyprint"><code>connection.v2.replaceEntityAttribute({
+    id: "Bcn_Welt",
+    attribute: "temperature"
+    value: 25,
+    metadata: {
+        "unitCode": {
+            "value": "CEL"
+        }
+    }
+}).then(
+    (response) => {
+        // Entity attribute replaced successfully
+        // response.attribute attribute details
+        // response.correlator transaction id associated with the server response
+    }, (error) => {
+        // Error replacing entity attribute
+        // If the error was reported by Orion, error.correlator will be
+        // filled with the associated transaction id
+        // Entity details retrieved successfully
+    }
+);</code></pre>
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="replaceEntityAttributes"><span class="type-signature"></span>replaceEntityAttributes<span class="signature">(entity, options<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {Promise}</span></h4>
+
+    
+
+
+
+<div class="description">
+    <p>Replaces all the attributes associated with a entity.</p>
+<blockquote>
+<p>This method uses v2 of the FIWARE's NGSI Specification</p>
+</blockquote>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>entity</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>options</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>Object with extra options:</p>
+<pre class="prettyprint source"><code>- `correlator` (`String`): Transaction id
+- `keyValues` (`Boolean`; default: `false`): Use flat attributes
+- `service` (`String`): Service/tenant to use in this operation
+- `servicepath` (`String`): Service path to use in this operation</code></pre></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+    <dt class="tag-since">Since:</dt>
+    <dd class="tag-since"><ul class="dummy"><li>1.0</li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="NGSI.js.html">NGSI.js</a>, <a href="NGSI.js.html#line2467">line 2467</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+    <h5>Examples</h5>
+    
+        <p class="code-caption">Basic usage</p>
+    
+    <pre class="prettyprint"><code>connection.replaceEntityAttributes({
+    "id": "Spain-Road-A62",
+    "type": "Road",
+    "name": {"value": "A-62"},
+    "alternateName": {"value": "E-80"},
+    "description": {"value": "Autovía de Castilla"},
+    "roadClass": {"value": "motorway"},
+    "length": {"value": 355},
+    "refRoadSegment": {
+        "value": [
+            "Spain-RoadSegment-A62-0-355-forwards",
+            "Spain-RoadSegment-A62-0-355-backwards"
+        ]
+     },
+    "responsible": {"value": "Ministerio de Fomento - Gobierno de España"}
+}).then(
+    (response) => {
+        // Entity attributes replaced successfully
+        // response.correlator transaction id associated with the server response
+    }, (error) => {
+        // Error replacing the attributes of the entity
+        // If the error was reported by Orion, error.correlator will be
+        // filled with the associated transaction id
+    }
+);</code></pre>
+
+        <p class="code-caption">Using the keyValues option</p>
+    
+    <pre class="prettyprint"><code>connection.v2.replaceEntityAttributes({
+    "id": "Spain-Road-A62",
+    "type": "Road",
+    "name": "A-62",
+    "alternateName": "E-80",
+    "description": "Autovía de Castilla",
+    "roadClass": "motorway",
+    "length": 355,
+    "refRoadSegment": [
+        "Spain-RoadSegment-A62-0-355-forwards",
+        "Spain-RoadSegment-A62-0-355-backwards"
+    ],
+    "responsible": "Ministerio de Fomento - Gobierno de España"
+}, {keyValues: true}).then(
+    (response) => {
+        // Entity attributes replaced successfully
+        // response.correlator transaction id associated with the server response
+    }, (error) => {
+        // Error replacing the attributes of the entity
+        // If the error was reported by Orion, error.correlator will be
+        // filled with the associated transaction id
+    }
+);</code></pre>
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="replaceEntityAttributeValue"><span class="type-signature"></span>replaceEntityAttributeValue<span class="signature">(options)</span><span class="type-signature"> &rarr; {Promise}</span></h4>
+
+    
+
+
+
+<div class="description">
+    <p>Updates the value of an entity attribute.</p>
+<blockquote>
+<p>This method uses v2 of the FIWARE's NGSI Specification</p>
+</blockquote>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>options</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Object with options:</p>
+<pre class="prettyprint source"><code>- `attribute` (`String`): Name of the attribute to query
+- `correlator` (`String`): Transaction id
+- `id` (`String`): Id of the entity to query
+- `service` (`String`): Service/tenant to use in this operation
+- `servicepath` (`String`): Service path to use in this operation
+- `value` (`String`|`Boolean`|`Number`|`Object`|`Array`) new value</code></pre></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+    <dt class="tag-since">Since:</dt>
+    <dd class="tag-since"><ul class="dummy"><li>1.0</li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="NGSI.js.html">NGSI.js</a>, <a href="NGSI.js.html#line3072">line 3072</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+    <h5>Examples</h5>
+    
+        <p class="code-caption">Basic usage</p>
+    
+    <pre class="prettyprint"><code>connection.replaceEntityAttributeValue({
+    id: "Bcn_Welt",
+    attribute: "temperature",
+    value: 21
+}).then(
+    (response) => {
+        // Entity value replaced successfully
+        // response.value entity value
+        // response.correlator transaction id associated with the server response
+    }, (error) => {
+        // Error replacing attribute value
+        // If the error was reported by Orion, error.correlator will be
+        // filled with the associated transaction id
+    }
+);</code></pre>
+
+        <p class="code-caption">Get attribute value from a typed entity</p>
+    
+    <pre class="prettyprint"><code>connection.v2.replaceEntityAttributeValue({
+    id: "Bcn_Welt",
+    type: "Room",
+    attribute: "temperature",
+    value: 21
+}).then(
+    (response) => {
+        // Entity value replaced successfully
+        // response.value entity value
+        // response.correlator transaction id associated with the server response
+    }, (error) => {
+        // Error replacing attribute value
+        // If the error was reported by Orion, error.correlator will be
+        // filled with the associated transaction id
+    }
+);</code></pre>
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="updateEntityAttributes"><span class="type-signature"></span>updateEntityAttributes<span class="signature">(changes, options<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {Promise}</span></h4>
+
+    
+
+
+
+<div class="description">
+    <p>Updates attributes of an entity.</p>
+<blockquote>
+<p>This method uses v2 of the FIWARE's NGSI Specification</p>
+</blockquote>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>changes</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>options</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>Object with extra options:</p>
+<pre class="prettyprint source"><code>- `correlator` (`String`): Transaction id
+- `keyValues` (`Boolean`; default: `false`): Use flat attributes
+- `service` (`String`): Service/tenant to use in this operation
+- `servicepath` (`String`): Service path to use in this operation</code></pre></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+    <dt class="tag-since">Since:</dt>
+    <dd class="tag-since"><ul class="dummy"><li>1.0</li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="NGSI.js.html">NGSI.js</a>, <a href="NGSI.js.html#line2364">line 2364</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+    <h5>Examples</h5>
+    
+        <p class="code-caption">Basic attribute update</p>
+    
+    <pre class="prettyprint"><code>connection.v2.appendEntityAttributes({
+    "id": "sensor",
+    "temperature": {
+        "value": 31.5
+    },
+    "humidity": {
+        "value": 50.2
+    }
+}).then(
+    (response) => {
+        // Attributes updated successfully
+        // response.correlator transaction id associated with the server response
+    }, (error) => {
+        // Error updating the attributes of the entity
+        // If the error was reported by Orion, error.correlator will be
+        // filled with the associated transaction id
+    }
+);</code></pre>
+
+        <p class="code-caption">Update some attributes using the keyValues option</p>
+    
+    <pre class="prettyprint"><code>connection.v2.updateEntityAttributes({
+    "id": "sensor",
+    "temperature": 31.5
+    "humidity": 50.2
+}, {
+    keyValues: true
+}).then(
+    (response) => {
+        // Attributes updated successfully
+        // response.correlator transaction id associated with the server response
+    }, (error) => {
+        // Error updating the attributes of the entity
+        // If the error was reported by Orion, error.correlator will be
+        // filled with the associated transaction id
+    }
+);</code></pre>
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="updateSubscription"><span class="type-signature"></span>updateSubscription<span class="signature">(changes, options<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {Promise}</span></h4>
+
+    
+
+
+
+<div class="description">
+    <p>Updates a subscription.</p>
+<blockquote>
+<p>This method uses v2 of the FIWARE's NGSI Specification</p>
+</blockquote>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>changes</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>options</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>Object with extra options:</p>
+<pre class="prettyprint source"><code>- `correlator` (`String`): Transaction id
+- `service` (`String`): Service/tenant to use in this operation
+- `servicepath` (`String`): Service path to use in this operation</code></pre></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+    <dt class="tag-since">Since:</dt>
+    <dd class="tag-since"><ul class="dummy"><li>1.0</li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="NGSI.js.html">NGSI.js</a>, <a href="NGSI.js.html#line3682">line 3682</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+    <h5>Examples</h5>
+    
+        <p class="code-caption">Update subscription expiration time</p>
+    
+    <pre class="prettyprint"><code>connection.v2.updateSubscription({
+    "id": "abcdef",
+    "expires": "2016-04-05T14:00:00.00Z"
+}).then(
+    (response) => {
+        // Subscription updated successfully
+        // response.correlator transaction id associated with the server response
+    }, (error) => {
+        // Error updating subscription
+        // If the error was reported by Orion, error.correlator will be
+        // filled with the associated transaction id
+    }
+);</code></pre>
+
+        <p class="code-caption">Use a custom service path for the update operation</p>
+    
+    <pre class="prettyprint"><code>connection.v2.updateSubscription({
+    "id": "abcdef",
+    "expires": "2016-04-05T14:00:00.00Z"
+}, {
+    servicepath: "/Spain/Madrid"
+}).then(
+    (response) => {
+        // Subscription updated successfully
+        // response.correlator transaction id associated with the server response
+    }, (error) => {
+        // Error updating subscription
+        // If the error was reported by Orion, error.correlator will be
+        // filled with the associated transaction id
+    }
+);</code></pre>
+
+
+
+        
+    
+
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="NGSI.Connection.html">Connection</a></li><li><a href="NGSI.ConnectionError.html">ConnectionError</a></li><li><a href="NGSI.InvalidRequestError.html">InvalidRequestError</a></li><li><a href="NGSI.InvalidResponseError.html">InvalidResponseError</a></li></ul><h3>Namespaces</h3><ul><li><a href="NGSI.html">NGSI</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.3</a> on Wed Feb 22 2017 11:08:18 GMT+0100 (CET)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
