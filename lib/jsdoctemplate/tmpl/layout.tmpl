@@ -7,8 +7,9 @@
 	<title><?js= this.navOptions.systemName ?> <?js= title ?></title>
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
-    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
-	<link type="text/css" rel="stylesheet" href="styles/site.<?js= this.navOptions.theme ?>.css">
+    <link type="text/css" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css" />
+	<link type="text/css" rel="stylesheet" href="styles/site.<?js= this.navOptions.theme ?>.css" />
 </head>
 
 <body>
@@ -41,7 +42,7 @@
                     <div class="input-group">
                         <input type="text" class="form-control" placeholder="Search" name="q" id="search-input">
                         <div class="input-group-btn">
-                            <button class="btn btn-default" id="search-submit"><i class="glyphicon glyphicon-search"></i></button>
+                            <button class="btn btn-default" id="search-submit"><i class="fa fa-search"></i></button>
                         </div>
                     </div>
                 </form>
@@ -162,7 +163,7 @@ $( function () {
 		anchorName  : function ( i, heading, prefix ) {
 			return $( heading ).attr( "id" ) || ( prefix + i );
 		},
-		selectors   : "#toc-content h1,#toc-content h2,#toc-content h3,#toc-content h4:not(.toc-ignore)",
+		selectors   : "#toc-content h1,#toc-content h2:not(.toc-ignore),#toc-content h3:not(.toc-ignore),#toc-content h4:not(.toc-ignore)",
 		showAndHide : false,
 		smoothScrolling: true
 	} );

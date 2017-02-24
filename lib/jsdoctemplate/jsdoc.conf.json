@@ -22,7 +22,9 @@
     "methodHeadingReturns": false
   },
   "markdown": {
-    "parser": "gfm",
-    "hardwrap": true
+    "markdown": {
+        "tags": ["example"]
+    },
+    "parser": "gfm"
   }
 }
