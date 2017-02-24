@@ -11,8 +11,9 @@ capabilities to widgets and operators. However, this library has also be
 designed to be used in other environments as normal web pages and
 clients/servers running on Node.js.
 
-This library has been developed following the
-[FIWARE NGSI v2 Specification](http://fiware.github.io/specifications/ngsiv2/stable/)
+This library has been developed following the FIWARE
+[NGSI v1](http://telefonicaid.github.io/fiware-orion/api/v1/) and
+[NGSI v2](http://fiware.github.io/specifications/ngsiv2/stable/) specifications
 and has been tested to work against version 0.26.0+ of the Orion Context Broker.
 
 
