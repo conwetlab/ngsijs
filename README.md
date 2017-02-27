@@ -1,6 +1,10 @@
 ngsijs
 ======
 
+[![License](https://img.shields.io/badge/license-AGPLv3+%20with%20classpath--like%20exception-blue.svg)](LICENSE)
+[![Build Status](https://build.conwet.etsiinf.upm.es/jenkins/job/wirecloud-ngsijs/badge/icon)](https://build.conwet.etsiinf.upm.es/jenkins/job/wirecloud-ngsijs/)
+[![Coverage Status](https://coveralls.io/repos/github/conwetlab/ngsijs/badge.svg?branch=master)](https://coveralls.io/github/conwetlab/ngsijs?branch=master)
+
 Ngsijs is the JavaScript library used by
 [WireCloud](https://github.com/Wirecloud/wirecloud) for adding FIWARE NGSI
 capabilities to widgets and operators. However, this library has also be
