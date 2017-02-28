@@ -30,7 +30,7 @@ Just include a `<script>` element linking to the `NGSI.min.js` file:
 Once added the `<script>` element, you will be able to use all the features
 provided by the ngsijs library except receiving notifications. To be able to
 receive notifications inside a web browser the library requires the use of a
-ngsi-proxy server.
+[ngsi-proxy](https://github.com/conwetlab/ngsi-proxy) server.
 
 
 Using ngsijs from Node.js

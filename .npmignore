@@ -1,8 +1,13 @@
 build/
+dist/
+helpers/
+jsdoctemplate/
+ngsi-proxy/
 notifications/
 responses/
-helpers/
+tests/
 .*
+*.tgz
 Gruntfile.js
 tests.js
 eventsource.js
