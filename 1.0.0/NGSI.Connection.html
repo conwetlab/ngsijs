@@ -7,8 +7,9 @@
 	<title>Documentation Class: Connection</title>
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
-    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
-	<link type="text/css" rel="stylesheet" href="styles/site.simplex.css">
+    <link type="text/css" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css" />
+	<link type="text/css" rel="stylesheet" href="styles/site.cosmo.css" />
 </head>
 
 <body>
@@ -47,7 +48,7 @@
                     <div class="input-group">
                         <input type="text" class="form-control" placeholder="Search" name="q" id="search-input">
                         <div class="input-group-btn">
-                            <button class="btn btn-default" id="search-submit"><i class="glyphicon glyphicon-search"></i></button>
+                            <button class="btn btn-default" id="search-submit"><i class="fa fa-search"></i></button>
                         </div>
                     </div>
                 </form>
@@ -82,7 +83,7 @@
         
 <hr>
 <dt>
-    <h4 class="name toc-ignore" id="Connection">new <a href="NGSI.html">NGSI</a>.Connection(url, options)</h4>
+    <h3 class="name toc-ignore" id="Connection">new <a href="NGSI.html">NGSI</a>.Connection(url, options)</h3>
 </dt>
 <dd>
 
@@ -256,13 +257,3136 @@
     
 
     
-        <h3 class="subsection-title">Methods</h3>
+        <h2 class="subsection-title">Methods</h2>
 
         <dl>
             
 <hr>
 <dt>
-    <h4 class="name" id=".%22v2.appendEntityAttributes%22">v2.appendEntityAttributes(changes [, options])</h4>
+    <h3 class="name" id=".%22v1.addAttributes%22">v1.addAttributes(toAdd [, options])</h3>
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Adds or updates entity attributes. This operation will create attributes
+and entities.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                
+                <td class="name"><code>toAdd</code></td>
+                
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Array</span>
+
+
+
+            
+            </td>
+
+            <td class="description last"><p>attribute additions</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                
+                <td class="name">[<code>options</code>]</td>
+                
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            <td class="description last"><ul>
+<li><code>onSuccess</code>: callback called if the request finishes successfully</li>
+<li><code>onFailure</code>: callback called if the request finishes with errors</li>
+<li><code>onComplete</code>: callback called regardless of whether the request is
+successful or not</li>
+</ul></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <h5>Example</h5>
+        
+    <pre class="prettyprint"><code>connection.v1.addAttributes([
+        {
+            'entity': {type: 'Technician', id: 'entity1'},
+            'attributes': [
+                {'name': 'new_attribute', 'type': 'string', 'contextValue': 'value'}
+            ]
+        }
+    ], {
+        onSuccess: function (data, partial_errors) {
+        }
+    }
+);</code></pre>
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h3 class="name" id=".%22v1.cancelAvailabilitySubscription%22">v1.cancelAvailabilitySubscription(subId [, callbacks])</h3>
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Cancels an existing context availability subscription.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                
+                <td class="name"><code>subId</code></td>
+                
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+
+            
+            </td>
+
+            <td class="description last"><p>id of the subscription to cancel</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                
+                <td class="name">[<code>callbacks</code>]</td>
+                
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            <td class="description last"><ul>
+<li><code>onSuccess</code>: callback called if the request finishes successfully</li>
+<li><code>onFailure</code>: callback called if the request finishes with errors</li>
+<li><code>onComplete</code>: callback called regardless of whether the request is
+successful or not</li>
+</ul></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h3 class="name" id=".%22v1.cancelSubscription%22">v1.cancelSubscription(subId [, options])</h3>
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Cancels a context subscription</p>
+    </div>
+    
+
+    
+
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                
+                <td class="name"><code>subId</code></td>
+                
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+
+            
+            </td>
+
+            <td class="description last"><p>id of the context subscription to cancel</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                
+                <td class="name">[<code>options</code>]</td>
+                
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            <td class="description last"><ul>
+<li><code>onSuccess</code>: callback called if the request finishes successfully</li>
+<li><code>onFailure</code>: callback called if the request finishes with errors</li>
+<li><code>onComplete</code>: callback called regardless of whether the request is
+successful or not</li>
+</ul></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <h5>Example</h5>
+        
+    <pre class="prettyprint"><code>connection.v1.cancelSubscription('sub1',
+    {
+        onSuccess: function (data) {
+            // Subscription canceled successfully
+            // data.subscriptionId should be equal to 'sub1'
+        }
+    }
+);</code></pre>
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h3 class="name" id=".%22v1.createAvailabilitySubscription%22">v1.createAvailabilitySubscription(entities, attributeNames, duration, restriction [, options])</h3>
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Creates a subscription about context availability.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                
+                <td class="name"><code>entities</code></td>
+                
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Array</span>
+
+
+
+            
+            </td>
+
+            <td class="description last"><p>the list of <strong>Entities</strong> that are going to be queried</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                
+                <td class="name"><code>attributeNames</code></td>
+                
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Array</span>
+
+
+
+            
+            </td>
+
+            <td class="description last"><p>list of attribute names to query. Use <code>null</code> for retrieving all the attributes</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                
+                <td class="name"><code>duration</code></td>
+                
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+
+            
+            </td>
+
+            <td class="description last"><p>time interval during which the registration will be active, using as
+reference the current time. String following the format defined at
+http://books.xmlschemata.org/relaxng/ch19-77073.html.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                
+                <td class="name"><code>restriction</code></td>
+                
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                
+                <td class="name">[<code>options</code>]</td>
+                
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            <td class="description last"><ul>
+<li><code>onNotify</code>: URL of the service or callback function to be used for
+notifying updates in the context availability</li>
+<li><code>onSuccess</code>: callback called if the request finishes successfully</li>
+<li><code>onFailure</code>: callback called if the request finishes with errors</li>
+<li><code>onComplete</code>: callback called regardless of whether the request is
+successful or not</li>
+</ul></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h3 class="name" id=".%22v1.createRegistration%22">v1.createRegistration(entities, attributes, duration, providingApplication [, callbacks])</h3>
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Registers context information (entities and attributes) into the NGSI
+server.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                
+                <td class="name"><code>entities</code></td>
+                
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Array</span>
+
+
+
+            
+            </td>
+
+            <td class="description last"><p>the list of entities that are going to be registered</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                
+                <td class="name"><code>attributes</code></td>
+                
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Array</span>
+
+
+
+            
+            </td>
+
+            <td class="description last"><p>the list of attributes that are going to be assigned to
+the entities</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                
+                <td class="name"><code>duration</code></td>
+                
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+
+            
+            </td>
+
+            <td class="description last"><p>time interval during which the registration will be active, using as
+reference the current time. String following the format defined at
+http://books.xmlschemata.org/relaxng/ch19-77073.html.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                
+                <td class="name"><code>providingApplication</code></td>
+                
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+
+            
+            </td>
+
+            <td class="description last"><p>the URI of the application to which this registration will belongs to</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                
+                <td class="name">[<code>callbacks</code>]</td>
+                
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            <td class="description last"><ul>
+<li><code>onSuccess</code>: callback called if the request finishes successfully</li>
+<li><code>onFailure</code>: callback called if the request finishes with errors</li>
+<li><code>onComplete</code>: callback called regardless of whether the request is
+successful or not</li>
+</ul></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <h5>Example</h5>
+        
+    <pre class="prettyprint"><code>connection.v1.createRegistration([
+        {type: 'Technician', id: 'entity1'}
+    ], [
+        {name: 'attr1', type: 'string'},
+        {name: 'attr2'},
+        {name: 'attr3', type: 'number'}
+    ],
+    'PT24H',
+    'http://app.example.com/',
+    {
+        onSuccess: function (data) {
+            //data.subscriptionId
+        }
+    }
+);</code></pre>
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h3 class="name" id=".%22v1.createSubscription%22">v1.createSubscription(entities, attributeNames, duration, throttling, cond [, options])</h3>
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Creates a context information subscription.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                
+                <td class="name"><code>entities</code></td>
+                
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Array</span>
+
+
+
+            
+            </td>
+
+            <td class="description last"><p>the list of <strong>Entities</strong> that are going to be queried</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                
+                <td class="name"><code>attributeNames</code></td>
+                
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Array</span>
+
+
+
+            
+            </td>
+
+            <td class="description last"><p>list of attribute names to query. Use <code>null</code> for retrieving all the attributes</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                
+                <td class="name"><code>duration</code></td>
+                
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+
+            
+            </td>
+
+            <td class="description last"><p>time interval during which the registration will be active, using as
+reference the current time. String following the format defined at
+http://books.xmlschemata.org/relaxng/ch19-77073.html.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                
+                <td class="name"><code>throttling</code></td>
+                
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+
+            
+            </td>
+
+            <td class="description last"><p>minimal period of time in seconds which must elapse between two
+consecutive notifications. String following the format defined at
+http://books.xmlschemata.org/relaxng/ch19-77073.html.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                
+                <td class="name"><code>cond</code></td>
+                
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Array</span>
+
+
+
+            
+            </td>
+
+            <td class="description last"><p>declare the condition or conditions that will trigger notifications.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                
+                <td class="name">[<code>options</code>]</td>
+                
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            <td class="description last"><ul>
+<li><code>onNotify</code>: URL of the service or callback function to be used for
+notifying updates in the context availability</li>
+<li><code>onSuccess</code>: callback called if the request finishes successfully</li>
+<li><code>onFailure</code>: callback called if the request finishes with errors</li>
+<li><code>onComplete</code>: callback called regardless of whether the request is
+successful or not</li>
+</ul></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <h5>Example</h5>
+        
+    <pre class="prettyprint"><code>connection.v1.createSubscription([
+        {type: 'Technician', id: 'tech*', isPattern: true},
+        {type: 'Van', id: 'van1'},
+    ],
+    null,
+    'PT24H',
+    null,
+    [{type: 'ONCHANGE', condValues: ['position']}],
+    {
+        onNotify: function (data) {
+            // called when a notification arrives
+        },
+        onSuccess: function (data) {
+            // subscription created successfully
+            // data.subscriptionId contains the id associated with the created subscription
+        }
+    }
+);</code></pre>
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h3 class="name" id=".%22v1.deleteAttributes%22">v1.deleteAttributes(toDelete [, callbacks])</h3>
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Deletes attributes form entities. This method also removes entities from
+the context broker server.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                
+                <td class="name"><code>toDelete</code></td>
+                
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Array</span>
+
+
+
+            
+            </td>
+
+            <td class="description last"><p>attributes to remove</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                
+                <td class="name">[<code>callbacks</code>]</td>
+                
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            <td class="description last"><ul>
+<li><code>onSuccess</code>: callback called if the request finishes successfully</li>
+<li><code>onFailure</code>: callback called if the request finishes with errors</li>
+<li><code>onComplete</code>: callback called regardless of whether the request is
+successful or not</li>
+</ul></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <h5>Examples</h5>
+        
+        <p class="code-caption">Removing the `position` attribute from the `Madrid` entity</p>
+    
+    <pre class="prettyprint"><code>connection.v1.deleteAttributes([
+        {
+            'entity': {type: 'City', id: 'Madrid'},
+            'attributes': {
+                'name': 'position',
+                'type': 'coords'
+            }
+        }
+    ], {
+        onSuccess: function (data, partial_errors) {
+        }
+    }
+);</code></pre>
+
+        <p class="code-caption">Removing `Madrid` from the context broker</p>
+    
+    <pre class="prettyprint"><code>**
+
+connection.v1.deleteAttributes([
+        {
+            'entity': {type: 'City', id: 'Madrid'}
+        }
+    ], {
+        onSuccess: function (data, partial_errors) {
+        }
+    }
+);</code></pre>
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h3 class="name" id=".%22v1.discoverAvailability%22">v1.discoverAvailability(entities, attributeNames [, callbacks])</h3>
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Discovers context information registrations on the NGSI server.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                
+                <td class="name"><code>entities</code></td>
+                
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Array</span>
+
+
+
+            
+            </td>
+
+            <td class="description last"><p>the list of <strong>Entities</strong> that are going to be queried</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                
+                <td class="name"><code>attributeNames</code></td>
+                
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Array</span>
+
+
+
+            
+            </td>
+
+            <td class="description last"><p>list of attribute names to query. Use <code>null</code> for retrieving all the attributes</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                
+                <td class="name">[<code>callbacks</code>]</td>
+                
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            <td class="description last"><ul>
+<li><code>onSuccess</code>: callback called if the request finishes successfully</li>
+<li><code>onFailure</code>: callback called if the request finishes with errors</li>
+<li><code>onComplete</code>: callback called regardless of whether the request is
+successful or not</li>
+</ul></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <h5>Example</h5>
+        
+    <pre class="prettyprint"><code>connection.v1.discoverAvailability([
+        {type: 'Technician', id: 'entity1'},
+        {type: 'Van', id: '.*', isPattern: true},
+    ],
+    null,
+    {
+        onSuccess: function (registrations) {
+            ...
+        }
+    }
+);</code></pre>
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h3 class="name" id=".%22v1.getAvailableTypes%22">v1.getAvailableTypes([options])</h3>
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Gets info about about the used context types. This information is
+currently composed of the type name and the attributes used with that
+type (the attribute set returned by this operation is the union of the
+attributes used in each of the entities belonging to that type).</p>
+    </div>
+    
+
+    
+
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                
+                <td class="name">[<code>options</code>]</td>
+                
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            <td class="description last"><ul>
+<li><code>details</code> (<code>Boolean</code>; default: <code>true</code>): Request total count</li>
+<li><code>limit</code> (<code>Number</code>; default: <code>20</code>): This option allow you to specify
+the maximum number of entities you want to receive from the server</li>
+<li><code>offset</code> (<code>Number</code>; default: <code>0</code>): Allows you to skip a given number of
+elements at the beginning</li>
+<li><code>onSuccess</code>: callback called if the request finishes successfully</li>
+<li><code>onFailure</code>: callback called if the request finishes with errors</li>
+<li><code>onComplete</code>: callback called regardless of whether the request is
+successful or not</li>
+</ul></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <h5>Example</h5>
+        
+    <pre class="prettyprint"><code>connection.v1.getAvailableTypes({
+    onSuccess: function (types, details) {
+        // The types parameter contains the information
+        // about the available types, see next slide for
+        // more info
+    }
+});</code></pre>
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h3 class="name" id=".%22v1.getTypeInfo%22">v1.getTypeInfo(type, options)</h3>
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Gets info about about a concrete entity type. This information is
+currently composed of the type name and the attributes used with that
+type (the attribute set returned by this operation is the union of the
+attributes used in each of the entities belonging to that type).</p>
+    </div>
+    
+
+    
+
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                
+                <td class="name"><code>type</code></td>
+                
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+
+            
+            </td>
+
+            <td class="description last"><p>Name of the type to query about</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                
+                <td class="name"><code>options</code></td>
+                
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            <td class="description last"><ul>
+<li><code>onSuccess</code>: callback called if the request finishes successfully</li>
+<li><code>onFailure</code>: callback called if the request finishes with errors</li>
+<li><code>onComplete</code>: callback called regardless of whether the request is
+successful or not</li>
+</ul></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <h5>Example</h5>
+        
+    <pre class="prettyprint"><code>connection.v1.getTypeInfo("Room", {
+    onSuccess: function (type_info) {
+        // The type_info parameter contains the information
+        // about the Room type, see next slide for more info
+    }
+});</code></pre>
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h3 class="name" id=".%22v1.query%22">v1.query(Entities, attributeNames, options)</h3>
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Query for context information. That information is returned using pagination
+(see supported options), so its very recommended the use of the <code>details</code>
+option.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                
+                <td class="name"><code>Entities</code></td>
+                
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Array</span>
+
+
+
+            
+            </td>
+
+            <td class="description last"><p>list of <strong>Entities</strong> to query</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                
+                <td class="name"><code>attributeNames</code></td>
+                
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Array</span>
+
+
+
+            
+            </td>
+
+            <td class="description last"><p>list of attribute names to query. Use <code>null</code> for retrieving all the attributes</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                
+                <td class="name"><code>options</code></td>
+                
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            <td class="description last"><ul>
+<li><code>details</code> (<code>Boolean</code>; default: <code>false</code>): Request total count</li>
+<li><code>limit</code> (<code>Number</code>; default: <code>20</code>): This option allow you to specify
+the maximum number of entities you want to receive from the server</li>
+<li><code>offset</code> (<code>Number</code>; default: <code>0</code>): Allows you to skip a given number of
+elements at the beginning</li>
+<li><code>onSuccess</code>: callback called if the request finishes successfully</li>
+<li><code>onFailure</code>: callback called if the request finishes with errors</li>
+<li><code>onComplete</code>: callback called regardless of whether the request is
+successful or not</li>
+</ul></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <h5>Example</h5>
+        
+    <pre class="prettyprint"><code>connection.v1.query([
+        {type: 'Technician', id: '.*', isPattern: true}
+    ],
+    null,
+    {
+        limit: 100,
+        offset: 200,
+        details: true
+        onSuccess: function (data, details) {
+            ...
+        }
+    }
+);</code></pre>
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h3 class="name" id=".%22v1.updateAttributes%22">v1.updateAttributes(update [, options])</h3>
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Updates entity attributes</p>
+    </div>
+    
+
+    
+
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                
+                <td class="name"><code>update</code></td>
+                
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Array</span>
+
+
+
+            
+            </td>
+
+            <td class="description last"><p>attribute changes</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                
+                <td class="name">[<code>options</code>]</td>
+                
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            <td class="description last"><ul>
+<li><code>onSuccess</code>: callback called if the request finishes successfully</li>
+<li><code>onFailure</code>: callback called if the request finishes with errors</li>
+<li><code>onComplete</code>: callback called regardless of whether the request is
+successful or not</li>
+</ul></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <h5>Example</h5>
+        
+    <pre class="prettyprint"><code>connection.v1.updateAttributes([
+        {
+            'entity': {type: 'Technician', id: 'entity1'},
+            'attributes': [
+                {name: 'mobile_phone', type: 'string', contextValue: '0034223456789'},
+                {name: 'attr2', contextValue: 'value'},
+                {name: 'attr3', contextValue: 5}
+            ]
+        }
+    ], {
+        onSuccess: function (data) {
+        }
+    }
+);</code></pre>
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h3 class="name" id=".%22v1.updateAvailabilitySubscription%22">v1.updateAvailabilitySubscription(subId, entities, attributeNames, duration, restriction [, callbacks])</h3>
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Updates an existing context availability subscription.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                
+                <td class="name"><code>subId</code></td>
+                
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+
+            
+            </td>
+
+            <td class="description last"><p>id of the subscription to update</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                
+                <td class="name"><code>entities</code></td>
+                
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Array</span>
+
+
+
+            
+            </td>
+
+            <td class="description last"><p>the list of <strong>Entities</strong> that are going to be queried</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                
+                <td class="name"><code>attributeNames</code></td>
+                
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Array</span>
+
+
+
+            
+            </td>
+
+            <td class="description last"><p>list of attribute names to query. Use <code>null</code> for retrieving all the attributes</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                
+                <td class="name"><code>duration</code></td>
+                
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+
+            
+            </td>
+
+            <td class="description last"><p>time interval during which the registration will be active, using as
+reference the current time. String following the format defined at
+http://books.xmlschemata.org/relaxng/ch19-77073.html.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                
+                <td class="name"><code>restriction</code></td>
+                
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                
+                <td class="name">[<code>callbacks</code>]</td>
+                
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            <td class="description last"><ul>
+<li><code>onSuccess</code>: callback called if the request finishes successfully</li>
+<li><code>onFailure</code>: callback called if the request finishes with errors</li>
+<li><code>onComplete</code>: callback called regardless of whether the request is
+successful or not</li>
+</ul></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h3 class="name" id=".%22v1.updateRegistration%22">v1.updateRegistration(regId, entities, attributes, duration, providingApplication [, callbacks])</h3>
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Updates an existing registration.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                
+                <td class="name"><code>regId</code></td>
+                
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+
+            
+            </td>
+
+            <td class="description last"><p>id of the registration to update</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                
+                <td class="name"><code>entities</code></td>
+                
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Array</span>
+
+
+
+            
+            </td>
+
+            <td class="description last"><p>list of entities to update</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                
+                <td class="name"><code>attributes</code></td>
+                
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Array</span>
+
+
+
+            
+            </td>
+
+            <td class="description last"><p>list of attributes to associate with this registration</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                
+                <td class="name"><code>duration</code></td>
+                
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+
+            
+            </td>
+
+            <td class="description last"><p>time interval during which the registration will be active, using as
+reference the current time. String following the format defined at
+http://books.xmlschemata.org/relaxng/ch19-77073.html.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                
+                <td class="name"><code>providingApplication</code></td>
+                
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+
+            
+            </td>
+
+            <td class="description last"><p>URL identifing the source of the context information</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                
+                <td class="name">[<code>callbacks</code>]</td>
+                
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            <td class="description last"><ul>
+<li><code>onSuccess</code>: callback called if the request finishes successfully</li>
+<li><code>onFailure</code>: callback called if the request finishes with errors</li>
+<li><code>onComplete</code>: callback called regardless of whether the request is
+successful or not</li>
+</ul></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <h5>Example</h5>
+        
+    <pre class="prettyprint"><code>connection.v1.updateRegistration("167",
+    [
+        {type: 'Technician', id: 'entity1'}
+    ],
+    [
+        {name: 'attr1', type: 'string'},
+        {name: 'attr2'}
+    ],
+    'PT24H',
+    'http://app.example.com/'
+);</code></pre>
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h3 class="name" id=".%22v1.updateRegistration%22">v1.updateRegistration(regId [, callbacks])</h3>
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Cancels an existing registration by marking it as expired.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                
+                <td class="name"><code>regId</code></td>
+                
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+
+            
+            </td>
+
+            <td class="description last"><p>id of the registration to cancelRegistration</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                
+                <td class="name">[<code>callbacks</code>]</td>
+                
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            <td class="description last"><ul>
+<li><code>onSuccess</code>: callback called if the request finishes successfully</li>
+<li><code>onFailure</code>: callback called if the request finishes with errors</li>
+<li><code>onComplete</code>: callback called regardless of whether the request is
+successful or not</li>
+</ul></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <h5>Example</h5>
+        
+    <pre class="prettyprint"><code>connection.v1.cancelRegistration("167", {
+    onSuccess: function () {
+        // Registration cancelled successfully
+    }
+});</code></pre>
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h3 class="name" id=".%22v1.updateSubscription%22">v1.updateSubscription(subId, duration, throttling, cond [, options])</h3>
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Updates a context subcription.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                
+                <td class="name"><code>subId</code></td>
+                
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+
+            
+            </td>
+
+            <td class="description last"><p>id of the subscription to update</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                
+                <td class="name"><code>duration</code></td>
+                
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+
+            
+            </td>
+
+            <td class="description last"><p>time interval during which the registration will be active, using as
+reference the current time. String following the format defined at
+http://books.xmlschemata.org/relaxng/ch19-77073.html.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                
+                <td class="name"><code>throttling</code></td>
+                
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+
+            
+            </td>
+
+            <td class="description last"><p>minimal period of time in seconds which must elapse between two
+consecutive notifications. String following the format defined at
+http://books.xmlschemata.org/relaxng/ch19-77073.html.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                
+                <td class="name"><code>cond</code></td>
+                
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            <td class="description last"><p>declare the condition or conditions that will trigger notifications. Pass
+<code>null</code> for not modifying current conditions.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                
+                <td class="name">[<code>options</code>]</td>
+                
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            <td class="description last"><ul>
+<li><code>onSuccess</code>: callback called if the request finishes successfully</li>
+<li><code>onFailure</code>: callback called if the request finishes with errors</li>
+<li><code>onComplete</code>: callback called regardless of whether the request is
+successful or not</li>
+</ul></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <h5>Example</h5>
+        
+    <pre class="prettyprint"><code>connection.v1.updateSubscription(
+    'sub1',
+    'PT20H',
+    null,
+    null,
+    {
+        onSuccess: function (response_data) {
+            // subscription updated successfully
+        }
+    }
+);</code></pre>
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h3 class="name" id=".%22v2.appendEntityAttributes%22">v2.appendEntityAttributes(changes [, options])</h3>
 </dt>
 <dd>
 
@@ -342,11 +3466,15 @@
             </td>
 
             <td class="description last"><p>Object with extra options:</p>
-<pre class="prettyprint source"><code>- `correlator` (`String`): transaction id
-- `keyValues` (`Boolean`; default: `false`): Use flat attributes
-- `strict` (`Boolean`; default: `false`): Force strict append semantics
-- `service` (`String`): Service/tenant to use in this operation
-- `servicepath` (`String`): Service path to use in this operation</code></pre></td>
+<ul>
+<li><code>correlator</code> (<code>String</code>): transaction id</li>
+<li><code>keyValues</code> (<code>Boolean</code>; default: <code>false</code>): Use flat attributes</li>
+<li><code>strict</code> (<code>Boolean</code>; default: <code>false</code>): Force strict append semantics</li>
+<li><code>service</code> (<code>String</code>): Service/tenant to use in this operation</li>
+<li><code>servicepath</code> (<code>String</code>): Service path to use in this operation</li>
+<li><code>type</code> (<code>String</code>): Entity type, to avoid ambiguity in case there are
+several entities with the same entity id.</li>
+</ul></td>
         </tr>
 
     
@@ -481,7 +3609,7 @@
             
 <hr>
 <dt>
-    <h4 class="name" id=".%22v2.batchQuery%22">v2.batchQuery([options])</h4>
+    <h3 class="name" id=".%22v2.batchQuery%22">v2.batchQuery([options])</h3>
 </dt>
 <dd>
 
@@ -682,7 +3810,7 @@ values</li>
             
 <hr>
 <dt>
-    <h4 class="name" id=".%22v2.batchUpdate%22">v2.batchUpdate(changes [, options])</h4>
+    <h3 class="name" id=".%22v2.batchUpdate%22">v2.batchUpdate(changes [, options])</h3>
 </dt>
 <dd>
 
@@ -903,7 +4031,7 @@ in a single batch operation.</p>
             
 <hr>
 <dt>
-    <h4 class="name" id=".%22v2.createEntity%22">v2.createEntity(entity [, options])</h4>
+    <h3 class="name" id=".%22v2.createEntity%22">v2.createEntity(entity [, options])</h3>
 </dt>
 <dd>
 
@@ -1140,7 +4268,7 @@ in a single batch operation.</p>
             
 <hr>
 <dt>
-    <h4 class="name" id=".%22v2.createSubscription%22">v2.createSubscription(subscription [, options])</h4>
+    <h3 class="name" id=".%22v2.createSubscription%22">v2.createSubscription(subscription [, options])</h3>
 </dt>
 <dd>
 
@@ -1405,7 +4533,7 @@ in a single batch operation.</p>
             
 <hr>
 <dt>
-    <h4 class="name" id=".%22v2.deleteEntity%22">v2.deleteEntity(options)</h4>
+    <h3 class="name" id=".%22v2.deleteEntity%22">v2.deleteEntity(options)</h3>
 </dt>
 <dd>
 
@@ -1471,6 +4599,8 @@ in a single batch operation.</p>
 <li><code>id</code> (<code>String</code>): Id of the entity to remove</li>
 <li><code>service</code> (<code>String</code>): Service/tenant to use in this operation</li>
 <li><code>servicepath</code> (<code>String</code>): Service path to use in this operation</li>
+<li><code>type</code> (<code>String</code>): Entity type, to avoid ambiguity in case there are
+several entities with the same entity id.</li>
 </ul></td>
         </tr>
 
@@ -1598,7 +4728,7 @@ in a single batch operation.</p>
             
 <hr>
 <dt>
-    <h4 class="name" id=".%22v2.deleteEntityAttribute%22">v2.deleteEntityAttribute(options)</h4>
+    <h3 class="name" id=".%22v2.deleteEntityAttribute%22">v2.deleteEntityAttribute(options)</h3>
 </dt>
 <dd>
 
@@ -1664,6 +4794,8 @@ extra options:</p>
 <li><code>id</code> (<code>String</code>): Id of the entity to modify</li>
 <li><code>service</code> (<code>String</code>): Service/tenant to use in this operation</li>
 <li><code>servicepath</code> (<code>String</code>): Service path to use in this operation</li>
+<li><code>type</code> (<code>String</code>): Entity type, to avoid ambiguity in case there are
+several entities with the same entity id.</li>
 </ul></td>
         </tr>
 
@@ -1795,7 +4927,7 @@ extra options:</p>
             
 <hr>
 <dt>
-    <h4 class="name" id=".%22v2.deleteSubscription%22">v2.deleteSubscription(options)</h4>
+    <h3 class="name" id=".%22v2.deleteSubscription%22">v2.deleteSubscription(options)</h3>
 </dt>
 <dd>
 
@@ -1971,7 +5103,7 @@ options:</p>
             
 <hr>
 <dt>
-    <h4 class="name" id=".%22v2.getEntity%22">v2.getEntity(options)</h4>
+    <h3 class="name" id=".%22v2.getEntity%22">v2.getEntity(options)</h3>
 </dt>
 <dd>
 
@@ -2037,6 +5169,8 @@ options:</p>
 <li><code>keyValues</code> (<code>Boolean</code>; default: <code>false</code>): Use flat attributes</li>
 <li><code>service</code> (<code>String</code>): Service/tenant to use in this operation</li>
 <li><code>servicepath</code> (<code>String</code>): Service path to use in this operation</li>
+<li><code>type</code> (<code>String</code>): Entity type, to avoid ambiguity in case there are
+several entities with the same entity id.</li>
 </ul></td>
         </tr>
 
@@ -2167,7 +5301,7 @@ options:</p>
             
 <hr>
 <dt>
-    <h4 class="name" id=".%22v2.getEntityAttribute%22">v2.getEntityAttribute(options)</h4>
+    <h3 class="name" id=".%22v2.getEntityAttribute%22">v2.getEntityAttribute(options)</h3>
 </dt>
 <dd>
 
@@ -2231,6 +5365,8 @@ options:</p>
 <li><code>id</code> (<code>String</code>): Id of the entity to query</li>
 <li><code>service</code> (<code>String</code>): Service/tenant to use in this operation</li>
 <li><code>servicepath</code> (<code>String</code>): Service path to use in this operation</li>
+<li><code>type</code> (<code>String</code>): Entity type, to avoid ambiguity in case there are
+several entities with the same entity id.</li>
 </ul></td>
         </tr>
 
@@ -2364,7 +5500,7 @@ options:</p>
             
 <hr>
 <dt>
-    <h4 class="name" id=".%22v2.getEntityAttributes%22">v2.getEntityAttributes(options)</h4>
+    <h3 class="name" id=".%22v2.getEntityAttributes%22">v2.getEntityAttributes(options)</h3>
 </dt>
 <dd>
 
@@ -2431,6 +5567,8 @@ options:</p>
 <li><code>keyValues</code> (<code>Boolean</code>; default: <code>false</code>): Use flat attributes</li>
 <li><code>service</code> (<code>String</code>): Service/tenant to use in this operation</li>
 <li><code>servicepath</code> (<code>String</code>): Service path to use in this operation</li>
+<li><code>type</code> (<code>String</code>): Entity type, to avoid ambiguity in case there are
+several entities with the same entity id.</li>
 </ul></td>
         </tr>
 
@@ -2561,7 +5699,7 @@ options:</p>
             
 <hr>
 <dt>
-    <h4 class="name" id=".%22v2.getEntityAttributeValue%22">v2.getEntityAttributeValue(options)</h4>
+    <h3 class="name" id=".%22v2.getEntityAttributeValue%22">v2.getEntityAttributeValue(options)</h3>
 </dt>
 <dd>
 
@@ -2625,6 +5763,8 @@ options:</p>
 <li><code>id</code> (<code>String</code>): Id of the entity to query</li>
 <li><code>service</code> (<code>String</code>): Service/tenant to use in this operation</li>
 <li><code>servicepath</code> (<code>String</code>): Service path to use in this operation</li>
+<li><code>type</code> (<code>String</code>): Entity type, to avoid ambiguity in case there are
+several entities with the same entity id.</li>
 </ul></td>
         </tr>
 
@@ -2758,7 +5898,7 @@ options:</p>
             
 <hr>
 <dt>
-    <h4 class="name" id=".%22v2.getSubscription%22">v2.getSubscription(options)</h4>
+    <h3 class="name" id=".%22v2.getSubscription%22">v2.getSubscription(options)</h3>
 </dt>
 <dd>
 
@@ -2935,7 +6075,7 @@ options:</p>
             
 <hr>
 <dt>
-    <h4 class="name" id=".%22v2.getType%22">v2.getType(options)</h4>
+    <h3 class="name" id=".%22v2.getType%22">v2.getType(options)</h3>
 </dt>
 <dd>
 
@@ -3112,7 +6252,7 @@ options:</p>
             
 <hr>
 <dt>
-    <h4 class="name" id=".%22v2.listEntities%22">v2.listEntities([options])</h4>
+    <h3 class="name" id=".%22v2.listEntities%22">v2.listEntities([options])</h3>
 </dt>
 <dd>
 
@@ -3332,7 +6472,7 @@ values</li>
             
 <hr>
 <dt>
-    <h4 class="name" id=".%22v2.listSubscriptions%22">v2.listSubscriptions([options])</h4>
+    <h3 class="name" id=".%22v2.listSubscriptions%22">v2.listSubscriptions([options])</h3>
 </dt>
 <dd>
 
@@ -3528,7 +6668,7 @@ number of elements at the beginning</li>
             
 <hr>
 <dt>
-    <h4 class="name" id=".%22v2.listTypes%22">v2.listTypes([options])</h4>
+    <h3 class="name" id=".%22v2.listTypes%22">v2.listTypes([options])</h3>
 </dt>
 <dd>
 
@@ -3724,7 +6864,7 @@ number of elements at the beginning</li>
             
 <hr>
 <dt>
-    <h4 class="name" id=".%22v2.replaceEntityAttribute%22">v2.replaceEntityAttribute(changes [, options])</h4>
+    <h3 class="name" id=".%22v2.replaceEntityAttribute%22">v2.replaceEntityAttribute(changes [, options])</h3>
 </dt>
 <dd>
 
@@ -3803,13 +6943,16 @@ number of elements at the beginning</li>
             
             </td>
 
-            <td class="description last"><p>Object with options:</p>
+            <td class="description last"><p>Object with options (those options can also be passed inside the changes
+parameter):</p>
 <ul>
 <li><code>attribute</code> (<code>String</code>): Name of the attribute to modify</li>
 <li><code>correlator</code> (<code>String</code>): Transaction id</li>
 <li><code>id</code> (<code>String</code>): Id of the entity to modify</li>
 <li><code>service</code> (<code>String</code>): Service/tenant to use in this operation</li>
 <li><code>servicepath</code> (<code>String</code>): Service path to use in this operation</li>
+<li><code>type</code> (<code>String</code>): Entity type, to avoid ambiguity in case there are
+several entities with the same entity id.</li>
 </ul></td>
         </tr>
 
@@ -3901,30 +7044,6 @@ number of elements at the beginning</li>
     
         <h5>Examples</h5>
         
-        <p class="code-caption">Basic usage</p>
-    
-    <pre class="prettyprint"><code>connection.v2.replaceEntityAttribute({
-    value: 25,
-    metadata: {
-        "unitCode": {
-            "value": "CEL"
-        }
-    }
-}, {
-    id: "Bcn_Welt",
-    attribute: "temperature"
-}).then(
-    (response) => {
-        // Entity attribute replaced successfully
-        // response.attribute attribute details
-        // response.correlator transaction id associated with the server response
-    }, (error) => {
-        // Error replacing entity attribute
-        // If the error was reported by Orion, error.correlator will be
-        // filled with the associated transaction id
-    }
-);</code></pre>
-
         <p class="code-caption">Simple usage</p>
     
     <pre class="prettyprint"><code>connection.v2.replaceEntityAttribute({
@@ -3949,6 +7068,32 @@ number of elements at the beginning</li>
     }
 );</code></pre>
 
+        <p class="code-caption">Partial update</p>
+    
+    <pre class="prettyprint"><code>connection.v2.getEntityAttribute({
+    id: "Bcn_Welt",
+    attribute: "temperature"
+}).then((response) => {
+    var changes = response.attribute;
+    changes.metadata.unitCode = {
+        "value": "FAR"
+    };
+    return connection.v2.replaceEntityAttribute(changes, {
+        id: "Bcn_Welt",
+        attribute: "temperature"
+    });
+}).then(
+    (response) => {
+        // Entity attribute replaced successfully
+        // response.attribute attribute details
+        // response.correlator transaction id associated with the server response
+    }, (error) => {
+        // Error replacing entity attribute
+        // If the error was reported by Orion, error.correlator will be
+        // filled with the associated transaction id
+    }
+);</code></pre>
+
     
 </dd>
 
@@ -3956,7 +7101,7 @@ number of elements at the beginning</li>
             
 <hr>
 <dt>
-    <h4 class="name" id=".%22v2.replaceEntityAttributes%22">v2.replaceEntityAttributes(entity [, options])</h4>
+    <h3 class="name" id=".%22v2.replaceEntityAttributes%22">v2.replaceEntityAttributes(entity [, options])</h3>
 </dt>
 <dd>
 
@@ -4013,7 +7158,8 @@ number of elements at the beginning</li>
             
             </td>
 
-            <td class="description last"></td>
+            <td class="description last"><p>New values for the attributes, including the <code>id</code> and the <code>type</code> values
+for searching the entity to update.</p></td>
         </tr>
 
     
@@ -4193,7 +7339,7 @@ number of elements at the beginning</li>
             
 <hr>
 <dt>
-    <h4 class="name" id=".%22v2.replaceEntityAttributeValue%22">v2.replaceEntityAttributeValue(options)</h4>
+    <h3 class="name" id=".%22v2.replaceEntityAttributeValue%22">v2.replaceEntityAttributeValue(options)</h3>
 </dt>
 <dd>
 
@@ -4258,6 +7404,8 @@ number of elements at the beginning</li>
 <li><code>service</code> (<code>String</code>): Service/tenant to use in this operation</li>
 <li><code>servicepath</code> (<code>String</code>): Service path to use in this operation</li>
 <li><code>value</code> (<code>String</code>|<code>Boolean</code>|<code>Number</code>|<code>Object</code>|<code>Array</code>) new value</li>
+<li><code>type</code> (<code>String</code>): Entity type, to avoid ambiguity in case there are
+several entities with the same entity id.</li>
 </ul></td>
         </tr>
 
@@ -4393,7 +7541,7 @@ number of elements at the beginning</li>
             
 <hr>
 <dt>
-    <h4 class="name" id=".%22v2.updateEntityAttributes%22">v2.updateEntityAttributes(changes [, options])</h4>
+    <h3 class="name" id=".%22v2.updateEntityAttributes%22">v2.updateEntityAttributes(changes [, options])</h3>
 </dt>
 <dd>
 
@@ -4450,7 +7598,8 @@ number of elements at the beginning</li>
             
             </td>
 
-            <td class="description last"></td>
+            <td class="description last"><p>New values for the attributes, including the <code>id</code> and the <code>type</code> values
+for searching the entity to update.</p></td>
         </tr>
 
     
@@ -4616,7 +7765,7 @@ number of elements at the beginning</li>
             
 <hr>
 <dt>
-    <h4 class="name" id=".%22v2.updateSubscription%22">v2.updateSubscription(changes [, options])</h4>
+    <h3 class="name" id=".%22v2.updateSubscription%22">v2.updateSubscription(changes [, options])</h3>
 </dt>
 <dd>
 
@@ -4878,7 +8027,7 @@ number of elements at the beginning</li>
 <span class="jsdoc-message">
 	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.3</a>
 	
-		on 2017-02-22T18:03:20+01:00
+		on 2017-02-28T14:07:13+01:00
 	.
 </span>
 </footer>
@@ -4934,7 +8083,7 @@ $( function () {
 		anchorName  : function ( i, heading, prefix ) {
 			return $( heading ).attr( "id" ) || ( prefix + i );
 		},
-		selectors   : "#toc-content h1,#toc-content h2,#toc-content h3,#toc-content h4:not(.toc-ignore)",
+		selectors   : "#toc-content h1,#toc-content h2:not(.toc-ignore),#toc-content h3:not(.toc-ignore),#toc-content h4:not(.toc-ignore)",
 		showAndHide : false,
 		smoothScrolling: true
 	} );
