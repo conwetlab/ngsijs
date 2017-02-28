@@ -55,7 +55,6 @@ var toQueryString = function toQueryString(parameters) {
 
 /* makeRequest for Node.js */
 var makeRequest = function makeRequest(url, options) {
-    var parsed_url = node_url.parse(url);
 
     if (options.requestHeaders == null || typeof options.requestHeaders !== 'object') {
         options.requestHeaders = {
@@ -72,19 +71,20 @@ var makeRequest = function makeRequest(url, options) {
     // parameters
     var querystring = toQueryString(options.parameters);
     if (querystring != null) {
-        if (parsed_url.path.indexOf('?') !== -1) {
-            parsed_url.path += '&' + querystring;
+        if (url.search.length > 0) {
+            url.search += '&' + querystring;
         }  else {
-            parsed_url.path += '?' + querystring;
+            url.search += '?' + querystring;
         }
     }
 
     return new Promise(function (resolve, reject) {
         var request = http.request({
                 method: options.method,
-                hostname: parsed_url.hostname,
-                port: parsed_url.port,
-                path: parsed_url.path,
+                hostname: url.hostname,
+                protocol: url.protocol,
+                port: url.port,
+                path: url.pathname + url.search,
                 headers: options.requestHeaders
             }, function(response) {
                 response.setEncoding('utf8');
