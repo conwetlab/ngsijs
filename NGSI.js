@@ -2766,6 +2766,8 @@
      * - `keyValues` (`Boolean`; default: `false`): Use flat attributes
      * - `service` (`String`): Service/tenant to use in this operation
      * - `servicepath` (`String`): Service path to use in this operation
+     * - `type` (`String`): Entity type, to avoid ambiguity in case there are
+     *   several entities with the same entity id.
      *
      * @returns {Promise}
      *
@@ -2869,6 +2871,8 @@
      * - `keyValues` (`Boolean`; default: `false`): Use flat attributes
      * - `service` (`String`): Service/tenant to use in this operation
      * - `servicepath` (`String`): Service path to use in this operation
+     * - `type` (`String`): Entity type, to avoid ambiguity in case there are
+     *   several entities with the same entity id.
      *
      * @returns {Promise}
      *
@@ -2964,13 +2968,19 @@
      * @memberof NGSI.Connection
      *
      * @param {Object} changes
+     *
      * @param {Object} [options]
-     *     Object with extra options:
-     *     - `correlator` (`String`): transaction id
-     *     - `keyValues` (`Boolean`; default: `false`): Use flat attributes
-     *     - `strict` (`Boolean`; default: `false`): Force strict append semantics
-     *     - `service` (`String`): Service/tenant to use in this operation
-     *     - `servicepath` (`String`): Service path to use in this operation
+     *
+     * Object with extra options:
+     *
+     * - `correlator` (`String`): transaction id
+     * - `keyValues` (`Boolean`; default: `false`): Use flat attributes
+     * - `strict` (`Boolean`; default: `false`): Force strict append semantics
+     * - `service` (`String`): Service/tenant to use in this operation
+     * - `servicepath` (`String`): Service path to use in this operation
+     * - `type` (`String`): Entity type, to avoid ambiguity in case there are
+     *   several entities with the same entity id.
+     *
      * @returns {Promise}
      *
      * @example <caption>Append or update the temperature attribute</caption>
@@ -3072,6 +3082,10 @@
      * @memberof NGSI.Connection
      *
      * @param {Object} changes
+     *
+     * New values for the attributes, including the `id` and the `type` values
+     * for searching the entity to update.
+     *
      * @param {Object} [options]
      *
      * Object with extra options:
@@ -3180,6 +3194,10 @@
      * @memberof NGSI.Connection
      *
      * @param {Object} entity
+     *
+     * New values for the attributes, including the `id` and the `type` values
+     * for searching the entity to update.
+     *
      * @param {Object} [options]
      *
      * Object with extra options:
@@ -3295,6 +3313,8 @@
      * - `id` (`String`): Id of the entity to remove
      * - `service` (`String`): Service/tenant to use in this operation
      * - `servicepath` (`String`): Service path to use in this operation
+     * - `type` (`String`): Entity type, to avoid ambiguity in case there are
+     *   several entities with the same entity id.
      *
      * @returns {Promise}
      *
@@ -3392,6 +3412,8 @@
      * - `id` (`String`): Id of the entity to query
      * - `service` (`String`): Service/tenant to use in this operation
      * - `servicepath` (`String`): Service path to use in this operation
+     * - `type` (`String`): Entity type, to avoid ambiguity in case there are
+     *   several entities with the same entity id.
      *
      * @returns {Promise}
      *
@@ -3496,39 +3518,18 @@
      *
      * @param {Object} [options]
      *
-     * Object with options:
+     * Object with options (those options can also be passed inside the changes
+     * parameter):
      *
      * - `attribute` (`String`): Name of the attribute to modify
      * - `correlator` (`String`): Transaction id
      * - `id` (`String`): Id of the entity to modify
      * - `service` (`String`): Service/tenant to use in this operation
      * - `servicepath` (`String`): Service path to use in this operation
+     * - `type` (`String`): Entity type, to avoid ambiguity in case there are
+     *   several entities with the same entity id.
      *
      * @returns {Promise}
-     *
-     * @example <caption>Basic usage</caption>
-     *
-     * connection.v2.replaceEntityAttribute({
-     *     value: 25,
-     *     metadata: {
-     *         "unitCode": {
-     *             "value": "CEL"
-     *         }
-     *     }
-     * }, {
-     *     id: "Bcn_Welt",
-     *     attribute: "temperature"
-     * }).then(
-     *     (response) => {
-     *         // Entity attribute replaced successfully
-     *         // response.attribute attribute details
-     *         // response.correlator transaction id associated with the server response
-     *     }, (error) => {
-     *         // Error replacing entity attribute
-     *         // If the error was reported by Orion, error.correlator will be
-     *         // filled with the associated transaction id
-     *     }
-     * );
      *
      * @example <caption>Simple usage</caption>
      *
@@ -3554,10 +3555,46 @@
      *     }
      * );
      *
+     * @example <caption>Partial update</caption>
+     *
+     * connection.v2.getEntityAttribute({
+     *     id: "Bcn_Welt",
+     *     attribute: "temperature"
+     * }).then((response) => {
+     *     var changes = response.attribute;
+     *     changes.metadata.unitCode = {
+     *         "value": "FAR"
+     *     };
+     *     return connection.v2.replaceEntityAttribute(changes, {
+     *         id: "Bcn_Welt",
+     *         attribute: "temperature"
+     *     });
+     * }).then(
+     *     (response) => {
+     *         // Entity attribute replaced successfully
+     *         // response.attribute attribute details
+     *         // response.correlator transaction id associated with the server response
+     *     }, (error) => {
+     *         // Error replacing entity attribute
+     *         // If the error was reported by Orion, error.correlator will be
+     *         // filled with the associated transaction id
+     *     }
+     * );
      */
-    NGSI.Connection.V2.prototype.replaceEntityAttribute = function replaceEntityAttribute(options) {
+    NGSI.Connection.V2.prototype.replaceEntityAttribute = function replaceEntityAttribute(changes, options) {
+        if (changes == null) {
+            throw new TypeError("missing changes parameter");
+        }
+
         if (options == null) {
-            throw new TypeError("missing options parameter");
+            options = {
+                attribute: changes.attribute,
+                correlator: changes.correlator,
+                id: changes.id,
+                service: service,
+                servicepath: servicepath,
+                type: changes.type
+            };
         }
 
         if (options.id == null) {
@@ -3624,6 +3661,8 @@
      * - `id` (`String`): Id of the entity to modify
      * - `service` (`String`): Service/tenant to use in this operation
      * - `servicepath` (`String`): Service path to use in this operation
+     * - `type` (`String`): Entity type, to avoid ambiguity in case there are
+     *   several entities with the same entity id.
      *
      * @returns {Promise}
      *
@@ -3730,6 +3769,8 @@
      * - `id` (`String`): Id of the entity to query
      * - `service` (`String`): Service/tenant to use in this operation
      * - `servicepath` (`String`): Service path to use in this operation
+     * - `type` (`String`): Entity type, to avoid ambiguity in case there are
+     *   several entities with the same entity id.
      *
      * @returns {Promise}
      *
@@ -3840,6 +3881,8 @@
      * - `service` (`String`): Service/tenant to use in this operation
      * - `servicepath` (`String`): Service path to use in this operation
      * - `value` (`String`|`Boolean`|`Number`|`Object`|`Array`) new value
+     * - `type` (`String`): Entity type, to avoid ambiguity in case there are
+     *   several entities with the same entity id.
      *
      * @returns {Promise}
      *

@@ -2631,6 +2631,43 @@
                 });
             });
 
+            it("allows passing options using the options parameter", function (done) {
+                var changes = {
+                    attribute: "temperature",
+                    value: 25,
+                    metadata: {
+                        "unitCode": {
+                            "value": "FAR"
+                        }
+                    }
+                };
+                Object.freeze(changes);
+                ajaxMockup.addStaticURL("http://ngsi.server.com/v2/entities/Bcn_Welt/attrs/temperature", {
+                    headers: {
+                        'Fiware-correlator': 'correlatortoken',
+                    },
+                    method: 'PUT',
+                    status: 204,
+                    checkRequestContent: function (url, options) {
+                        expect(options.parameters.type).toBe("Room");
+                        expect("options" in options.parameters).toBeFalsy();
+                    }
+                });
+
+                connection.v2.replaceEntityAttribute(changes, {
+                    id: "Bcn_Welt",
+                    type: "Room"
+                }).then(function (result) {
+                    expect(result).toEqual({
+                        attribute: changes,
+                        correlator: 'correlatortoken'
+                    });
+                    done();
+                }, function (e) {
+                    fail("Failure callback called");
+                });
+            });
+
             it("handles unexpected error codes", function (done) {
                 ajaxMockup.addStaticURL("http://ngsi.server.com/v2/entities/Bcn_Welt/attrs/temperature", {
                     method: "PUT",
