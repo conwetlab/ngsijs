@@ -2633,7 +2633,6 @@
 
             it("allows passing options using the options parameter", function (done) {
                 var changes = {
-                    attribute: "temperature",
                     value: 25,
                     metadata: {
                         "unitCode": {
@@ -2651,12 +2650,15 @@
                     checkRequestContent: function (url, options) {
                         expect(options.parameters.type).toBe("Room");
                         expect("options" in options.parameters).toBeFalsy();
+                        var data = JSON.parse(options.postBody);
+                        expect(data).toEqual(changes);
                     }
                 });
 
                 connection.v2.replaceEntityAttribute(changes, {
                     id: "Bcn_Welt",
-                    type: "Room"
+                    type: "Room",
+                    attribute: "temperature"
                 }).then(function (result) {
                     expect(result).toEqual({
                         attribute: changes,

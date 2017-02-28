@@ -3591,8 +3591,8 @@
                 attribute: changes.attribute,
                 correlator: changes.correlator,
                 id: changes.id,
-                service: service,
-                servicepath: servicepath,
+                service: changes.service,
+                servicepath: changes.servicepath,
                 type: changes.type
             };
         }
@@ -3604,8 +3604,8 @@
         }
 
         var data = {
-            value: options.value,
-            metadata: options.metadata
+            value: changes.value,
+            metadata: changes.metadata
         };
         var connection = privates.get(this);
         var url = connection.url + interpolate(
@@ -3622,6 +3622,7 @@
         return makeJSONRequest2.call(connection, url, {
             method: "PUT",
             parameters: parameters,
+            postBody: data,
             requestHeaders: {
                 "FIWARE-Correlator": options.correlator,
                 "FIWARE-Service": options.service,
