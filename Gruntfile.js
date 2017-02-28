@@ -23,6 +23,13 @@ module.exports = function (grunt) {
 
         pkg: grunt.file.readJSON('package.json'),
 
+        bump: {
+            options: {
+                files: ['package.json', 'bower.json'],
+                push: false
+            }
+        },
+
         copy: {
             main: {
                 files: [
@@ -134,7 +141,8 @@ module.exports = function (grunt) {
     });
 
     grunt.loadNpmTasks("gruntify-eslint");
-    grunt.loadNpmTasks("grunt-contrib-copy");
+    grunt.loadNpmTasks("grunt-bump");
+    grunt.loadNpmTasks("grunt-contrib-uglify");
     grunt.loadNpmTasks("grunt-contrib-uglify");
     grunt.loadNpmTasks("grunt-coveralls");
     grunt.loadNpmTasks('grunt-karma');

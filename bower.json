@@ -1,0 +1,29 @@
+{
+  "name": "ngsijs",
+  "version": "1.0.0",
+  "description": "Node JavaScript library for Orion Context Broker",
+  "main": "NGSI.js",
+  "authors": [
+    "Álvaro Arranz <aarranz@fi.upm.es>"
+  ],
+  "license": "AGPLv3 with linking exception",
+  "keywords": [
+    "context",
+    "broker",
+    "fiware",
+    "FIWARE",
+    "fiware-orion",
+    "iot",
+    "IoT",
+    "NGSI",
+    "orion",
+    "wirecloud"
+  ],
+  "homepage": "https://github.com/conwetlab/ngsijs",
+  "ignore": [
+    "node_modules",
+    "bower_components",
+    "tests",
+    "ngsi-node.js"
+  ]
+}
