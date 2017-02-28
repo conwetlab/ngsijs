@@ -142,7 +142,7 @@ module.exports = function (grunt) {
 
     grunt.loadNpmTasks("gruntify-eslint");
     grunt.loadNpmTasks("grunt-bump");
-    grunt.loadNpmTasks("grunt-contrib-uglify");
+    grunt.loadNpmTasks("grunt-contrib-copy");
     grunt.loadNpmTasks("grunt-contrib-uglify");
     grunt.loadNpmTasks("grunt-coveralls");
     grunt.loadNpmTasks('grunt-karma');
