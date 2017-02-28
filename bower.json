@@ -22,13 +22,13 @@
   "homepage": "https://github.com/conwetlab/ngsijs",
   "ignore": [
     "helpers",
-    "jsontemplate",
+    "jsdoctemplate",
     "ngsi-proxy",
     "responses",
     "tests",
     ".*",
     "Gruntfile.js",
-    "NGSI.js",
+    "./NGSI.js",
     "ngsi-node.js",
     "package.json"
   ]
