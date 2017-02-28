@@ -764,7 +764,10 @@
         status_info = process_status_info_json(data);
 
         if (status_info.code === 404) {
-            throw new NGSI.NotFoundError(data);
+            throw new NGSI.NotFoundError({
+                details: data,
+                message: status_info.reasonPhrase
+            });
         } else if (status_info.code !== 200) {
             throw new NGSI.InvalidResponseError('Unexpected error code');
         }
@@ -980,6 +983,14 @@
         }
 
         return parameters;
+    };
+
+    var parse_error_response = function parse_error_response(response) {
+        if (response.getHeader('Content-Type') !== 'application/json') {
+            throw new TypeError("Unexpected response mimetype");
+        }
+
+        return JSON.parse(response.responseText);
     };
 
     NGSI.parseNotifyContextRequest = function parseNotifyContextRequest(data, options) {
@@ -1371,16 +1382,19 @@
      * @summary Exception raised when detecting invalid responses from the
      * server.
      */
-    NGSI.InvalidResponseError = function InvalidResponseError(message) {
+    NGSI.InvalidResponseError = function InvalidResponseError(message, correlator) {
         this.name = 'InvalidResponse';
         this.message = message || '';
+        this.correlator = correlator;
     };
     NGSI.InvalidResponseError.prototype = new Error();
     NGSI.InvalidResponseError.prototype.constructor = NGSI.InvalidResponseError;
 
-    NGSI.NotFoundError = function NotFoundError(details) {
+    NGSI.NotFoundError = function NotFoundError(options) {
         this.name = 'NotFound';
-        this.details = details || '';
+        this.message = options.message || '';
+        this.details = options.details || '';
+        this.correlator = options.correlator || null;
     };
     NGSI.NotFoundError.prototype = new Error();
     NGSI.NotFoundError.prototype.constructor = NGSI.NotFoundError;
@@ -2591,21 +2605,23 @@
                 "FIWARE-ServicePath": options.servicepath
             }
         }).then(function (response) {
+            var correlator = response.getHeader('Fiware-correlator');
+
             if (response.status !== 200) {
-                return Promise.reject(new NGSI.InvalidResponseError('Unexpected error code: ' + response.status));
+                return Promise.reject(new NGSI.InvalidResponseError('Unexpected error code: ' + response.status, correlator));
             }
 
             try {
                 var data = JSON.parse(response.responseText);
             } catch (e) {
-                return Promise.reject(new NGSI.InvalidResponseError('Server returned invalid JSON content'));
+                return Promise.reject(new NGSI.InvalidResponseError('Server returned invalid JSON content', correlator));
             }
 
             var result = {
                 results: data,
                 limit: options.limit,
                 offset: options.offset,
-                correlator: response.getHeader("Fiware-correlator")
+                correlator: correlator
             };
             if (options.count === true) {
                 result.count = parseInt(response.getHeader("Fiware-Total-Count"), 10);
@@ -2719,11 +2735,12 @@
                 "FIWARE-ServicePath": options.servicepath
             }
         }).then(function (response) {
+            var correlator = response.getHeader('Fiware-correlator');
             if (response.status !== 201) {
-                return Promise.reject(new NGSI.InvalidResponseError('Unexpected error code: ' + response.status));
+                return Promise.reject(new NGSI.InvalidResponseError('Unexpected error code: ' + response.status, correlator));
             }
             return Promise.resolve({
-                correlator: response.getHeader('Fiware-correlator'),
+                correlator: correlator,
                 entity: entity,
                 location: response.getHeader('Location')
             });
@@ -2816,16 +2833,17 @@
                 "FIWARE-ServicePath": options.servicepath
             }
         }).then(function (response) {
+            var correlator = response.getHeader('Fiware-correlator');
             if (response.status !== 200) {
-                return Promise.reject(new NGSI.InvalidResponseError('Unexpected error code: ' + response.status));
+                return Promise.reject(new NGSI.InvalidResponseError('Unexpected error code: ' + response.status, correlator));
             }
             try {
                 var data = JSON.parse(response.responseText);
             } catch (e) {
-                throw new NGSI.InvalidResponseError('Server returned invalid JSON content');
+                throw new NGSI.InvalidResponseError('Server returned invalid JSON content', correlator);
             }
             return Promise.resolve({
-                correlator: response.getHeader('Fiware-correlator'),
+                correlator: correlator,
                 entity: data
             });
         });
@@ -2918,17 +2936,18 @@
                 "FIWARE-ServicePath": options.servicepath
             }
         }).then(function (response) {
+            var correlator = response.getHeader('Fiware-correlator');
             if (response.status !== 200) {
-                return Promise.reject(new NGSI.InvalidResponseError('Unexpected error code: ' + response.status));
+                return Promise.reject(new NGSI.InvalidResponseError('Unexpected error code: ' + response.status, correlator));
             }
             try {
                 var data = JSON.parse(response.responseText);
             } catch (e) {
-                throw new NGSI.InvalidResponseError('Server returned invalid JSON content');
+                throw new NGSI.InvalidResponseError('Server returned invalid JSON content', correlator);
             }
             return Promise.resolve({
                 attributes: data,
-                correlator: response.getHeader("Fiware-correlator")
+                correlator: correlator
             });
         });
     };
@@ -3031,11 +3050,12 @@
                 "FIWARE-ServicePath": options.servicepath
             }
         }).then(function (response) {
+            var correlator = response.getHeader('Fiware-correlator');
             if (response.status !== 204) {
-                return Promise.reject(new NGSI.InvalidResponseError('Unexpected error code: ' + response.status));
+                return Promise.reject(new NGSI.InvalidResponseError('Unexpected error code: ' + response.status, correlator));
             }
             return Promise.resolve({
-                correlator: response.getHeader('Fiware-correlator')
+                correlator: correlator
             });
         });
     };
@@ -3138,11 +3158,12 @@
                 "FIWARE-ServicePath": options.servicepath
             }
         }).then(function (response) {
+            var correlator = response.getHeader('Fiware-correlator');
             if (response.status !== 204) {
-                return Promise.reject(new NGSI.InvalidResponseError('Unexpected error code: ' + response.status));
+                return Promise.reject(new NGSI.InvalidResponseError('Unexpected error code: ' + response.status, correlator));
             }
             return Promise.resolve({
-                correlator: response.getHeader('Fiware-correlator')
+                correlator: correlator
             });
         });
     };
@@ -3244,12 +3265,13 @@
                 "FIWARE-ServicePath": options.servicepath
             }
         }).then(function (response) {
+            var correlator = response.getHeader('Fiware-correlator');
             if (response.status !== 204) {
-                return Promise.reject(new NGSI.InvalidResponseError('Unexpected error code: ' + response.status));
+                return Promise.reject(new NGSI.InvalidResponseError('Unexpected error code: ' + response.status, correlator));
             }
             return Promise.resolve({
-                entity: entity,
-                correlator: response.getHeader('Fiware-correlator')
+                correlator: correlator,
+                entity: entity
             });
         });
     };
@@ -3333,11 +3355,19 @@
                 "FIWARE-ServicePath": options.servicepath
             }
         }).then(function (response) {
-            if (response.status !== 204) {
-                return Promise.reject(new NGSI.InvalidResponseError('Unexpected error code: ' + response.status));
+            var correlator = response.getHeader('Fiware-correlator');
+            if (response.status === 404) {
+                try {
+                    var error = parse_error_response(response);
+                } catch (e) {
+                    return Promise.reject(new NGSI.InvalidResponseError(null, correlator));
+                }
+                return Promise.reject(new NGSI.NotFoundError({message: error.description, correlator: correlator}));
+            } else if (response.status !== 204) {
+                return Promise.reject(new NGSI.InvalidResponseError('Unexpected error code: ' + response.status, correlator));
             }
             return Promise.resolve({
-                correlator: response.getHeader('Fiware-correlator')
+                correlator: correlator
             });
         });
     };
@@ -3433,16 +3463,17 @@
                 "FIWARE-ServicePath": options.servicepath
             }
         }).then(function (response) {
+            var correlator = response.getHeader('Fiware-correlator');
             if (response.status !== 200) {
-                return Promise.reject(new NGSI.InvalidResponseError('Unexpected error code: ' + response.status));
+                return Promise.reject(new NGSI.InvalidResponseError('Unexpected error code: ' + response.status), correlator);
             }
             try {
                 var data = JSON.parse(response.responseText);
             } catch (e) {
-                throw new NGSI.InvalidResponseError('Server returned invalid JSON content');
+                throw new NGSI.InvalidResponseError('Server returned invalid JSON content', correlator);
             }
             return Promise.resolve({
-                correlator: response.getHeader('Fiware-correlator'),
+                correlator: correlator,
                 attribute: data
             });
         });
@@ -3560,11 +3591,12 @@
                 "FIWARE-ServicePath": options.servicepath
             }
         }).then(function (response) {
+            var correlator = response.getHeader('Fiware-correlator');
             if (response.status !== 204) {
-                return Promise.reject(new NGSI.InvalidResponseError('Unexpected error code: ' + response.status));
+                return Promise.reject(new NGSI.InvalidResponseError('Unexpected error code: ' + response.status, correlator));
             }
             return Promise.resolve({
-                correlator: response.getHeader('Fiware-correlator'),
+                correlator: correlator,
                 attribute: data
             });
         });
@@ -3661,11 +3693,19 @@
                 "FIWARE-ServicePath": options.servicepath
             }
         }).then(function (response) {
-            if (response.status !== 204) {
-                return Promise.reject(new NGSI.InvalidResponseError('Unexpected error code: ' + response.status));
+            var correlator = response.getHeader('Fiware-correlator');
+            if (response.status === 404) {
+                try {
+                    var error = parse_error_response(response);
+                } catch (e) {
+                    return Promise.reject(new NGSI.InvalidResponseError(null, correlator));
+                }
+                return Promise.reject(new NGSI.NotFoundError({message: error.description, correlator: correlator}));
+            } else if (response.status !== 204) {
+                return Promise.reject(new NGSI.InvalidResponseError('Unexpected error code: ' + response.status, correlator));
             }
             return Promise.resolve({
-                correlator: response.getHeader('Fiware-correlator')
+                correlator: correlator
             });
         });
     };
@@ -3763,16 +3803,17 @@
                 "FIWARE-ServicePath": options.servicepath
             }
         }).then(function (response) {
+            var correlator = response.getHeader('Fiware-correlator');
             if (response.status !== 200) {
-                return Promise.reject(new NGSI.InvalidResponseError('Unexpected error code: ' + response.status));
+                return Promise.reject(new NGSI.InvalidResponseError('Unexpected error code: ' + response.status, correlator));
             }
             try {
                 var data = JSON.parse(response.responseText);
             } catch (e) {
-                throw new NGSI.InvalidResponseError('Server returned invalid JSON content');
+                throw new NGSI.InvalidResponseError('Server returned invalid JSON content', correlator);
             }
             return Promise.resolve({
-                correlator: response.getHeader('Fiware-correlator'),
+                correlator: correlator,
                 value: data
             });
         });
@@ -3876,11 +3917,12 @@
                 "FIWARE-ServicePath": options.servicepath
             }
         }).then(function (response) {
+            var correlator = response.getHeader('Fiware-correlator');
             if (response.status !== 204) {
-                return Promise.reject(new NGSI.InvalidResponseError('Unexpected error code: ' + response.status));
+                return Promise.reject(new NGSI.InvalidResponseError('Unexpected error code: ' + response.status, correlator));
             }
             return Promise.resolve({
-                correlator: response.getHeader('Fiware-correlator'),
+                correlator: correlator,
                 value: options.value
             });
         });
@@ -3969,12 +4011,13 @@
                 "FIWARE-ServicePath": options.servicepath
             }
         }).then(function (response) {
+            var correlator = response.getHeader('Fiware-correlator');
             if (response.status !== 200) {
-                return Promise.reject(new NGSI.InvalidResponseError('Unexpected error code: ' + response.status));
+                return Promise.reject(new NGSI.InvalidResponseError('Unexpected error code: ' + response.status, correlator));
             }
 
             var result = {
-                correlator: response.getHeader('Fiware-correlator'),
+                correlator: correlator,
                 limit: options.limit,
                 offset: options.offset,
                 results: JSON.parse(response.responseText),
@@ -4045,16 +4088,17 @@
                 "FIWARE-ServicePath": options.servicepath
             }
         }).then(function (response) {
+            var correlator = response.getHeader('Fiware-correlator');
             if (response.status !== 200) {
-                return Promise.reject(new NGSI.InvalidResponseError('Unexpected error code: ' + response.status));
+                return Promise.reject(new NGSI.InvalidResponseError('Unexpected error code: ' + response.status, correlator));
             }
             try {
                 var data = JSON.parse(response.responseText);
             } catch (e) {
-                throw new NGSI.InvalidResponseError('Server returned invalid JSON content');
+                throw new NGSI.InvalidResponseError('Server returned invalid JSON content', correlator);
             }
             return Promise.resolve({
-                correlator: response.getHeader('Fiware-correlator'),
+                correlator: correlator,
                 type: data
             });
         });
@@ -4141,12 +4185,13 @@
                 "FIWARE-ServicePath": options.servicepath
             }
         }).then(function (response) {
+            var correlator = response.getHeader('Fiware-correlator');
             if (response.status !== 200) {
-                return Promise.reject(new NGSI.InvalidResponseError('Unexpected error code: ' + response.status));
+                return Promise.reject(new NGSI.InvalidResponseError('Unexpected error code: ' + response.status, correlator));
             }
 
             var result = {
-                correlator: response.getHeader('Fiware-correlator'),
+                correlator: correlator,
                 limit: options.limit,
                 offset: options.offset,
                 results: JSON.parse(response.responseText),
@@ -4316,8 +4361,9 @@
                 }
             });
         }).then(function (response) {
+            var correlator = response.getHeader('Fiware-correlator');
             if (response.status !== 201) {
-                return Promise.reject(new NGSI.InvalidResponseError('Unexpected error code: ' + response.status));
+                return Promise.reject(new NGSI.InvalidResponseError('Unexpected error code: ' + response.status, correlator));
             }
 
             var subscription_url = response.getHeader('Location');
@@ -4329,7 +4375,7 @@
             }
 
             return Promise.resolve({
-                correlator: response.getHeader('Fiware-correlator'),
+                correlator: correlator,
                 subscription: subscription,
                 location: subscription_url
             });
@@ -4399,16 +4445,17 @@
                 "FIWARE-ServicePath": options.servicepath
             }
         }).then(function (response) {
+            var correlator = response.getHeader('Fiware-correlator');
             if (response.status !== 200) {
-                return Promise.reject(new NGSI.InvalidResponseError('Unexpected error code: ' + response.status));
+                return Promise.reject(new NGSI.InvalidResponseError('Unexpected error code: ' + response.status, correlator));
             }
             try {
                 var data = JSON.parse(response.responseText);
             } catch (e) {
-                throw new NGSI.InvalidResponseError('Server returned invalid JSON content');
+                throw new NGSI.InvalidResponseError('Server returned invalid JSON content', correlator);
             }
             return Promise.resolve({
-                correlator: response.getHeader('Fiware-correlator'),
+                correlator: correlator,
                 subscription: data
             });
         });
@@ -4491,11 +4538,12 @@
                 "FIWARE-ServicePath": options.servicepath
             }
         }).then(function (response) {
+            var correlator = response.getHeader('Fiware-correlator');
             if (response.status !== 204) {
-                return Promise.reject(new NGSI.InvalidResponseError('Unexpected error code: ' + response.status));
+                return Promise.reject(new NGSI.InvalidResponseError('Unexpected error code: ' + response.status, correlator));
             }
             return Promise.resolve({
-                correlator: response.getHeader('Fiware-correlator')
+                correlator: correlator
             });
         });
     };
@@ -4558,11 +4606,19 @@
                 "FIWARE-ServicePath": options.servicepath
             }
         }).then(function (response) {
-            if (response.status !== 204) {
-                return Promise.reject(new NGSI.InvalidResponseError('Unexpected error code: ' + response.status));
+            var correlator = response.getHeader('Fiware-correlator');
+            if (response.status === 404) {
+                try {
+                    var error = parse_error_response(response);
+                } catch (e) {
+                    return Promise.reject(new NGSI.InvalidResponseError(null, correlator));
+                }
+                return Promise.reject(new NGSI.NotFoundError({message: error.description, correlator: correlator}));
+            } else if (response.status !== 204) {
+                return Promise.reject(new NGSI.InvalidResponseError('Unexpected error code: ' + response.status, correlator));
             }
             return Promise.resolve({
-                correlator: response.getHeader('Fiware-correlator')
+                correlator: correlator
             });
         });
     };
@@ -4656,11 +4712,12 @@
                 "FIWARE-ServicePath": options.servicepath
             }
         }).then(function (response) {
+            var correlator = response.getHeader('Fiware-correlator');
             if (response.status !== 204) {
-                return Promise.reject(new NGSI.InvalidResponseError('Unexpected error code: ' + response.status));
+                return Promise.reject(new NGSI.InvalidResponseError('Unexpected error code: ' + response.status, correlator));
             }
             return Promise.resolve({
-                correlator: response.getHeader('Fiware-correlator')
+                correlator: correlator
             });
         });
     };
@@ -4767,21 +4824,22 @@
                 "FIWARE-ServicePath": options.servicepath
             }
         }).then(function (response) {
+            var correlator = response.getHeader('Fiware-correlator');
             if (response.status !== 200) {
-                return Promise.reject(new NGSI.InvalidResponseError('Unexpected error code: ' + response.status));
+                return Promise.reject(new NGSI.InvalidResponseError('Unexpected error code: ' + response.status, correlator));
             }
 
             try {
                 var data = JSON.parse(response.responseText);
             } catch (e) {
-                return Promise.reject(new NGSI.InvalidResponseError('Server returned invalid JSON content'));
+                return Promise.reject(new NGSI.InvalidResponseError('Server returned invalid JSON content', correlator));
             }
 
             var result = {
-                results: data,
+                correlator: correlator,
                 limit: options.limit,
                 offset: options.offset,
-                correlator: response.getHeader("Fiware-correlator")
+                results: data
             };
             if (options.count === true) {
                 result.count = parseInt(response.getHeader("Fiware-Total-Count"), 10);

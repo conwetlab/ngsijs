@@ -70,7 +70,11 @@
                         response_info.headers = {};
                     }
                     response_info.getHeader = function (header_name) {
-                        return this.headers[header_name];
+                        if (this.headers[header_name] != null) {
+                            return this.headers[header_name];
+                        } else {
+                            return null;
+                        }
                     };
 
                     if (response_info.exception != null) {

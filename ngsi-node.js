@@ -12,7 +12,12 @@ var Response = function Response(message, body) {
 };
 
 Response.prototype.getHeader = function getHeader(name) {
-    return this.headers[String(name).toLowerCase()];
+    name = String(name).toLowerCase();
+    if (this.headers[name] != null) {
+        return this.headers[name];
+    } else {
+        return null;
+    }
 };
 
 
