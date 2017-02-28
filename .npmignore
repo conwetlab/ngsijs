@@ -10,4 +10,3 @@ tests/
 *.tgz
 Gruntfile.js
 tests.js
-eventsource.js

@@ -21,9 +21,14 @@
   ],
   "homepage": "https://github.com/conwetlab/ngsijs",
   "ignore": [
-    "node_modules",
-    "bower_components",
+    "helpers",
+    "jsontempalte",
+    "ngsi-proxy",
+    "responses",
     "tests",
-    "ngsi-node.js"
+    ".*",
+    "Gruntfile.js",
+    "ngsi-node.js",
+    "package.json"
   ]
 }
