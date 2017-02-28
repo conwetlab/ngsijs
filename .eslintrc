@@ -2,11 +2,5 @@
   "extends": ".eslintrc-rules",
   "env": {
     "browser": true
-  },
-  "rules": {
-    "strict": [
-      "error",
-      "global"
-    ]
   }
 }
