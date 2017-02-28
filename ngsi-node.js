@@ -1,6 +1,6 @@
-// NGSI config
+"use strict";
+
 var http = require('http');
-var node_url = require('url');
 
 var Response = function Response(message, body) {
     Object.defineProperties(this, {
@@ -80,20 +80,20 @@ var makeRequest = function makeRequest(url, options) {
 
     return new Promise(function (resolve, reject) {
         var request = http.request({
-                method: options.method,
-                hostname: url.hostname,
-                protocol: url.protocol,
-                port: url.port,
-                path: url.pathname + url.search,
-                headers: options.requestHeaders
-            }, function(response) {
-                response.setEncoding('utf8');
-                buf = '';
-                response.on('data', function (chunck) { buf += chunck; });
-                response.on('end', function () {
-                    resolve(new Response(response, buf));
-                });
+            method: options.method,
+            hostname: url.hostname,
+            protocol: url.protocol,
+            port: url.port,
+            path: url.pathname + url.search,
+            headers: options.requestHeaders
+        }, function (response) {
+            response.setEncoding('utf8');
+            var buf = '';
+            response.on('data', function (chunck) { buf += chunck; });
+            response.on('end', function () {
+                resolve(new Response(response, buf));
             });
+        });
 
         request.on('error', (e) => {
             if (e != null && "message" in e) {

@@ -41,6 +41,12 @@ module.exports = function (grunt) {
             library: {
                 src: 'NGSI.js'
             },
+            nodebridge: {
+                options: {
+                    configFile: ".eslintrc-node",
+                },
+                src: 'ngsi-node.js'
+            },
             specs: {
                 options: {
                     configFile: ".eslintrc-jasmine",
