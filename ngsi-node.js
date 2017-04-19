@@ -65,7 +65,7 @@ var makeRequest = function makeRequest(url, options) {
     // Headers
     if (options.postBody != null) {
         options.requestHeaders['Content-Type'] = 'application/json'
-        options.requestHeaders['Content-Length'] = options.postBody.length;
+        options.requestHeaders['Content-Length'] = Buffer.byteLength(options.postBody);
     }
 
     // parameters
