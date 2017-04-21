@@ -17,6 +17,9 @@ This library has been developed following the FIWARE
 [NGSI v2](http://fiware.github.io/specifications/ngsiv2/stable/) specifications
 and has been tested to work against version 0.26.0+ of the Orion Context Broker.
 
+Reference documentation of the API is available at
+[http://conwetlab.github.io/ngsijs/stable/NGSI.html](http://conwetlab.github.io/ngsijs/stable/NGSI.html).
+
 
 Using ngsijs from normal web pages
 ----------------------------------
@@ -28,27 +31,50 @@ Just include a `<script>` element linking to the `NGSI.min.js` file:
 ```
 
 Once added the `<script>` element, you will be able to use all the features
-provided by the ngsijs library except receiving notifications. To be able to
-receive notifications inside a web browser the library requires the use of a
-[ngsi-proxy](https://github.com/conwetlab/ngsi-proxy) server.
+provided by the ngsijs library (except receiving notifications):
 
+```javascript
+    var connection = new NGSI.Connection("http://orion.example.com:1026");
+    connection.v2.listEntities().then((result) => {
+        response.results.forEach((entity) => {
+            console.log(entity.id);
+        });
+    });
+```
+
+This example will display the `id` of the first 20 entities. See the
+documentation of the [`listEntities`](http://conwetlab.github.io/ngsijs/stable/NGSI.Connection.html#.%22v2.listEntities%22__anchor)
+method for more info.
+
+To be able to receive notifications inside a web browser the library requires
+the use of a [ngsi-proxy](https://github.com/conwetlab/ngsi-proxy) server. You
+can use your own instance or you the `ngsi-proxy` available at
+`https://ngsiproxy.lab.fiware.org`.
+
+```javascript
+    var connection = new NGSI.Connection("http://orion.example.com:1026", {
+        ngsi_proxy_url: "https://ngsiproxy.lab.fiware.org"
+    });
+```
 
 Using ngsijs from Node.js
 -------------------------
 
 ```bash
-  npm install ngsijs
+$ npm install ngsijs
 ```
 
 After installing the ngsijs node module, you will be able to use the API as usual:
 
-```js
-  var NGSI = require('ngsijs');
-  var connection = new NGSI.Connection("http://orion.example.com:1026");
+```javascript
+    var NGSI = require('ngsijs');
+    var connection = new NGSI.Connection("http://orion.example.com:1026");
 ```
 
 **Note:** Node.js doesn't require the usage of a ngsi-proxy as you can create
-an HTTP endpoint easily (e.g. using express).
+an HTTP endpoint easily (e.g. using express). Anyway, you can use it if you
+want, you only have to take into account that is better to directly provide the
+HTTP endpoint to reduce the overhead.
 
 
 Using ngsijs from WireCloud widgets/operators

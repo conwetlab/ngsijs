@@ -2543,7 +2543,8 @@
      *         // Entities retrieved successfully
      *         // response.results is an array with the retrieved entities
      *         // response.correlator transaction id associated with the server response
-     *         // response.count contains the number of entities
+     *         // response.count contains the total number of entities selected
+     *         //   by this query
      *         // response.offset contains the offset used in the request
      *     }, (error) => {
      *         // Error retrieving entities
