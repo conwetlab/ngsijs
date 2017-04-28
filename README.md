@@ -27,19 +27,19 @@ Using ngsijs from normal web pages
 Just include a `<script>` element linking to the `NGSI.min.js` file:
 
 ```html
-    <script type="text/javascript" src="url_to_NGSI.js"></script>
+<script type="text/javascript" src="url_to_NGSI.js"></script>
 ```
 
 Once added the `<script>` element, you will be able to use all the features
 provided by the ngsijs library (except receiving notifications):
 
 ```javascript
-    var connection = new NGSI.Connection("http://orion.example.com:1026");
-    connection.v2.listEntities().then((result) => {
-        response.results.forEach((entity) => {
-            console.log(entity.id);
-        });
+var connection = new NGSI.Connection("http://orion.example.com:1026");
+connection.v2.listEntities().then((result) => {
+    response.results.forEach((entity) => {
+        console.log(entity.id);
     });
+});
 ```
 
 This example will display the `id` of the first 20 entities. See the
@@ -52,9 +52,9 @@ can use your own instance or you the `ngsi-proxy` available at
 `https://ngsiproxy.lab.fiware.org`.
 
 ```javascript
-    var connection = new NGSI.Connection("http://orion.example.com:1026", {
-        ngsi_proxy_url: "https://ngsiproxy.lab.fiware.org"
-    });
+var connection = new NGSI.Connection("http://orion.example.com:1026", {
+    ngsi_proxy_url: "https://ngsiproxy.lab.fiware.org"
+});
 ```
 
 Using ngsijs from Node.js
@@ -67,8 +67,8 @@ $ npm install ngsijs
 After installing the ngsijs node module, you will be able to use the API as usual:
 
 ```javascript
-    var NGSI = require('ngsijs');
-    var connection = new NGSI.Connection("http://orion.example.com:1026");
+var NGSI = require('ngsijs');
+var connection = new NGSI.Connection("http://orion.example.com:1026");
 ```
 
 **Note:** Node.js doesn't require the usage of a ngsi-proxy as you can create
