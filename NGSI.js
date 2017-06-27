@@ -4341,7 +4341,11 @@
      *        }
      *    },
      *    "notification": {
-     *        "callback": function () {
+     *        "callback": function (notification) {
+     *            // notification.attrsformat provides information about the format used by notification.data
+     *            // notification.data contains the modified entities
+     *            // notification.subscriptionId provides the associated subscription id
+     *            // etc...
      *        },
      *        "attrs": [
      *            "temperature",
