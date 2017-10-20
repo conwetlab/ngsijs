@@ -8,7 +8,7 @@ ngsijs
 
 Ngsijs is the JavaScript library used by
 [WireCloud](https://github.com/Wirecloud/wirecloud) for adding FIWARE NGSI
-capabilities to widgets and operators. However, this library has also be
+capabilities to widgets and operators. However, this library has also been
 designed to be used in other environments as normal web pages and
 clients/servers running on Node.js.
 
