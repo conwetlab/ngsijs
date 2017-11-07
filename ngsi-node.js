@@ -1,6 +1,7 @@
 "use strict";
 
-var http = require('http');
+var http = require('http'),
+    https = require('https');
 
 var Response = function Response(message, body) {
     Object.defineProperties(this, {
@@ -79,7 +80,8 @@ var makeRequest = function makeRequest(url, options) {
     }
 
     return new Promise(function (resolve, reject) {
-        var request = http.request({
+        var handler = url.protocol === "http:" ? http : https;
+        var request = handler.request({
             method: options.method,
             hostname: url.hostname,
             protocol: url.protocol,
