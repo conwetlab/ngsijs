@@ -63,6 +63,12 @@
                 }).toThrowError(TypeError);
             });
 
+            it("throws a TypeError exception when not passing the id option", function () {
+                expect(function () {
+                    connection.v2.deleteEntity({});
+                }).toThrowError(TypeError);
+            });
+
             it("deletes entities only passing the id", function (done) {
                 ajaxMockup.addStaticURL("http://ngsi.server.com/v2/entities/Spain-Road-A62", {
                     checkRequestContent: function (url, options) {
@@ -426,6 +432,12 @@
                 "type": "b",
                 "attr": "value"
             };
+
+            it("throws a TypeError exception when not passing the id option", function () {
+                expect(function () {
+                    connection.v2.createEntity({});
+                }).toThrowError(TypeError);
+            });
 
             it("basic request", function (done) {
                 ajaxMockup.addStaticURL("http://ngsi.server.com/v2/entities", {
@@ -805,6 +817,12 @@
                 }).toThrowError(TypeError);
             });
 
+            it("throws a TypeError exception when not passing the id option", function () {
+                expect(function () {
+                    connection.v2.getEntity({});
+                }).toThrowError(TypeError);
+            });
+
             it("basic get request", function (done) {
                 var entity_data = {
                     "id": "Spain-Road-A62",
@@ -1088,6 +1106,12 @@
             it("throws a TypeError exception when not passing the options parameter", function () {
                 expect(function () {
                     connection.v2.getEntityAttributes();
+                }).toThrowError(TypeError);
+            });
+
+            it("throws a TypeError exception when not passing the id option", function () {
+                expect(function () {
+                    connection.v2.getEntityAttributes({});
                 }).toThrowError(TypeError);
             });
 
@@ -1655,6 +1679,42 @@
                     "temperature": {
                         "value": 21.7
                     }
+                }).then(function (result) {
+                    expect(result).toEqual({
+                        correlator: 'correlatortoken'
+                    });
+                    done();
+                }, function (e) {
+                    fail("Failure callback called");
+                });
+            });
+
+            it("allows to update typed entities (passing the type as option)", function (done) {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/v2/entities/Bcn-Welt/attrs", {
+                    headers: {
+                        'Fiware-correlator': 'correlatortoken',
+                    },
+                    method: 'POST',
+                    status: 204,
+                    checkRequestContent: function (url, options) {
+                        expect(options.parameters.type).toBe("Room");
+                        expect("options" in options.parameters).toBeFalsy();
+                        var data = JSON.parse(options.postBody);
+                        expect(data).toEqual({
+                            "temperature": {
+                                "value": 21.7
+                            }
+                        });
+                    }
+                });
+
+                connection.v2.appendEntityAttributes({
+                    "id": "Bcn-Welt",
+                    "temperature": {
+                        "value": 21.7
+                    }
+                }, {
+                    "type": "Room"
                 }).then(function (result) {
                     expect(result).toEqual({
                         correlator: 'correlatortoken'
