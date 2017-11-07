@@ -11,4 +11,4 @@ script:
     - grunt karma
 branches:
   only:
-    - develop
+    - master
