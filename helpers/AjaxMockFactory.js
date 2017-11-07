@@ -19,6 +19,10 @@
             func = function (url, options) {
                 var specific_callback, response_info;
 
+                if (!(url instanceof URL)) {
+                    throw TypeError();
+                }
+
                 if (options == null) {
                     options = {};
                 }

@@ -2785,7 +2785,7 @@
                 expect(failure).toEqual(false);
                 expect(notification_data).toBe(null);
                 expect(mockedeventsources.length).toEqual(1);
-                expect(mockedeventsources[0].url).toEqual('http://ngsiproxy.example.com/eventsource/1');
+                expect(mockedeventsources[0].url.toString()).toEqual('http://ngsiproxy.example.com/eventsource/1');
                 expect(response_data).toEqual({
                     'subscriptionId': 'sub1',
                     'duration': 'PT24H'
@@ -2876,7 +2876,7 @@
                 expect(failure).toEqual(false);
                 expect(notification_data).toBe(null);
                 expect(mockedeventsources.length).toEqual(1);
-                expect(mockedeventsources[0].url).toEqual('http://ngsiproxy.example.com/eventsource/1');
+                expect(mockedeventsources[0].url.toString()).toEqual('http://ngsiproxy.example.com/eventsource/1');
                 expect(response_data).toEqual({
                     'subscriptionId': 'sub1',
                     'duration': 'PT24H'

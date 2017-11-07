@@ -1020,6 +1020,7 @@
                 if (priv.source_url == null) {
                     return Promise.reject(new NGSI.InvalidResponseError('Missing Location Header'));
                 }
+                priv.source_url = new URL(priv.source_url);
                 return connect_to_eventsource.call(this);
             }.bind(this),
             function (error) {
@@ -1180,7 +1181,7 @@
         }
 
         return this.connect().then(function () {
-            return this.makeRequest(this.url + NGSI.proxy_endpoints.CALLBACK_COLLECTION, {
+            return this.makeRequest(new URL(NGSI.proxy_endpoints.CALLBACK_COLLECTION, this.url), {
                 supportsAccessControl: true,  // required for using CORS on WireCloud
                 method: 'POST',
                 contentType: 'application/json',
@@ -1254,7 +1255,7 @@
      * @returns {Promise}
      */
     NGSI.ProxyConnection.prototype.closeCallback = function closeCallback(callback_id) {
-        return this.makeRequest(this.url + NGSI.proxy_endpoints.CALLBACK_COLLECTION + '/' + callback_id, {
+        return this.makeRequest(new URL(NGSI.proxy_endpoints.CALLBACK_COLLECTION + '/' + callback_id, this.url), {
             supportsAccessControl: true,  // required for using CORS on WireCloud
             method: 'DELETE'
         }).then(
@@ -3494,12 +3495,12 @@
         }
 
         var connection = privates.get(this);
-        var url = connection.url + interpolate(
+        var url = new URL(interpolate(
             NGSI.endpoints.v2.ENTITY_ATTR_ENTRY, {
                 entityId: encodeURIComponent(options.id),
                 attribute: encodeURIComponent(options.attribute)
             }
-        );
+        ), connection.url);
         var parameters = {};
         if (options.type != null) {
             parameters.type = options.type;
@@ -3638,12 +3639,12 @@
             metadata: changes.metadata
         };
         var connection = privates.get(this);
-        var url = connection.url + interpolate(
+        var url = new URL(interpolate(
             NGSI.endpoints.v2.ENTITY_ATTR_ENTRY, {
                 entityId: encodeURIComponent(options.id),
                 attribute: encodeURIComponent(options.attribute)
             }
-        );
+        ), connection.url);
         var parameters = {};
         if (options.type != null) {
             parameters.type = options.type;
@@ -3742,12 +3743,12 @@
         }
 
         var connection = privates.get(this);
-        var url = connection.url + interpolate(
+        var url = new URL(interpolate(
             NGSI.endpoints.v2.ENTITY_ATTR_ENTRY, {
                 entityId: encodeURIComponent(options.id),
                 attribute: encodeURIComponent(options.attribute)
             }
-        );
+        ), connection.url);
 
         var parameters = {};
         if (options.type != null) {
@@ -3853,12 +3854,12 @@
         }
 
         var connection = privates.get(this);
-        var url = connection.url + interpolate(
+        var url = new URL(interpolate(
             NGSI.endpoints.v2.ENTITY_ATTR_VALUE_ENTRY, {
                 entityId: encodeURIComponent(options.id),
                 attribute: encodeURIComponent(options.attribute)
             }
-        );
+        ), connection.url);
         var parameters = {};
         if (options.type != null) {
             parameters.type = options.type;
@@ -3970,12 +3971,12 @@
         }
 
         var connection = privates.get(this);
-        var url = connection.url + interpolate(
+        var url = new URL(interpolate(
             NGSI.endpoints.v2.ENTITY_ATTR_VALUE_ENTRY, {
                 entityId: encodeURIComponent(options.id),
                 attribute: encodeURIComponent(options.attribute)
             }
-        );
+        ), connection.url);
         var parameters = {};
         if (options.type != null) {
             parameters.type = options.type;
