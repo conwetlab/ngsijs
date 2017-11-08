@@ -109,7 +109,7 @@
             body = JSON.stringify(payload);
         }
 
-        requestHeaders = JSON.parse(JSON.stringify(this.request_headers));
+        requestHeaders = JSON.parse(JSON.stringify(this.headers));
         requestHeaders.Accept = 'application/json';
 
         this.makeRequest(url, {
@@ -192,7 +192,7 @@
             options.postBody = JSON.stringify(options.postBody);
         }
 
-        var requestHeaders = JSON.parse(JSON.stringify(this.request_headers));
+        var requestHeaders = JSON.parse(JSON.stringify(this.headers));
         requestHeaders.Accept = 'application/json';
 
         for (var headerName in options.requestHeaders) {
@@ -1419,7 +1419,18 @@
      * @summary A context broker connection.
      *
      * @param {String|URL} url URL of the context broker
-     * @param {Object} options
+     * @param {Object} [options]
+     *
+     * Object with extra options:
+     *
+     * - `headers` (`Object`): Default headers to be sent when making requests
+     *   through this connection.
+     * - `service` (`String`): Default service/tenant to use when making
+     *   requests through this connection.
+     * - `servicepath` (`String`): Default service path to use when making
+     *   requests through this connection.
+     * - `ngsi_proxy_url` (`String`|`URL`): URL of the NGSI proxy to be used for
+     *   receiving notifications.
      *
      * @example <caption>Basic usage</caption>
      *
@@ -1427,14 +1438,14 @@
      *
      * @example <caption>Using the FIWARE Lab's instance</caption>
      *
-     * var connection = new NGSI.Connection("http://orion.lab.fiware.org", {
-     *     requestHeaders: {
+     * var connection = new NGSI.Connection("http://orion.lab.fiware.org:1026", {
+     *     headers: {
      *         "X-Auth-Token": token
      *     }
      * });
      *
      **/
-    NGSI.Connection = function NGSIConnection(url, options) {
+    NGSI.Connection = function Connection(url, options) {
 
         try {
             url = new URL(url);
@@ -1454,20 +1465,23 @@
             options = {};
         }
 
-        if (options.request_headers != null) {
-            this.request_headers = options.request_headers;
+        if (options.headers != null && typeof options.headers === 'object') {
+            this.headers = options.headers;
+        } else if (options.request_headers != null) {
+            // Backwards compatibilty
+            this.headers = options.request_headers;
         } else {
-            this.request_headers = {};
+            this.headers = {};
         }
 
         if (options.service != null) {
-            deleteHeader("FIWARE-Service", this.request_headers);
-            this.request_headers["FIWARE-Service"] = options.service;
+            deleteHeader("FIWARE-Service", this.headers);
+            this.headers["FIWARE-Service"] = options.service;
         }
 
         if (options.servicepath != null) {
-            deleteHeader("FIWARE-ServicePath", this.request_headers);
-            this.request_headers["FIWARE-ServicePath"] = options.servicepath;
+            deleteHeader("FIWARE-ServicePath", this.headers);
+            this.headers["FIWARE-ServicePath"] = options.servicepath;
         }
 
         if (typeof options.requestFunction === 'function') {

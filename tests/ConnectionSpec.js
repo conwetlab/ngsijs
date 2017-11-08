@@ -43,7 +43,7 @@
 
     describe("NGSI.Connection", function () {
 
-        describe("new NGSI.Connection(url, options)", function () {
+        describe("new NGSI.Connection(url[, options])", function () {
 
             it("normalizes provided urls", function () {
                 var connection = new NGSI.Connection("http://ngsi.example.com:1026/prefix");
@@ -74,6 +74,86 @@
                 expect(function () {
                     new NGSI.Connection(new URL("ftp://ngsi.example.com:1026"));
                 }).toThrowError(TypeError);
+            });
+
+            it("supports the headers option", function () {
+                var connection = new NGSI.Connection("http://ngsi.example.com:1026/prefix", {
+                    headers: {
+                        'Authorization': 'Bearer token'
+                    }
+                });
+
+                // TODO request_headers is not part of the stable API
+                expect(connection.headers).toEqual({
+                    'Authorization': 'Bearer token'
+                });
+            });
+
+            it("supports the service option", function () {
+                var connection = new NGSI.Connection("http://ngsi.example.com:1026/prefix", {
+                    service: 'AirQuality'
+                });
+
+                // TODO request_headers is not part of the stable API
+                expect(connection.headers).toEqual({
+                    'FIWARE-Service': 'AirQuality'
+                });
+            });
+
+            it("supports the servicepath option", function () {
+                var connection = new NGSI.Connection("http://ngsi.example.com:1026/", {
+                    servicepath: '/Spain/Madrid'
+                });
+
+                // TODO request_headers is not part of the stable API
+                expect(connection.headers).toEqual({
+                    'FIWARE-ServicePath': '/Spain/Madrid'
+                });
+            });
+
+            it("supports using the 'headers', 'service' and 'servicepath' options at the same time", function () {
+                var connection = new NGSI.Connection("http://ngsi.example.com:1026/", {
+                    headers: {
+                        'Authorization': 'Bearer token'
+                    },
+                    service: 'AirQuality',
+                    servicepath: '/Spain/Madrid'
+                });
+
+                // TODO request_headers is not part of the stable API
+                expect(connection.headers).toEqual({
+                    'Authorization': 'Bearer token',
+                    'FIWARE-Service': 'AirQuality',
+                    'FIWARE-ServicePath': '/Spain/Madrid'
+                });
+            });
+
+            it("gives preference to the service when the FIWARE-Service header is provided using the headers option", function () {
+                var connection = new NGSI.Connection("http://ngsi.example.com:1026/", {
+                    headers: {
+                        'Fiware-Service': 'myservice'
+                    },
+                    service: 'AirQuality'
+                });
+
+                // TODO request_headers is not part of the stable API
+                expect(connection.headers).toEqual({
+                    'FIWARE-Service': 'AirQuality'
+                });
+            });
+
+            it("gives preference to the servicepath option when the FIWARE-ServicePath header is provided using the headers option", function () {
+                var connection = new NGSI.Connection("http://ngsi.example.com:1026/", {
+                    headers: {
+                        'Fiware-Servicepath': '/my/path'
+                    },
+                    servicepath: '/Spain/Madrid'
+                });
+
+                // TODO request_headers is not part of the stable API
+                expect(connection.headers).toEqual({
+                    'FIWARE-ServicePath': '/Spain/Madrid'
+                });
             });
 
         });
