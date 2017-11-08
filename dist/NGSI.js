@@ -1020,6 +1020,7 @@
                 if (priv.source_url == null) {
                     return Promise.reject(new NGSI.InvalidResponseError('Missing Location Header'));
                 }
+                priv.source_url = new URL(priv.source_url);
                 return connect_to_eventsource.call(this);
             }.bind(this),
             function (error) {
@@ -1180,7 +1181,7 @@
         }
 
         return this.connect().then(function () {
-            return this.makeRequest(this.url + NGSI.proxy_endpoints.CALLBACK_COLLECTION, {
+            return this.makeRequest(new URL(NGSI.proxy_endpoints.CALLBACK_COLLECTION, this.url), {
                 supportsAccessControl: true,  // required for using CORS on WireCloud
                 method: 'POST',
                 contentType: 'application/json',
@@ -1254,7 +1255,7 @@
      * @returns {Promise}
      */
     NGSI.ProxyConnection.prototype.closeCallback = function closeCallback(callback_id) {
-        return this.makeRequest(this.url + NGSI.proxy_endpoints.CALLBACK_COLLECTION + '/' + callback_id, {
+        return this.makeRequest(new URL(NGSI.proxy_endpoints.CALLBACK_COLLECTION + '/' + callback_id, this.url), {
             supportsAccessControl: true,  // required for using CORS on WireCloud
             method: 'DELETE'
         }).then(
@@ -2496,7 +2497,8 @@
      *   the attributes are retrieved in arbitrary order.
      * - `correlator` (`String`): Transaction id
      * - `count` (`Boolean`; default: `false`): Request total count
-     * - `id` (`String`): A comma-separated list of entity ids to retrieve
+     * - `id` (`String`): A comma-separated list of entity ids to retrieve.
+     *   Incompatible with the `idPattern` option.
      * - `idPattern` (`String`): A correctly formated regular expression.
      *   Retrieve entities whose ID matches the regular expression. Incompatible
      *   with the `id` option
@@ -2513,7 +2515,8 @@
      *   separated by semicolons (`;`)
      * - `service` (`String`): Service/tenant to use in this operation
      * - `servicepath` (`String`): Service path to use in this operation
-     * - `type` (`String`): A comma-separated list of entity types to retrieve
+     * - `type` (`String`): A comma-separated list of entity types to retrieve.
+     *   Incompatible with the `typePattern` option.
      * - `typePattern` (`String`): A correctly formated regular expression.
      *   Retrieve entities whose type matches the regular expression.
      *   Incompatible with the `type` option.
@@ -2649,7 +2652,8 @@
      *
      * @param {Object}
      *
-     * entity values to be used for creating the new entity
+     * entity values to be used for creating the new entity. Requires at least
+     * the `id` value for the new entity.
      *
      * @param {Object} [options]
      *
@@ -2722,6 +2726,10 @@
             options = {};
         }
 
+        if (entity.id == null) {
+            throw new TypeError('missing entity id');
+        }
+
         var connection = privates.get(this);
         var parameters = {};
 
@@ -2765,10 +2773,12 @@
      *
      * @param {String|Object} options
      *
-     * Object with extra options:
+     * String with the id of the entity to query or an object with extra
+     * options:
      *
      * - `correlator` (`String`): Transaction id
      * - `keyValues` (`Boolean`; default: `false`): Use flat attributes
+     * - `id` (`String`, required): Id of the entity to query
      * - `service` (`String`): Service/tenant to use in this operation
      * - `servicepath` (`String`): Service path to use in this operation
      * - `type` (`String`): Entity type, to avoid ambiguity in case there are
@@ -2818,6 +2828,8 @@
             options = {
                 id: options
             };
+        } else if (options.id == null) {
+            throw new TypeError("missing id option");
         }
 
         var connection = privates.get(this);
@@ -2874,6 +2886,7 @@
      *
      * - `correlator` (`String`): Transaction id
      * - `keyValues` (`Boolean`; default: `false`): Use flat attributes
+     * - `id` (`String`, required): Id of the entity to query
      * - `service` (`String`): Service/tenant to use in this operation
      * - `servicepath` (`String`): Service path to use in this operation
      * - `type` (`String`): Entity type, to avoid ambiguity in case there are
@@ -2923,6 +2936,8 @@
             options = {
                 id: options
             };
+        } else if (options.id == null) {
+            throw new TypeError("missing id option");
         }
 
         var connection = privates.get(this);
@@ -2973,6 +2988,10 @@
      * @memberof NGSI.Connection
      *
      * @param {Object} changes
+     *
+     * New values for the attributes. Must contain the `id` of the entity to
+     * update and may contain the `type` option to avoid ambiguity in case there are
+     * several entities with the same entity id.
      *
      * @param {Object} [options]
      *
@@ -3041,6 +3060,8 @@
         if (changes.type != null) {
             parameters.type = changes.type;
             delete changes.type;
+        } else if (options.type != null) {
+            parameters.type = options.type;
         }
 
         if (options.strict === true) {
@@ -3088,8 +3109,9 @@
      *
      * @param {Object} changes
      *
-     * New values for the attributes, including the `id` and the `type` values
-     * for searching the entity to update.
+     * New values for the attributes. Must contain the `id` of the entity to
+     * update and may contain the `type` option to avoid ambiguity in case there are
+     * several entities with the same entity id.
      *
      * @param {Object} [options]
      *
@@ -3200,8 +3222,9 @@
      *
      * @param {Object} entity
      *
-     * New values for the attributes, including the `id` and the `type` values
-     * for searching the entity to update.
+     * New values for the attributes. Must contain the `id` of the entity to
+     * update and may contain the `type` option to avoid ambiguity in case there are
+     * several entities with the same entity id.
      *
      * @param {Object} [options]
      *
@@ -3315,7 +3338,7 @@
      * String with the entity id to remove or an object providing options:
      *
      * - `correlator` (`String`): Transaction id
-     * - `id` (`String`): Id of the entity to remove
+     * - `id` (`String`, required): Id of the entity to remove
      * - `service` (`String`): Service/tenant to use in this operation
      * - `servicepath` (`String`): Service path to use in this operation
      * - `type` (`String`): Entity type, to avoid ambiguity in case there are
@@ -3361,6 +3384,8 @@
             options = {
                 id: options
             };
+        } else if (options.id == null) {
+            throw new TypeError("missing id option");
         }
 
         var connection = privates.get(this);
@@ -3412,9 +3437,9 @@
      *
      * Object with options:
      *
-     * - `attribute` (`String`): Name of the attribute to query
+     * - `attribute` (`String`, required): Name of the attribute to query
      * - `correlator` (`String`): Transaction id
-     * - `id` (`String`): Id of the entity to query
+     * - `id` (`String`, required): Id of the entity to query
      * - `service` (`String`): Service/tenant to use in this operation
      * - `servicepath` (`String`): Service path to use in this operation
      * - `type` (`String`): Entity type, to avoid ambiguity in case there are
@@ -3430,7 +3455,7 @@
      * }).then(
      *     (response) => {
      *         // Entity details retrieved successfully
-     *         // response.entity entity details
+     *         // response.attribute attribute details
      *         // response.correlator transaction id associated with the server response
      *     }, (error) => {
      *         // Error retrieving entity
@@ -3448,7 +3473,7 @@
      * }).then(
      *     (response) => {
      *         // Entity details retrieved successfully
-     *         // response.entity entity details
+     *         // response.attribute attribute details
      *         // response.correlator transaction id associated with the server response
      *     }, (error) => {
      *         // Error retrieving entity
@@ -3470,12 +3495,12 @@
         }
 
         var connection = privates.get(this);
-        var url = connection.url + interpolate(
+        var url = new URL(interpolate(
             NGSI.endpoints.v2.ENTITY_ATTR_ENTRY, {
                 entityId: encodeURIComponent(options.id),
                 attribute: encodeURIComponent(options.attribute)
             }
-        );
+        ), connection.url);
         var parameters = {};
         if (options.type != null) {
             parameters.type = options.type;
@@ -3519,16 +3544,17 @@
      *
      * @param {Object} changes
      *
-     * Object with the new values for the attribute
+     * Object with the new values for the attribute. Can also be used for
+     * providing options. See the `options` parameter.
      *
      * @param {Object} [options]
      *
      * Object with options (those options can also be passed inside the changes
      * parameter):
      *
-     * - `attribute` (`String`): Name of the attribute to modify
+     * - `attribute` (`String`, required): Name of the attribute to modify
      * - `correlator` (`String`): Transaction id
-     * - `id` (`String`): Id of the entity to modify
+     * - `id` (`String`, required): Id of the entity to modify
      * - `service` (`String`): Service/tenant to use in this operation
      * - `servicepath` (`String`): Service path to use in this operation
      * - `type` (`String`): Entity type, to avoid ambiguity in case there are
@@ -3613,12 +3639,12 @@
             metadata: changes.metadata
         };
         var connection = privates.get(this);
-        var url = connection.url + interpolate(
+        var url = new URL(interpolate(
             NGSI.endpoints.v2.ENTITY_ATTR_ENTRY, {
                 entityId: encodeURIComponent(options.id),
                 attribute: encodeURIComponent(options.attribute)
             }
-        );
+        ), connection.url);
         var parameters = {};
         if (options.type != null) {
             parameters.type = options.type;
@@ -3662,9 +3688,9 @@
      * Object providing information about the attribute to remove and any
      * extra options:
      *
-     * - `attribute` (`String`): Name of the attribute to delete
+     * - `attribute` (`String`, required): Name of the attribute to delete
      * - `correlator` (`String`): Transaction id
-     * - `id` (`String`): Id of the entity to modify
+     * - `id` (`String`, required): Id of the entity to modify
      * - `service` (`String`): Service/tenant to use in this operation
      * - `servicepath` (`String`): Service path to use in this operation
      * - `type` (`String`): Entity type, to avoid ambiguity in case there are
@@ -3717,12 +3743,12 @@
         }
 
         var connection = privates.get(this);
-        var url = connection.url + interpolate(
+        var url = new URL(interpolate(
             NGSI.endpoints.v2.ENTITY_ATTR_ENTRY, {
                 entityId: encodeURIComponent(options.id),
                 attribute: encodeURIComponent(options.attribute)
             }
-        );
+        ), connection.url);
 
         var parameters = {};
         if (options.type != null) {
@@ -3770,9 +3796,9 @@
      *
      * Object with extra options:
      *
-     * - `attribute` (`String`): Name of the attribute to query
+     * - `attribute` (`String`, required): Name of the attribute to query
      * - `correlator` (`String`): Transaction id
-     * - `id` (`String`): Id of the entity to query
+     * - `id` (`String`, required): Id of the entity to query
      * - `service` (`String`): Service/tenant to use in this operation
      * - `servicepath` (`String`): Service path to use in this operation
      * - `type` (`String`): Entity type, to avoid ambiguity in case there are
@@ -3828,12 +3854,12 @@
         }
 
         var connection = privates.get(this);
-        var url = connection.url + interpolate(
+        var url = new URL(interpolate(
             NGSI.endpoints.v2.ENTITY_ATTR_VALUE_ENTRY, {
                 entityId: encodeURIComponent(options.id),
                 attribute: encodeURIComponent(options.attribute)
             }
-        );
+        ), connection.url);
         var parameters = {};
         if (options.type != null) {
             parameters.type = options.type;
@@ -3881,12 +3907,13 @@
      *
      * Object with options:
      *
-     * - `attribute` (`String`): Name of the attribute to query
+     * - `attribute` (`String`, required): Name of the attribute to query
      * - `correlator` (`String`): Transaction id
-     * - `id` (`String`): Id of the entity to query
+     * - `id` (`String`, required): Id of the entity to query
      * - `service` (`String`): Service/tenant to use in this operation
      * - `servicepath` (`String`): Service path to use in this operation
-     * - `value` (`String`|`Boolean`|`Number`|`Object`|`Array`) new value
+     * - `value` (`String`|`Boolean`|`Number`|`Object`|`Array`, required) new
+     *   value
      * - `type` (`String`): Entity type, to avoid ambiguity in case there are
      *   several entities with the same entity id.
      *
@@ -3944,12 +3971,12 @@
         }
 
         var connection = privates.get(this);
-        var url = connection.url + interpolate(
+        var url = new URL(interpolate(
             NGSI.endpoints.v2.ENTITY_ATTR_VALUE_ENTRY, {
                 entityId: encodeURIComponent(options.id),
                 attribute: encodeURIComponent(options.attribute)
             }
-        );
+        ), connection.url);
         var parameters = {};
         if (options.type != null) {
             parameters.type = options.type;
@@ -4341,7 +4368,11 @@
      *        }
      *    },
      *    "notification": {
-     *        "callback": function () {
+     *        "callback": function (notification) {
+     *            // notification.attrsformat provides information about the format used by notification.data
+     *            // notification.data contains the modified entities
+     *            // notification.subscriptionId provides the associated subscription id
+     *            // etc...
      *        },
      *        "attrs": [
      *            "temperature",
