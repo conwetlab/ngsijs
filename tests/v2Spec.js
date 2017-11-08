@@ -733,27 +733,53 @@
                 });
             });
 
-            it("handles connection errors", function (done) {
-                connection.v2.createSubscription(subscription).then(function (value) {
-                    fail("Success callback called");
-                }, function (e) {
-                    expect(e).toEqual(jasmine.any(NGSI.ConnectionError));
-                    done();
-                });
+            describe("handles connection errors:", function () {
+
+                it("normal connection error", function (done) {
+                    connection.v2.createSubscription(subscription).then(function (value) {
+                        fail("Success callback called");
+                    }, function (e) {
+                        expect(e).toEqual(jasmine.any(NGSI.ConnectionError));
+                        done();
+                    });
+                })
+
+                var test = function test(code, done) {
+                    ajaxMockup.addStaticURL("http://ngsi.server.com/v2/subscriptions", {
+                        method: "POST",
+                        status: code
+                    });
+
+                    connection.v2.createSubscription(subscription).then(function (value) {
+                        fail("Success callback called");
+                    }, function (e) {
+                        expect(e).toEqual(jasmine.any(NGSI.ConnectionError));
+                        done();
+                    });
+                };
+
+                it("502", test.bind(null, 502));
+                it("504", test.bind(null, 504));
             });
 
-            it("handles unexpected error codes", function (done) {
-                ajaxMockup.addStaticURL("http://ngsi.server.com/v2/subscriptions", {
-                    method: "POST",
-                    status: 204
-                });
+            describe("handles unexpected error codes", function () {
 
-                connection.v2.createSubscription(subscription).then(function (value) {
-                    fail("Success callback called");
-                }, function (e) {
-                    expect(e).toEqual(jasmine.any(NGSI.InvalidResponseError));
-                    done();
-                });
+                var test = function test(code, done) {
+                    ajaxMockup.addStaticURL("http://ngsi.server.com/v2/subscriptions", {
+                        method: "POST",
+                        status: code
+                    });
+
+                    connection.v2.createSubscription(subscription).then(function (value) {
+                        fail("Success callback called");
+                    }, function (e) {
+                        expect(e).toEqual(jasmine.any(NGSI.InvalidResponseError));
+                        done();
+                    });
+                };
+
+                it("204", test.bind(null, 204));
+                it("404", test.bind(null, 404));
             });
 
             it("close ngsi-proxy callbacks on error", function (done) {

@@ -57,6 +57,189 @@
     } else {
         NGSI = {};
         var URL = window.URL;
+
+        /*
+         * Basic makeRequest implementation for webbrowsers
+         */
+        var merge = function merge(object) {
+
+            if (object == null || typeof object !== "object") {
+                throw new TypeError("object argument must be an object");
+            }
+
+            Array.prototype.slice.call(arguments, 1).forEach(function (source) {
+                if (source != null) {
+                    Object.keys(source).forEach(function (key) {
+                        object[key] = source[key];
+                    });
+                }
+            });
+
+            return object;
+        };
+
+        var setRequestHeaders = function setRequestHeaders() {
+            var headers, name;
+
+            headers = merge({
+                'Accept': 'text/javascript, text/html, application/xml, text/xml, */*'
+            }, this.options.requestHeaders);
+
+            if (!('Content-Type' in headers) && this.options.contentType != null) {
+                headers['Content-Type'] = this.options.contentType;
+                if (this.options.encoding != null) {
+                    headers['Content-Type'] += '; charset=' + this.options.encoding;
+                }
+            }
+
+            for (name in headers) {
+                if (headers[name] != null) {
+                    this.transport.setRequestHeader(name, headers[name]);
+                }
+            }
+        };
+
+        var Response = function Response(request) {
+            Object.defineProperties(this, {
+                'request': {value: request},
+                'transport': {value: request.transport},
+                'status': {value: request.transport.status},
+                'statusText': {value: request.transport.statusText},
+                'response': {value: request.transport.response}
+            });
+
+            if (request.options.responseType == null || request.options.responseType === '') {
+                Object.defineProperties(this, {
+                    'responseText': {value: request.transport.responseText},
+                    'responseXML': {value: request.transport.responseXML}
+                });
+            }
+        };
+
+        Response.prototype.getHeader = function getHeader(name) {
+            try {
+                return this.transport.getResponseHeader(name);
+            } catch (e) { return null; }
+        };
+
+        Response.prototype.getAllResponseHeaders = function getAllResponseHeaders() {
+            return this.transport.getAllResponseHeaders();
+        };
+
+        var toQueryString = function toQueryString(parameters) {
+            var key, query = [];
+
+            if (parameters != null && typeof parameters === 'object') {
+                for (key in parameters) {
+                    if (typeof parameters[key] === 'undefined') {
+                        continue;
+                    } else if (parameters[key] === null) {
+                        query.push(encodeURIComponent(key) + '=');
+                    } else {
+                        query.push(encodeURIComponent(key) + '=' + encodeURIComponent(parameters[key]));
+                    }
+                }
+            } else {
+                return null;
+            }
+
+            if (query.length > 0) {
+                return query.join('&');
+            } else {
+                return null;
+            }
+        };
+
+        var Request = function Request(url, options) {
+            this.options = merge({
+                method: 'POST',
+                asynchronous: true,
+                responseType: null,
+                contentType: null,
+                encoding: null,
+                postBody: null
+            }, options);
+
+            Object.defineProperties(this, {
+                method: {
+                    value: this.options.method.toUpperCase()
+                }
+            });
+
+            var parameters = toQueryString(this.options.parameters);
+            if (['PUT', 'POST'].indexOf(this.method) !== -1 && this.options.postBody == null) {
+                if (parameters != null) {
+                    this.options.postBody = parameters;
+                    if (this.options.contentType == null) {
+                        this.options.contentType = 'application/x-www-form-urlencoded';
+                    }
+                    if (this.options.encoding == null) {
+                        this.options.encoding = 'UTF-8';
+                    }
+                }
+            } else /* if (['PUT', 'POST'].indexOf(this.method) === -1 || this.options.postBody != null) */ {
+                if (parameters != null) {
+                    if (url.search !== "") {
+                        url.search = url.search + '&' + parameters;
+                    }  else {
+                        url.search = '?' + parameters;
+                    }
+                }
+            }
+
+            Object.defineProperties(this, {
+                url: {
+                    value: url
+                },
+                abort: {
+                    value: function () {
+                        this.transport.aborted = true;
+                        this.transport.abort();
+                        return this;
+                    }
+                }
+            });
+
+            Object.defineProperty(this, 'transport', {value: new XMLHttpRequest()});;
+            if (this.options.withCredentials === true && this.options.supportsAccessControl) {
+                this.transport.withCredentials = true;
+            }
+            if (this.options.responseType) {
+                this.transport.responseType = this.options.responseType;
+            }
+
+            this.promise = new Promise(function (resolve, reject) {
+                this.transport.addEventListener("abort", function (event) {
+                    event.stopPropagation();
+                    event.preventDefault();
+
+                    reject("aborted");
+                });
+                this.transport.addEventListener("load", function () {
+                    var response = new Response(this);
+                    resolve(response);
+                }.bind(this));
+                this.transport.addEventListener("error", function () {
+                    reject(new NGSI.ConnectionError(this));
+                }.bind(this));
+            }.bind(this));
+
+            this.transport.open(this.method, this.url, this.options.asynchronous);
+            setRequestHeaders.call(this);
+            this.transport.send(this.options.postBody);
+        };
+
+        Request.prototype.then = function then(onFulfilled, onRejected) {
+            return this.promise.then(onFulfilled, onRejected);
+        };
+
+        Request.prototype.catch = function _catch(onRejected) {
+            return this.promise.catch(onRejected);
+        };
+
+        var makeRequest = function makeRequest(url, options) {
+            return new Request(url, options);
+        };
     }
 
     NGSI.endpoints = {
@@ -1486,6 +1669,8 @@
 
         if (typeof options.requestFunction === 'function') {
             this.makeRequest = options.requestFunction;
+        } else {
+            this.makeRequest = makeRequest;
         }
 
         if (options.ngsi_proxy_connection instanceof NGSI.ProxyConnection) {
