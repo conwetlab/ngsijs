@@ -3,7 +3,7 @@ ngsijs
 
 [![License](https://img.shields.io/badge/license-AGPLv3+%20with%20classpath--like%20exception-blue.svg)](LICENSE)
 [![Documentation Status](https://img.shields.io/badge/docs-stable-brightgreen.svg?style=flat)](https://conwetlab.github.io/ngsijs/stable)
-[![Build Status](https://build.conwet.etsiinf.upm.es/jenkins/job/wirecloud-ngsijs/badge/icon)](https://build.conwet.etsiinf.upm.es/jenkins/job/wirecloud-ngsijs/)
+[![Build Status](https://travis-ci.org/conwetlab/ngsijs.svg?branch=master)](https://travis-ci.org/conwetlab/ngsijs)
 [![Coverage Status](https://coveralls.io/repos/github/conwetlab/ngsijs/badge.svg?branch=master)](https://coveralls.io/github/conwetlab/ngsijs?branch=master)
 
 Ngsijs is the JavaScript library used by
