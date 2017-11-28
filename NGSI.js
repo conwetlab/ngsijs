@@ -5012,6 +5012,24 @@
      * @method "v2.batchQuery"
      * @memberof NGSI.Connection
      *
+     * @param {Object} query
+     *
+     * Object with the parameters to make the entity queries. Composed of those
+     * attributes:
+     *
+     * - `entities` (`Array`): a list of entites to search for. Each element is
+     *   represented by a JSON object with the following elements:
+     *      - `id` or `idPattern`: Id or pattern of the affected entities. Both
+     *      cannot be used at the same time, but one of them must be present.
+     *      - `type` or `typePattern`: Type or type pattern of the entities total
+     *      search for. Both cannot be used at the same time. If omitted, it
+     *      means "any entity type"
+     * - `attributes` (`Array`): a list of attribute names to search for. If
+     *   omitted, it means "all attributes".
+     * - `metadata` (`Array`): a list of metadata names to include in the
+     *   response. See "Filtering out attributes and metadata" section for more
+     *   detail.
+     *
      * @param {Object} [options]
      *
      * Object with extra options:
@@ -5070,7 +5088,9 @@
         }
 
         if (query == null) {
-            throw new TypeError("missing query parameter");
+            query = {'entities': []};
+        } else if (query.entities == null && query.attributes == null) {
+            query.entities = [];
         }
 
         var connection = privates.get(this);

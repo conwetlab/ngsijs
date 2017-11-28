@@ -3025,10 +3025,60 @@
                 ]
             };
 
-            it("throws a TypeError exception when not passing the query parameter", function () {
-                expect(function () {
-                    connection.v2.batchQuery();
-                }).toThrowError(TypeError);
+            it("support requests without a query parameter", function (done) {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/v2/op/query", {
+                    checkRequestContent: function (url, options) {
+                        var data = JSON.parse(options.postBody);
+                        expect(data).toEqual({entities: []});
+                        expect(options.parameters.options).not.toBeDefined();
+                    },
+                    headers: {
+                        'Fiware-correlator': 'correlatortoken'
+                    },
+                    method: "POST",
+                    responseText: '[]',
+                    status: 200
+                });
+
+                connection.v2.batchQuery().then(function (result) {
+                    expect(result).toEqual({
+                        correlator: 'correlatortoken',
+                        limit: 20,
+                        offset: 0,
+                        results: []
+                    });
+                    done();
+                }, function (e) {
+                    fail("Failure callback called");
+                });
+            });
+
+            it("support requests with a query parameter missing entities and attributes", function (done) {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/v2/op/query", {
+                    checkRequestContent: function (url, options) {
+                        var data = JSON.parse(options.postBody);
+                        expect(data).toEqual({entities: [], metadata: ["accuracy", "timestamp"]});
+                        expect(options.parameters.options).not.toBeDefined();
+                    },
+                    headers: {
+                        'Fiware-correlator': 'correlatortoken'
+                    },
+                    method: "POST",
+                    responseText: '[]',
+                    status: 200
+                });
+
+                connection.v2.batchQuery({metadata: ["accuracy", "timestamp"]}).then(function (result) {
+                    expect(result).toEqual({
+                        correlator: 'correlatortoken',
+                        limit: 20,
+                        offset: 0,
+                        results: []
+                    });
+                    done();
+                }, function (e) {
+                    fail("Failure callback called");
+                });
             });
 
             it("basic request with empty results", function (done) {
