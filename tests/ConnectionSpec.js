@@ -1,5 +1,6 @@
 /*
  *     Copyright (c) 2017 CoNWeT Lab., Universidad Politécnica de Madrid
+ *     Copyright (c) 2018 Future Internet Consulting and Development Solutions S.L.
  *
  *     This file is part of ngsijs.
  *
@@ -35,7 +36,7 @@
  *
  */
 
-/* globals NGSI */
+/* globals ajaxMockFactory, NGSI */
 
 (function () {
 
@@ -156,6 +157,110 @@
                 });
             });
 
+        });
+
+        describe("getServerDetails([options])", () => {
+
+            var connection;
+            var ajaxMockup = ajaxMockFactory.createFunction();
+            const details = {
+                "orion": {
+                    "version": "1.9.0",
+                    "uptime": "2 d, 20 h, 14 m, 17 s",
+                    "git_hash": "f942277924867ced3682244c31a6df63bfa066e9",
+                    "compile_time": "Wed Nov 22 08:37:00 UTC 2017",
+                    "compiled_by": "root",
+                    "compiled_in": "c663f9f730c9",
+                    "release_date": "Wed Nov 22 08:37:00 UTC 2017",
+                    "doc": "https://fiware-orion.readthedocs.org/en/master/"
+                }
+            };
+
+            beforeEach(function () {
+                var options = {
+                    requestFunction: ajaxMockup
+                };
+                connection = new NGSI.Connection('http://ngsi.server.com', options);
+                ajaxMockup.clear();
+            });
+
+            it("provides server details", function (done) {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/version", {
+                    method: "GET",
+                    headers: {
+                        'Fiware-correlator': 'correlatortoken',
+                    },
+                    responseText: JSON.stringify(details),
+                    status: 200
+                });
+
+                connection.getServerDetails().then(function (result) {
+                    expect(result).toEqual({
+                        details: details,
+                        correlator: 'correlatortoken'
+                    });
+                    done();
+                }, function (e) {
+                    fail("Failure callback called");
+                });
+            });
+
+            it("supports the correlator option", function (done) {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/version", {
+                    method: "GET",
+                    checkRequestContent: function (url, options) {
+                        expect(options.requestHeaders).toEqual(jasmine.objectContaining({
+                            'FIWARE-Correlator': 'customcorrelator'
+                        }));
+                    },
+                    headers: {
+                        'Fiware-correlator': 'customcorrelator',
+                    },
+                    responseText: JSON.stringify(details),
+                    status: 200
+                });
+
+                connection.getServerDetails({correlator: "customcorrelator"}).then(function (result) {
+                    expect(result).toEqual({
+                        details: details,
+                        correlator: 'customcorrelator'
+                    });
+                    done();
+                }, function (e) {
+                    fail("Failure callback called");
+                });
+            });
+
+            it("unexpected error code", function (done) {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/version", {
+                    method: "GET",
+                    status: 404
+                });
+
+                connection.getServerDetails().then(function (value) {
+                    fail("Success callback called");
+                }, function (e) {
+                    expect(e).toEqual(jasmine.any(NGSI.InvalidResponseError));
+                    expect(e.correlator).toBeNull();
+                    done();
+                });
+            });
+
+            it("handles responses with invalid payloads", function (done) {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/version", {
+                    method: "GET",
+                    status: 200,
+                    responseText: "invalid json content"
+                });
+
+                connection.getServerDetails().then(function (value) {
+                    fail("Success callback called");
+                }, function (e) {
+                    expect(e).toEqual(jasmine.any(NGSI.InvalidResponseError));
+                    expect(e.correlator).toBeNull();
+                    done();
+                });
+            });
         });
 
     });
