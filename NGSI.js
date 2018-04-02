@@ -243,17 +243,19 @@
     }
 
     NGSI.endpoints = {
-        REGISTER_CONTEXT: 'v1/registry/registerContext',
-        DISCOVER_CONTEXT_AVAILABILITY: 'v1/registry/discoverContextAvailability',
-        SUBSCRIBE_CONTEXT_AVAILABILITY: 'v1/registry/subscribeContextAvailability',
-        UPDATE_CONTEXT_AVAILABILITY_SUBSCRIPTION: 'v1/registry/updateContextAvailabilitySubscription',
-        UNSUBSCRIBE_CONTEXT_AVAILABILITY: 'v1/registry/unsubscribeContextAvailability',
-        QUERY_CONTEXT: 'v1/queryContext',
-        UPDATE_CONTEXT: 'v1/updateContext',
-        SUBSCRIBE_CONTEXT: 'v1/subscribeContext',
-        UPDATE_CONTEXT_SUBSCRIPTION: 'v1/updateContextSubscription',
-        UNSUBSCRIBE_CONTEXT: 'v1/unsubscribeContext',
-        CONTEXT_TYPES: 'v1/contextTypes',
+        v1: {
+            REGISTER_CONTEXT: 'v1/registry/registerContext',
+            DISCOVER_CONTEXT_AVAILABILITY: 'v1/registry/discoverContextAvailability',
+            SUBSCRIBE_CONTEXT_AVAILABILITY: 'v1/registry/subscribeContextAvailability',
+            UPDATE_CONTEXT_AVAILABILITY_SUBSCRIPTION: 'v1/registry/updateContextAvailabilitySubscription',
+            UNSUBSCRIBE_CONTEXT_AVAILABILITY: 'v1/registry/unsubscribeContextAvailability',
+            QUERY_CONTEXT: 'v1/queryContext',
+            UPDATE_CONTEXT: 'v1/updateContext',
+            SUBSCRIBE_CONTEXT: 'v1/subscribeContext',
+            UPDATE_CONTEXT_SUBSCRIPTION: 'v1/updateContextSubscription',
+            UNSUBSCRIBE_CONTEXT: 'v1/unsubscribeContext',
+            CONTEXT_TYPES: 'v1/contextTypes'
+        },
 
         v2: {
             BATCH_QUERY_OP: 'v2/op/query',
@@ -1763,7 +1765,7 @@
         }
 
         var payload = ngsi_build_register_context_request(entities, attributes, duration, providingApplication);
-        var url = new URL(NGSI.endpoints.REGISTER_CONTEXT, this.url);
+        var url = new URL(NGSI.endpoints.v1.REGISTER_CONTEXT, this.url);
 
         makeJSONRequest.call(this, url, payload, parse_register_context_response, callbacks);
     };
@@ -1835,7 +1837,7 @@
         }
 
         var payload = ngsi_build_register_context_request(entities, attributes, duration, providingApplication, regId);
-        var url = new URL(NGSI.endpoints.REGISTER_CONTEXT, this.url);
+        var url = new URL(NGSI.endpoints.v1.REGISTER_CONTEXT, this.url);
 
         return makeJSONRequest.call(this, url, payload, parse_register_context_response, callbacks);
     };
@@ -1927,7 +1929,7 @@
         }
 
         var payload = ngsi_build_discover_context_availability_request(entities, attributeNames);
-        var url = new URL(NGSI.endpoints.DISCOVER_CONTEXT_AVAILABILITY, this.url);
+        var url = new URL(NGSI.endpoints.v1.DISCOVER_CONTEXT_AVAILABILITY, this.url);
 
         makeJSONRequest.call(this, url, payload, parse_discover_context_availability_response, callbacks);
     };
@@ -1986,7 +1988,7 @@
             throw new TypeError('A ngsi-proxy is needed for using local onNotify callbacks');
         }
 
-        var url = new URL(NGSI.endpoints.SUBSCRIBE_CONTEXT_AVAILABILITY, this.url);
+        var url = new URL(NGSI.endpoints.v1.SUBSCRIBE_CONTEXT_AVAILABILITY, this.url);
         if (typeof options.onNotify === 'function' && this.ngsi_proxy != null) {
 
             var onNotify = function onNotify(payload) {
@@ -2079,7 +2081,7 @@
         }
 
         var payload = ngsi_build_subscribe_update_context_availability_request(entities, attributeNames, duration, restriction, subId);
-        var url = new URL(NGSI.endpoints.UPDATE_CONTEXT_AVAILABILITY_SUBSCRIPTION, this.url);
+        var url = new URL(NGSI.endpoints.v1.UPDATE_CONTEXT_AVAILABILITY_SUBSCRIPTION, this.url);
 
         makeJSONRequest.call(this, url, payload, parse_subscribe_update_context_availability_response, callbacks);
     };
@@ -2112,7 +2114,7 @@
         }
 
         var payload = ngsi_build_unsubscribe_context_availability_request(subId);
-        var url = new URL(NGSI.endpoints.UNSUBSCRIBE_CONTEXT_AVAILABILITY, this.url);
+        var url = new URL(NGSI.endpoints.v1.UNSUBSCRIBE_CONTEXT_AVAILABILITY, this.url);
 
         makeJSONRequest.call(this, url, payload, parse_unsubscribe_context_availability_response, callbacks);
     };
@@ -2181,7 +2183,7 @@
 
         parameters = parse_pagination_options(options, 'off');
 
-        url = new URL(NGSI.endpoints.QUERY_CONTEXT, this.url);
+        url = new URL(NGSI.endpoints.v1.QUERY_CONTEXT, this.url);
         payload = ngsi_build_query_context_request(entities, attributesName, options.restriction);
         makeJSONRequest.call(this, url, payload, parse_query_context_response, options, parameters);
     };
@@ -2232,7 +2234,7 @@
         }
 
         var payload = ngsi_build_update_context_request('UPDATE', update);
-        var url = new URL(NGSI.endpoints.UPDATE_CONTEXT, this.url);
+        var url = new URL(NGSI.endpoints.v1.UPDATE_CONTEXT, this.url);
 
         makeJSONRequest.call(this, url, payload, parse_update_context_response, callbacks);
     };
@@ -2282,7 +2284,7 @@
         }
 
         var payload = ngsi_build_update_context_request('APPEND', toAdd);
-        var url = new URL(NGSI.endpoints.UPDATE_CONTEXT, this.url);
+        var url = new URL(NGSI.endpoints.v1.UPDATE_CONTEXT, this.url);
 
         makeJSONRequest.call(this, url, payload, parse_update_context_response, callbacks);
     };
@@ -2345,7 +2347,7 @@
         }
 
         var payload = ngsi_build_update_context_request('DELETE', toDelete);
-        var url = new URL(NGSI.endpoints.UPDATE_CONTEXT, this.url);
+        var url = new URL(NGSI.endpoints.v1.UPDATE_CONTEXT, this.url);
 
         makeJSONRequest.call(this, url, payload, parse_update_context_response, callbacks);
     };
@@ -2431,7 +2433,7 @@
             throw new TypeError('A ngsi-proxy is needed for using local onNotify callbacks');
         }
 
-        var url = new URL(NGSI.endpoints.SUBSCRIBE_CONTEXT, this.url);
+        var url = new URL(NGSI.endpoints.v1.SUBSCRIBE_CONTEXT, this.url);
         if (typeof options.onNotify === 'function' && this.ngsi_proxy != null) {
 
             var onNotify = function onNotify(payload) {
@@ -2539,7 +2541,7 @@
         }
 
         var payload = ngsi_build_subscribe_update_context_request(subId, null, null, duration, throttling, cond);
-        var url = new URL(NGSI.endpoints.UPDATE_CONTEXT_SUBSCRIPTION, this.url);
+        var url = new URL(NGSI.endpoints.v1.UPDATE_CONTEXT_SUBSCRIPTION, this.url);
 
         makeJSONRequest.call(this, url, payload, parse_update_context_subscription_response, options);
     };
@@ -2593,7 +2595,7 @@
             }.bind(this);
         }
         var payload = ngsi_build_unsubscribe_context_request(subId);
-        var url = new URL(NGSI.endpoints.UNSUBSCRIBE_CONTEXT, this.url);
+        var url = new URL(NGSI.endpoints.v1.UNSUBSCRIBE_CONTEXT, this.url);
 
         makeJSONRequest.call(this, url, payload, parse_unsubscribe_context_response, options);
     };
@@ -2632,7 +2634,7 @@
      *
      */
     NGSI.Connection.prototype.getAvailableTypes = function getAvailableTypes(options) {
-        var url = new URL(NGSI.endpoints.CONTEXT_TYPES, this.url);
+        var url = new URL(NGSI.endpoints.v1.CONTEXT_TYPES, this.url);
         var parameters = parse_pagination_options(options, 'on');
         makeJSONRequest.call(this, url, null, parse_available_types_response, options, parameters);
     };
@@ -2674,7 +2676,7 @@
             throw new TypeError("Invalid type parameter");
         }
 
-        var url = new URL(NGSI.endpoints.CONTEXT_TYPES + '/' + encodeURIComponent(type), this.url);
+        var url = new URL(NGSI.endpoints.v1.CONTEXT_TYPES + '/' + encodeURIComponent(type), this.url);
         makeJSONRequest.call(this, url, null, parse_type_info_response, options);
     };
 
