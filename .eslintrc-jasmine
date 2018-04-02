@@ -1,6 +1,7 @@
 {
     "extends": ".eslintrc",
     "env": {
-        "jasmine": true
+        "jasmine": true,
+        "es6": true
     }
 }

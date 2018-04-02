@@ -1,5 +1,6 @@
 /*
  *     Copyright (c) 2013-2017 CoNWeT Lab., Universidad Politécnica de Madrid
+ *     Copyright (c) 2018 Future Internet Consulting and Development Solutions S.L.
  *
  *     This file is part of ngsijs.
  *
@@ -243,6 +244,8 @@
     }
 
     NGSI.endpoints = {
+        SERVER_DETAILS: 'version',
+
         v1: {
             REGISTER_CONTEXT: 'v1/registry/registerContext',
             DISCOVER_CONTEXT_AVAILABILITY: 'v1/registry/discoverContextAvailability',
@@ -1694,6 +1697,69 @@
             v2: {value: new NGSI.Connection.V2(this)}
         });
     };
+
+    /**
+     * Retrieves context broker server information.
+     *
+     * @name NGSI.Connection@getServerDetails
+     * @memberof NGSI.Connection
+     * @method "getServerDetails"
+     *
+     * @param {Object} [options]
+     *
+     * Object with extra options:
+     *
+     * - `correlator` (`String`): Transaction id
+     *
+     * @returns {Promise}
+     *
+     * @example
+     *
+     * connection.getServerDetails().then(
+     *     (response) => {
+     *         // Server information retrieved successfully
+     *         // response.details contains all the details returned by the server.
+     *         // response.correlator transaction id associated with the server response
+     *     }, (error) => {
+     *         // Error retrieving server information
+     *         // If the error was reported by Orion, error.correlator will be
+     *         // filled with the associated transaction id
+     *     }
+     * );
+     */
+    NGSI.Connection.prototype.getServerDetails = function getServerDetails(options) {
+        if (options == null) {
+            options = {};
+        }
+
+        var url = new URL(NGSI.endpoints.SERVER_DETAILS, this.url);
+        return makeJSONRequest2.call(this, url, {
+            method: "GET",
+            requestHeaders: {
+                "FIWARE-Correlator": options.correlator,
+            }
+        }).then(function (response) {
+            var correlator = response.getHeader('Fiware-correlator');
+
+            if (response.status !== 200) {
+                return Promise.reject(new NGSI.InvalidResponseError('Unexpected error code: ' + response.status, correlator));
+            }
+
+            try {
+                var data = JSON.parse(response.responseText);
+            } catch (e) {
+                return Promise.reject(new NGSI.InvalidResponseError('Server returned invalid JSON content', correlator));
+            }
+
+            var result = {
+                details: data,
+                correlator: correlator
+            };
+
+            return Promise.resolve(result);
+        });
+    };
+
 
     /**
      * Registers context information (entities and attributes) into the NGSI
