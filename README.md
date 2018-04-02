@@ -28,6 +28,10 @@ Using ngsijs from normal web pages
 > orion 1.10.0. This support must be enabled to access the context broker from a
 > web page in a different domain than the context broker.
 >
+> CORS support can also be enabled by accessing to the context broker server
+> using some proxies, like [cors-anywhere](https://www.npmjs.com/package/cors-anywhere)
+> or the [FIWARE's pep proxy](https://github.com/ging/fiware-pep-proxy).
+>
 > You can access any context broker server (without requiring CORS support and
 > regardless of the context broker version) if the context broker is accessible
 > throught the same domain as the web page. How to create such configuration is
