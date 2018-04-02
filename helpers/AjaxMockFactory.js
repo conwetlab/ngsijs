@@ -4,6 +4,7 @@
     var proto = {
         'clear': function clear() {
             this.staticURLs = {};
+            this.spy.calls.reset();
         },
         'addStaticURL': function addStaticURL(url, response) {
             this.staticURLs[url] = response;
@@ -16,7 +17,7 @@
 
             instance = {};
 
-            func = function (url, options) {
+            func = jasmine.createSpy("makeRequest").and.callFake(function (url, options) {
                 var specific_callback, response_info;
 
                 if (!(url instanceof URL)) {
@@ -97,9 +98,9 @@
                 } else {
                     return Promise.reject();
                 }
-            };
+            }.bind(instance));
 
-            func = func.bind(instance);
+            instance.spy = func;
             for (key in proto) {
                 func[key] = proto[key].bind(instance);
             }

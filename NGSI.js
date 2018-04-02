@@ -1400,15 +1400,20 @@
      *
      * @returns {Promise}
      */
-    NGSI.ProxyConnection.prototype.close = function close() {
+    NGSI.ProxyConnection.prototype.close = function close(async) {
         if (this.connected === false) {
             return Promise.resolve();
+        }
+
+        if (async !== false) {
+            async = true;
         }
 
         var priv = privates.get(this);
         return this.makeRequest(priv.source_url, {
             supportsAccessControl: true,  // required for using CORS on WireCloud
-            method: 'DELETE'
+            method: 'DELETE',
+            asynchronous: async
         }).then(
             function (response) {
                 if (response.status !== 204) {

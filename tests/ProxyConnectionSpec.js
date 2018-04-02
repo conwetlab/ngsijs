@@ -153,7 +153,7 @@
 
         });
 
-        describe("close()", function () {
+        describe("close([async])", function () {
 
             var connection;
 
@@ -178,6 +178,26 @@
 
                 expect(p).toEqual(jasmine.any(Promise));
                 p.then(function () {
+                    var options = ajaxMockup.calls.argsFor(1)[1];
+                    expect(options.asynchronous).toBe(true);
+
+                    expect(mockedeventsources[0].close).toHaveBeenCalledWith();
+                    expect(connection.connected).toBeFalsy();
+                    expect(connection.connecting).toBeFalsy();
+                    expect(connection.callbackSubscriptions).toEqual({});
+                    expect(connection.subscriptionCallbacks).toEqual({});
+                    done();
+                });
+            });
+
+            it("supports syncrhonous mode", function (done) {
+                var p = connection.close(false);
+
+                expect(p).toEqual(jasmine.any(Promise));
+                p.then(function () {
+                    var options = ajaxMockup.calls.argsFor(1)[1];
+                    expect(options.asynchronous).toBe(false);
+
                     expect(mockedeventsources[0].close).toHaveBeenCalledWith();
                     expect(connection.connected).toBeFalsy();
                     expect(connection.connecting).toBeFalsy();
@@ -206,7 +226,6 @@
                     done();
                 });
             });
-
 
             it("do nothing if not connected", function (done) {
                 // created an unconnected connection
