@@ -24,6 +24,16 @@ Reference documentation of the API is available at
 Using ngsijs from normal web pages
 ----------------------------------
 
+> **Note**: Support for Cross-Origin Resource Sharing (CORS) has been added on
+> orion 1.10.0. This support must be enabled to access the context broker from a
+> web page in a different domain than the context broker.
+>
+> You can access any context broker server (without requiring CORS support and
+> regardless of the context broker version) if the context broker is accessible
+> throught the same domain as the web page. How to create such configuration is
+> out of the scope of this documentation.
+
+
 Just include a `<script>` element linking to the `NGSI.min.js` file:
 
 ```html
@@ -48,7 +58,7 @@ method for more info.
 
 To be able to receive notifications inside a web browser the library requires
 the use of a [ngsi-proxy](https://github.com/conwetlab/ngsi-proxy) server. You
-can use your own instance or you the `ngsi-proxy` available at
+can use your own instance or the `ngsi-proxy` instance available at
 `https://ngsiproxy.lab.fiware.org`.
 
 ```javascript
@@ -56,6 +66,7 @@ var connection = new NGSI.Connection("http://orion.example.com:1026", {
     ngsi_proxy_url: "https://ngsiproxy.lab.fiware.org"
 });
 ```
+
 
 Using ngsijs from Node.js
 -------------------------
@@ -71,17 +82,27 @@ var NGSI = require('ngsijs');
 var connection = new NGSI.Connection("http://orion.example.com:1026");
 ```
 
-**Note:** Node.js doesn't require the usage of a ngsi-proxy as you can create
-an HTTP endpoint easily (e.g. using express). Anyway, you can use it if you
-want, you only have to take into account that is better to directly provide the
-HTTP endpoint to reduce the overhead.
+> **Note:** Node.js doesn't require the usage of a ngsi-proxy as you can create
+> an HTTP endpoint easily (e.g. using [express]). Anyway, you can use it if you
+> want, you only have to take into account that is better to directly provide
+> the HTTP endpoint to reduce the overhead.
+
+[express]: https://expressjs.com/
 
 
 Using ngsijs from WireCloud widgets/operators
 ---------------------------------------------
 
-Take a look to the "3.2.1. Using Orion Context Broker" tutorial available at
+WireCloud already provides some components (widgets, operators and mashups)
+allowing NGSI connectivity. E.g.:
+
+- [NGSI Source operator](https://github.com/Wirecloud-fiware/ngsi-source-operator)
+- [NGSI Browser widget](https://github.com/wirecloud-fiware/ngsi-browser-widget)
+- [NGSI datamodel 2 PoI operator](https://github.com/wirecloud-fiware/ngsi-datamodel2poi-operator)
+
+Anyway, WireCloud uses ngsijs as the binding for connecting to context
+brokers. If you need to create a new specific component you can take a look into
+the "3.2.1. Using Orion Context Broker" tutorial available at the
 [FIWARE Academy].
 
 [FIWARE Academy]: http://edu.fiware.org/course/view.php?id=53#section-3
-

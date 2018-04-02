@@ -1398,6 +1398,8 @@
      * Closes the connection with the ngsi-proxy. All the callback endpoints
      * will be removed.
      *
+     * @param {Boolean} [async] Make an asynchronous requests. default: `true`.
+     *
      * @returns {Promise}
      */
     NGSI.ProxyConnection.prototype.close = function close(async) {
