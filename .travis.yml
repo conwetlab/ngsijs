@@ -21,21 +21,21 @@ matrix:
           script:
               - ./node_modules/istanbul/lib/cli.js cover -- ./node_modules/jasmine/bin/jasmine.js --config=jasmine.json
           after_script:
-              - grunt coveralls:library-node
+              - grunt coveralls:librarynode
         - node_js: "lts/*"
           before_install:
               - npm install grunt-cli -g
           script:
               - ./node_modules/istanbul/lib/cli.js cover -- ./node_modules/jasmine/bin/jasmine.js --config=jasmine.json
           after_script:
-              - grunt coveralls:library-node
+              - grunt coveralls:librarynode
         - node_js: "10"
           before_install:
               - npm install grunt-cli -g
           script:
               - ./node_modules/istanbul/lib/cli.js cover -- ./node_modules/jasmine/bin/jasmine.js --config=jasmine.json
           after_script:
-              - grunt coveralls:library-node
+              - grunt coveralls:librarynode
 
 branches:
   only:

@@ -39,11 +39,11 @@ module.exports = function (grunt) {
         },
 
         coveralls: {
-            library-node: {
-                src: 'build/coverage/library-node/lcov.info',
+            librarynode: {
+                src: 'build/coverage/library-node/lcov.info'
             },
             library: {
-                src: 'build/coverage/library/lcov/lcov.info',
+                src: 'build/coverage/library/lcov/lcov.info'
             }
         },
 
