@@ -35,13 +35,36 @@
  *
  */
 
-/* globals ajaxMockFactory, mockedeventsources, NGSI */
+/* globals ajaxMockFactory, NGSI */
 
 (function () {
 
     "use strict";
 
-    var connection, response, response_data, response_error_data, response_details, failure, ajaxMockup, notification_data;
+    var connection, response, response_data, response_error_data, response_details, failure, ajaxMockup, notification_data, readresponse;
+
+    if ((typeof require === 'function') && typeof global != null) {
+
+        // eslint-disable-next-line no-undef
+        NGSI = require('../../ngsi-node');
+
+        // eslint-disable-next-line no-undef
+        let fs = require('fs')
+
+        readresponse = function readresponse(filename) {
+            return fs.readFileSync('responses/' + filename + '.json', 'utf8');
+        };
+
+    } else {
+
+        readresponse = function readresponse(filename) {
+            var request = new XMLHttpRequest();
+            request.open('GET', '/base/responses/' + filename + '.json', false);
+            request.send();
+            return request.responseText;
+        };
+
+    }
 
     var _waitsForResponse = function _waitsForResponse(next, done, hop) {
         if (response) {
@@ -270,7 +293,7 @@
             };
             connection = new NGSI.Connection('http://ngsi.server.com', options);
             ajaxMockup.clear();
-            mockedeventsources = [];
+            EventSource.clear();
             response = false;
             response_data = null;
             response_error_data = null;
@@ -311,13 +334,9 @@
         });
 
         it("basic register context requests", function (done) {
-            // TODO
-            var request = new XMLHttpRequest();
-            request.open('GET', '/base/responses/registerContext1.json', false);
-            request.send();
             ajaxMockup.addStaticURL("http://ngsi.server.com/v1/registry/registerContext", {
                 status: 200,
-                responseText: request.responseText
+                responseText: readresponse('registerContext1')
             });
 
             connection.v1.createRegistration(
@@ -349,13 +368,9 @@
         });
 
         it("register context requests passing attributes", function (done) {
-            // TODO
-            var request = new XMLHttpRequest();
-            request.open('GET', '/base/responses/registerContext1.json', false);
-            request.send();
             ajaxMockup.addStaticURL("http://ngsi.server.com/v1/registry/registerContext", {
                 status: 200,
-                responseText: request.responseText,
+                responseText: readresponse('registerContext1'),
                 checkRequestContent: function (url, options) {
                     var data, entity, attributes;
 
@@ -427,14 +442,9 @@
 
         it("basic update context registration requests", function (done) {
 
-
-            // TODO
-            var request = new XMLHttpRequest();
-            request.open('GET', '/base/responses/registerContext1.json', false);
-            request.send();
             ajaxMockup.addStaticURL("http://ngsi.server.com/v1/registry/registerContext", {
                 status: 200,
-                responseText: request.responseText
+                responseText: readresponse('registerContext1')
             });
 
             connection.v1.updateRegistration(
@@ -469,13 +479,9 @@
         });
 
         it("basic cancel registration requests", function (done) {
-            // TODO
-            var request = new XMLHttpRequest();
-            request.open('GET', '/base/responses/registerContext2.json', false);
-            request.send();
             ajaxMockup.addStaticURL("http://ngsi.server.com/v1/registry/registerContext", {
                 status: 200,
-                responseText: request.responseText
+                responseText: readresponse('registerContext2')
             });
 
             connection.v1.cancelRegistration(
@@ -503,13 +509,9 @@
         });
 
         it("discover context availability requests", function (done) {
-            // TODO
-            var request = new XMLHttpRequest();
-            request.open('GET', '/base/responses/discoverContextAvailability1.json', false);
-            request.send();
             ajaxMockup.addStaticURL("http://ngsi.server.com/v1/registry/discoverContextAvailability", {
                 status: 200,
-                responseText: request.responseText,
+                responseText: readresponse('discoverContextAvailability1'),
                 checkRequestContent: function (url, options) {
                     var doc, entity;
 
@@ -564,13 +566,9 @@
         });
 
         it("basic subscribe context availability requests", function (done) {
-            // TODO
-            var request = new XMLHttpRequest();
-            request.open('GET', '/base/responses/subscribeContextAvailability1.json', false);
-            request.send();
             ajaxMockup.addStaticURL("http://ngsi.server.com/v1/registry/subscribeContextAvailability", {
                 status: 200,
-                responseText: request.responseText,
+                responseText: readresponse('subscribeContextAvailability1'),
                 checkRequestContent: function (url, options) {
                     var data;
 
@@ -622,7 +620,7 @@
 
             waitsForResponse(function () {
                 expect(failure).toEqual(false);
-                expect(mockedeventsources.length).toEqual(0);
+                expect(EventSource.mockedeventsources.length).toEqual(0);
                 expect(response_data).toEqual({
                     'subscriptionId': 'sub1',
                     'duration': 'PT24H'
@@ -631,13 +629,9 @@
         });
 
         it("basic update context availability subscription requests", function (done) {
-            // TODO
-            var request = new XMLHttpRequest();
-            request.open('GET', '/base/responses/updateContextAvailabilitySubscription1.json', false);
-            request.send();
             ajaxMockup.addStaticURL("http://ngsi.server.com/v1/registry/updateContextAvailabilitySubscription", {
                 status: 200,
-                responseText: request.responseText,
+                responseText: readresponse('updateContextAvailabilitySubscription1'),
                 checkRequestContent: function (url, options) {
                     var data;
 
@@ -686,13 +680,9 @@
         });
 
         it("basic cancel context availability subscription requests", function (done) {
-            // TODO
-            var request = new XMLHttpRequest();
-            request.open('GET', '/base/responses/unsubscribeContextAvailability1.json', false);
-            request.send();
             ajaxMockup.addStaticURL("http://ngsi.server.com/v1/registry/unsubscribeContextAvailability", {
                 status: 200,
-                responseText: request.responseText
+                responseText: readresponse('unsubscribeContextAvailability1')
             });
 
             connection.v1.cancelAvailabilitySubscription('sub1', {
@@ -748,13 +738,9 @@
                 }
 
                 it(label, function (done) {
-                    // TODO
-                    var request = new XMLHttpRequest();
-                    request.open('GET', '/base/responses/' + response_file, false);
-                    request.send();
                     ajaxMockup.addStaticURL("http://ngsi.server.com/v1/queryContext", {
                         status: 200,
-                        responseText: request.responseText,
+                        responseText: readresponse(response_file),
                         checkRequestContent: function (url, options) {
                             var data = JSON.parse(options.postBody);
                             if (parameters != null) {
@@ -809,13 +795,9 @@
                 }
 
                 it(label, function (done) {
-                    // TODO
-                    var request = new XMLHttpRequest();
-                    request.open('GET', '/base/responses/' + response_file, false);
-                    request.send();
                     ajaxMockup.addStaticURL("http://ngsi.server.com/v1/queryContext", {
                         status: 200,
-                        responseText: request.responseText,
+                        responseText: readresponse(response_file),
                         checkRequestContent: function (url, options) {
                             var data = JSON.parse(options.postBody);
                             if (parameters != null) {
@@ -911,7 +893,7 @@
 
             check_query_method(
                 "supports passing null values to attrNames",
-                "query1.json",
+                "query1",
                 [
                     {type: 'Technician', id: 'tech1'},
                     {type: 'Technician', id: 'tech2'}
@@ -923,7 +905,7 @@
 
             check_query_method(
                 "supports passing [] to attrNames",
-                "query1.json",
+                "query1",
                 [
                     {type: 'Technician', id: 'tech1'},
                     {type: 'Technician', id: 'tech2'}
@@ -935,7 +917,7 @@
 
             check_query_method(
                 "supports passing an attribute list to attrNames",
-                "query_with_attribute_list.json",
+                "query_with_attribute_list",
                 [
                     {type: 'Technician', id: 'tech1'},
                     {type: 'Technician', id: 'tech2'}
@@ -966,7 +948,7 @@
 
             check_query_method(
                 "handles structured attributes",
-                "query6.json",
+                "query6",
                 [
                     {type: 'Technician', id: 'tech1'}
                 ],
@@ -998,7 +980,7 @@
 
             check_query_method(
                 "handles empty responses",
-                "query_empty_result.json",
+                "query_empty_result",
                 [
                     {type: 'BankAccount', id: '.*', isPattern: true}
                 ],
@@ -1009,7 +991,7 @@
 
             check_query_method(
                 "supports the flat option",
-                "query1.json",
+                "query1",
                 [
                     {type: 'Technician', id: 'entity1'}
                 ],
@@ -1036,7 +1018,7 @@
 
             check_query_method(
                 "handles empty responses when using the flat option",
-                "query_empty_result.json",
+                "query_empty_result",
                 [
                     {type: 'BankAccount', id: '.*', isPattern: true}
                 ],
@@ -1047,7 +1029,7 @@
 
             check_query_method(
                 "handles structured attributes when using the flat option",
-                "query6.json",
+                "query6",
                 [
                     {type: 'Technician', id: 'tech1'}
                 ],
@@ -1071,7 +1053,7 @@
 
             check_query_method(
                 "supports the limit option",
-                "query1.json",
+                "query1",
                 [
                     {type: 'Technician', id: '.*', isPattern: true}
                 ],
@@ -1083,7 +1065,7 @@
 
             check_query_method(
                 "supports the offset option",
-                "query1.json",
+                "query1",
                 [
                     {type: 'Technician', id: '.*', isPattern: true}
                 ],
@@ -1095,7 +1077,7 @@
 
             check_query_method(
                 "supports the details option",
-                "query3.json",
+                "query3",
                 [
                     {type: 'Technician', id: '.*', isPattern: true}
                 ],
@@ -1134,7 +1116,7 @@
 
             check_query_method(
                 "handles empty responses when using the details option",
-                "query_empty_result.json",
+                "query_empty_result",
                 [
                     {type: 'BankAccount', id: '.*', isPattern: true}
                 ],
@@ -1147,7 +1129,7 @@
 
             check_query_method_error(
                 "handles out of boundary responses when using the details option",
-                "query4.json",
+                "query4",
                 [
                     {type: 'Technician', id: '.*', isPattern: true}
                 ],
@@ -1193,7 +1175,7 @@
 
             check_query_method(
                 "supports restrictions (polygon)",
-                "query5.json",
+                "query5",
                 [
                     {type: 'Point', id: '.*', isPattern: true}
                 ],
@@ -1222,7 +1204,7 @@
 
             check_query_method(
                 "supports restrictions (inverted polygon)",
-                "query5.json",
+                "query5",
                 [
                     {type: 'Point', id: '.*', isPattern: true}
                 ],
@@ -1252,7 +1234,7 @@
 
             check_query_method(
                 "supports restrictions (circle)",
-                "query_empty_result.json",
+                "query_empty_result",
                 [
                     {type: 'City', id: '.*', isPattern: true}
                 ],
@@ -1278,7 +1260,7 @@
 
             check_query_method(
                 "supports restrictions (inverted circle)",
-                "query_empty_result.json",
+                "query_empty_result",
                 [
                     {type: 'City', id: '.*', isPattern: true}
                 ],
@@ -1403,13 +1385,9 @@
                 errors = errors == null ? [] : errors;
 
                 it(label, function (done) {
-                    // TODO
-                    var request = new XMLHttpRequest();
-                    request.open('GET', '/base/responses/' + response_file, false);
-                    request.send();
                     ajaxMockup.addStaticURL("http://ngsi.server.com/v1/updateContext", {
                         status: 200,
-                        responseText: request.responseText,
+                        responseText: readresponse(response_file),
                         checkRequestContent: function (url, options) {
                             var data = JSON.parse(options.postBody);
                             expect(data).toEqual(expected_request);
@@ -1477,7 +1455,7 @@
             check_update_attributes_method(
                 "supports empty string values",
                 [{"name": "mobile_phone", "type": "string", "value": ""}],
-                "update_empty_string.json",
+                "update_empty_string",
                 {
                     'tech1': {
                         'id': 'tech1',
@@ -1491,7 +1469,7 @@
             check_update_attributes_method(
                 "supports null values",
                 [{"name": "new_attribute", "type": "string", "value": null}],
-                "update2.json",
+                "update2",
                 {
                     'tech1': {
                         'id': 'tech1',
@@ -1518,7 +1496,7 @@
                         ]
                     }
                 ],
-                "update9.json",
+                "update9",
                 [
                     {
                         "entity": {
@@ -1542,7 +1520,7 @@
                     {name: 'attr2', value: 'value'},
                     {name: 'attr3', value: 5}
                 ],
-                "update1.json",
+                "update1",
                 [
                     {
                         'entity': {
@@ -1574,7 +1552,7 @@
                     {name: 'attr2', value: 'value'},
                     {name: 'attr3', value: 5}
                 ],
-                "update1.json",
+                "update1",
                 {
                     "tech1": {
                         "id": "tech1",
@@ -1593,7 +1571,7 @@
                     {name: 'position', type: 'coords', value: '40.418889, -3.691944'},
                     {name: 'mobile_phone', type: 'string', value: '0034223456789'}
                 ],
-                "update_attribute_not_found.json",
+                "update_attribute_not_found",
                 [
                     {
                         entity: {id: 'tech1', type: 'Technician'},
@@ -1627,13 +1605,9 @@
                 errors = errors == null ? [] : errors;
 
                 it(label, function (done) {
-                    // TODO
-                    var request = new XMLHttpRequest();
-                    request.open('GET', '/base/responses/' + response_file, false);
-                    request.send();
                     ajaxMockup.addStaticURL("http://ngsi.server.com/v1/updateContext", {
                         status: 200,
-                        responseText: request.responseText,
+                        responseText: readresponse(response_file),
                         checkRequestContent: function (url, options) {
                             var data = JSON.parse(options.postBody);
                             expect(data).toEqual(expected_request);
@@ -1703,7 +1677,7 @@
             check_add_attributes_method(
                 "supports simple string values",
                 [{"name": "new_attribute", "type": "string", "value": "value"}],
-                "update2.json",
+                "update2",
                 [
                     {
                         entity: {
@@ -1732,7 +1706,7 @@
                         ]
                     }
                 ],
-                "update3.json",
+                "update3",
                 [
                     {
                         entity: {
@@ -1768,7 +1742,7 @@
                         ]
                     }
                 ],
-                "update9.json",
+                "update9",
                 [
                     {
                         'entity': {
@@ -1788,7 +1762,7 @@
             check_add_attributes_method(
                 "supports the flat option",
                 [{"name": "new_attribute", "type": "string", "value": "value"}],
-                "update2.json",
+                "update2",
                 {
                     'tech1': {
                         'id': 'tech1',
@@ -1802,7 +1776,7 @@
             check_add_attributes_method(
                 "supports empty string values",
                 [{"name": "new_attribute", "type": "string", "value": ""}],
-                "update2.json",
+                "update2",
                 {
                     'tech1': {
                         'id': 'tech1',
@@ -1816,7 +1790,7 @@
             check_add_attributes_method(
                 "supports null values",
                 [{"name": "new_attribute", "type": "string", "value": null}],
-                "update2.json",
+                "update2",
                 {
                     'tech1': {
                         'id': 'tech1',
@@ -1830,7 +1804,7 @@
             check_add_attributes_method(
                 "supports null values",
                 [{"name": "new_attribute", "type": "string", "value": null}],
-                "update2.json",
+                "update2",
                 {
                     'tech1': {
                         'id': 'tech1',
@@ -1845,13 +1819,9 @@
         });
 
         it("basic delete context attributes requests", function (done) {
-            // TODO
-            var request = new XMLHttpRequest();
-            request.open('GET', '/base/responses/update4.json', false);
-            request.send();
             ajaxMockup.addStaticURL("http://ngsi.server.com/v1/updateContext", {
                 status: 200,
-                responseText: request.responseText,
+                responseText: readresponse('update4'),
                 checkRequestContent: function (url, options) {
                     var data, entity;
 
@@ -1921,13 +1891,9 @@
         });
 
         it("errors when making basic delete context requests", function (done) {
-            // TODO
-            var request = new XMLHttpRequest();
-            request.open('GET', '/base/responses/update5.json', false);
-            request.send();
             ajaxMockup.addStaticURL("http://ngsi.server.com/v1/updateContext", {
                 status: 200,
-                responseText: request.responseText,
+                responseText: readresponse('update5'),
                 checkRequestContent: function (url, options) {
                     var data, entity;
 
@@ -1998,13 +1964,9 @@
         });
 
         it("errors when making basic delete context requests using the flat option", function (done) {
-            // TODO
-            var request = new XMLHttpRequest();
-            request.open('GET', '/base/responses/update6.json', false);
-            request.send();
             ajaxMockup.addStaticURL("http://ngsi.server.com/v1/updateContext", {
                 status: 200,
-                responseText: request.responseText,
+                responseText: readresponse('update6'),
                 checkRequestContent: function (url, options) {
                     var data, entity;
 
@@ -2096,13 +2058,9 @@
         });
 
         it("basic delete context entities requests", function (done) {
-            // TODO
-            var request = new XMLHttpRequest();
-            request.open('GET', '/base/responses/update8.json', false);
-            request.send();
             ajaxMockup.addStaticURL("http://ngsi.server.com/v1/updateContext", {
                 status: 200,
-                responseText: request.responseText,
+                responseText: readresponse('update8'),
                 checkRequestContent: function (url, options) {
                     var data, entity;
 
@@ -2159,13 +2117,9 @@
         });
 
         it("basic subscribe context requests", function (done) {
-            // TODO
-            var request = new XMLHttpRequest();
-            request.open('GET', '/base/responses/subscribeContext1.json', false);
-            request.send();
             ajaxMockup.addStaticURL("http://ngsi.server.com/v1/subscribeContext", {
                 status: 200,
-                responseText: request.responseText,
+                responseText: readresponse('subscribeContext1'),
                 checkRequestContent: function (url, options) {
                     var data, condition;
 
@@ -2220,7 +2174,7 @@
 
             waitsForResponse(function () {
                 expect(failure).toEqual(false);
-                expect(mockedeventsources.length).toEqual(0);
+                expect(EventSource.mockedeventsources.length).toEqual(0);
                 expect(response_data).toEqual({
                     'subscriptionId': 'sub1',
                     'duration': 'PT24H'
@@ -2229,13 +2183,9 @@
         });
 
         it("basic update context subscription requests", function (done) {
-            // TODO
-            var request = new XMLHttpRequest();
-            request.open('GET', '/base/responses/updateContextSubscription1.json', false);
-            request.send();
             ajaxMockup.addStaticURL("http://ngsi.server.com/v1/updateContextSubscription", {
                 status: 200,
-                responseText: request.responseText,
+                responseText: readresponse('updateContextSubscription1'),
                 checkRequestContent: function (url, options) {
                     var data;
 
@@ -2280,13 +2230,9 @@
         });
 
         it("basic cancel context subscription requests", function (done) {
-            // TODO
-            var request = new XMLHttpRequest();
-            request.open('GET', '/base/responses/unsubscribeContext1.json', false);
-            request.send();
             ajaxMockup.addStaticURL("http://ngsi.server.com/v1/unsubscribeContext", {
                 status: 200,
-                responseText: request.responseText
+                responseText: readresponse('unsubscribeContext1')
             });
 
             connection.v1.cancelSubscription('sub1', {
@@ -2314,12 +2260,9 @@
         });
 
         it("basic get available types requests", function (done) {
-            var request = new XMLHttpRequest();
-            request.open('GET', '/base/responses/contextTypes.json', false);
-            request.send();
             ajaxMockup.addStaticURL("http://ngsi.server.com/v1/contextTypes", {
                 status: 200,
-                responseText: request.responseText,
+                responseText: readresponse('contextTypes'),
                 checkRequestContent: function (url, options) {
                     return options.parameters.details === 'on';
                 }
@@ -2378,12 +2321,9 @@
         });
 
         it("empty get available types requests", function (done) {
-            var request = new XMLHttpRequest();
-            request.open('GET', '/base/responses/contextTypes_empty.json', false);
-            request.send();
             ajaxMockup.addStaticURL("http://ngsi.server.com/v1/contextTypes", {
                 status: 200,
-                responseText: request.responseText,
+                responseText: readresponse('contextTypes_empty'),
                 checkRequestContent: function (url, options) {
                     return options.parameters.details === 'on';
                 }
@@ -2412,12 +2352,9 @@
         });
 
         it("basic get available types requests without details", function (done) {
-            var request = new XMLHttpRequest();
-            request.open('GET', '/base/responses/contextTypes3.json', false);
-            request.send();
             ajaxMockup.addStaticURL("http://ngsi.server.com/v1/contextTypes", {
                 status: 200,
-                responseText: request.responseText,
+                responseText: readresponse('contextTypes'),
                 checkRequestContent: function (url, options) {
                     return options.parameters.details === 'off';
                 }
@@ -2476,12 +2413,9 @@
         describe('getTypeInfo(type, options)', function () {
 
             it("basic get type info requests", function (done) {
-                var request = new XMLHttpRequest();
-                request.open('GET', '/base/responses/contextTypes2.json', false);
-                request.send();
                 ajaxMockup.addStaticURL("http://ngsi.server.com/v1/contextTypes/Agrarium", {
                     status: 200,
-                    responseText: request.responseText
+                    responseText: readresponse('contextTypes2')
                 });
 
                 connection.v1.getTypeInfo("Agrarium", {
@@ -2513,14 +2447,9 @@
 
             var check_get_type_info_error = function check_get_type_info_error(label, code, response_file, error_class, error_details) {
                 it(label, function (done) {
-                    var request, response_info;
-
-                    response_info = {status: code};
+                    var response_info = {status: code};
                     if (response_file) {
-                        request = new XMLHttpRequest();
-                        request.open('GET', '/base/responses/' + response_file, false);
-                        request.send();
-                        response_info.responseText = request.responseText;
+                        response_info.responseText = readresponse(response_file)
                     }
                     ajaxMockup.addStaticURL("http://ngsi.server.com/v1/contextTypes/Agrarium", response_info);
 
@@ -2551,7 +2480,7 @@
             check_get_type_info_error(
                 "handles not found errors",
                 200,
-                "contextTypes_type_not_found.json",
+                "contextTypes_type_not_found",
                 NGSI.NotFoundError,
                 {
                     "name": "Agrarium",
@@ -2571,10 +2500,10 @@
             check_get_type_info_error("handles invalid error code from server (402)", 402, null, NGSI.InvalidResponseError);
             check_get_type_info_error("handles invalid error code from server (503)", 503, null, NGSI.InvalidResponseError);
 
-            check_get_type_info_error("handles invalid responses from server (unrelated json)", 200, "invalid_content_array.json", NGSI.InvalidResponseError);
-            check_get_type_info_error("handles invalid responses from server (totally invalid content)", 200, "full_invalid_content.json", NGSI.InvalidResponseError);
-            check_get_type_info_error("handles invalid responses from server (partial response)", 200, "partial_content.json", NGSI.InvalidResponseError);
-            check_get_type_info_error("handles invalid responses from server (missing statusCode)", 200, "missing_statuscode_content.json", NGSI.InvalidResponseError);
+            check_get_type_info_error("handles invalid responses from server (unrelated json)", 200, "invalid_content_array", NGSI.InvalidResponseError);
+            check_get_type_info_error("handles invalid responses from server (totally invalid content)", 200, "full_invalid_content", NGSI.InvalidResponseError);
+            check_get_type_info_error("handles invalid responses from server (partial response)", 200, "partial_content", NGSI.InvalidResponseError);
+            check_get_type_info_error("handles invalid responses from server (missing statusCode)", 200, "missing_statuscode_content", NGSI.InvalidResponseError);
 
             arguments_error_test('getTypeInfo', [], 'missing all arguments');
 
@@ -2694,13 +2623,13 @@
             };
             connection = new NGSI.Connection('http://ngsi.server.com', options);
             ajaxMockup.clear();
+            EventSource.clear();
             response = false;
             response_data = null;
             response_error_data = null;
             response_details = null;
             notification_data = null;
             failure = false;
-            window.mockedeventsources = [];
         });
 
         connection_error_on_query_test('Connection Error', 0);
@@ -2708,10 +2637,6 @@
         connection_error_on_query_test('Connection timeout via proxy', 504);
 
         it("basic subscribe availability context requests using the ngsi proxy", function (done) {
-            // TODO
-            var request = new XMLHttpRequest();
-            request.open('GET', '/base/responses/subscribeContextAvailability1.json', false);
-            request.send();
 
             ajaxMockup.addStaticURL("http://ngsiproxy.example.com/eventsource", {
                 status: 201,
@@ -2732,7 +2657,7 @@
 
             ajaxMockup.addStaticURL("http://ngsi.server.com/v1/registry/subscribeContextAvailability", {
                 status: 200,
-                responseText: request.responseText,
+                responseText: readresponse('subscribeContextAvailability1'),
                 checkRequestContent: function (url, options) {
                     var data = JSON.parse(options.postBody);
                     if (!Array.isArray(data.entities) || data.entities.length !== 2 || 'attributes' in data || 'subscriptionId' in data) {
@@ -2784,8 +2709,8 @@
             waitsForResponse(function () {
                 expect(failure).toEqual(false);
                 expect(notification_data).toBe(null);
-                expect(mockedeventsources.length).toEqual(1);
-                expect(mockedeventsources[0].url.toString()).toEqual('http://ngsiproxy.example.com/eventsource/1');
+                expect(EventSource.mockedeventsources.length).toEqual(1);
+                expect(EventSource.mockedeventsources[0].url.toString()).toEqual('http://ngsiproxy.example.com/eventsource/1');
                 expect(response_data).toEqual({
                     'subscriptionId': 'sub1',
                     'duration': 'PT24H'
@@ -2794,10 +2719,6 @@
         });
 
         it("basic subscribe context requests using the ngsi proxy", function (done) {
-            // TODO
-            var request = new XMLHttpRequest();
-            request.open('GET', '/base/responses/subscribeContext1.json', false);
-            request.send();
 
             ajaxMockup.addStaticURL("http://ngsiproxy.example.com/eventsource", {
                 status: 201,
@@ -2818,7 +2739,7 @@
 
             ajaxMockup.addStaticURL("http://ngsi.server.com/v1/subscribeContext", {
                 status: 200,
-                responseText: request.responseText,
+                responseText: readresponse('subscribeContext1'),
                 checkRequestContent: function (url, options) {
                     var data, condition;
 
@@ -2875,8 +2796,8 @@
             waitsForResponse(function () {
                 expect(failure).toEqual(false);
                 expect(notification_data).toBe(null);
-                expect(mockedeventsources.length).toEqual(1);
-                expect(mockedeventsources[0].url.toString()).toEqual('http://ngsiproxy.example.com/eventsource/1');
+                expect(EventSource.mockedeventsources.length).toEqual(1);
+                expect(EventSource.mockedeventsources[0].url.toString()).toEqual('http://ngsiproxy.example.com/eventsource/1');
                 expect(response_data).toEqual({
                     'subscriptionId': 'sub1',
                     'duration': 'PT24H'

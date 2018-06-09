@@ -37,6 +37,12 @@
 
 /* globals ajaxMockFactory, NGSI */
 
+if ((typeof require === 'function') && typeof global != null) {
+    // eslint-disable-next-line no-undef
+    NGSI = require('../../ngsi-node');
+    // eslint-disable-next-line no-undef
+    URL = require('whatwg-url').URL;
+}
 
 (function () {
 

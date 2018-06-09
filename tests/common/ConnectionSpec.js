@@ -38,6 +38,11 @@
 
 /* globals ajaxMockFactory, NGSI */
 
+if ((typeof require === 'function') && typeof global != null) {
+    // eslint-disable-next-line no-undef
+    NGSI = require('../../ngsi-node');
+}
+
 (function () {
 
     "use strict";

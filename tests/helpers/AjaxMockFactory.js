@@ -110,5 +110,10 @@
         }
     };
 
-    window.ajaxMockFactory = ajaxMockFactory;
+    /* Detect Node.js */
+    if ((typeof require === 'function') && typeof global != null) {
+        global.ajaxMockFactory = ajaxMockFactory;
+    } else {
+        window.ajaxMockFactory = ajaxMockFactory;
+    }
 })();

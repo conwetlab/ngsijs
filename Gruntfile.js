@@ -39,6 +39,9 @@ module.exports = function (grunt) {
         },
 
         coveralls: {
+            library-node: {
+                src: 'build/coverage/library-node/lcov.info',
+            },
             library: {
                 src: 'build/coverage/library/lcov/lcov.info',
             }
@@ -58,7 +61,7 @@ module.exports = function (grunt) {
                 options: {
                     configFile: ".eslintrc-jasmine",
                 },
-                src: ['tests/*Spec.js']
+                src: ['tests/**/*Spec.js']
             }
         },
 
@@ -93,9 +96,10 @@ module.exports = function (grunt) {
                     },
                     files: [
                         {pattern: 'responses/*', included: false, served: true},
-                        'helpers/*.js',
+                        'tests/helpers/*.js',
                         'NGSI.js',
-                        'tests/*Spec.js'
+                        'tests/browser/*Spec.js',
+                        'tests/common/*Spec.js'
                     ],
                     preprocessors: {
                         "NGSI.js": ['coverage'],
@@ -117,9 +121,10 @@ module.exports = function (grunt) {
                     },
                     files: [
                         {pattern: 'responses/*', included: false, served: true},
-                        'helpers/*.js',
+                        'tests/helpers/*.js',
                         'NGSI.js',
-                        'tests/*Spec.js'
+                        'tests/browser/*Spec.js',
+                        'tests/common/*Spec.js'
                     ],
                     preprocessors: {
                         "NGSI.js": ['coverage'],

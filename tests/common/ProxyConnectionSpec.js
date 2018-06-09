@@ -35,7 +35,12 @@
  *
  */
 
-/* globals ajaxMockFactory, eventsourceconfs, mockedeventsources, NGSI */
+/* globals ajaxMockFactory, NGSI */
+
+if ((typeof require === 'function') && typeof global != null) {
+    // eslint-disable-next-line no-undef
+    NGSI = require('../../ngsi-node');
+}
 
 (function () {
 
@@ -181,7 +186,7 @@
                     var options = ajaxMockup.calls.argsFor(1)[1];
                     expect(options.asynchronous).toBe(true);
 
-                    expect(mockedeventsources[0].close).toHaveBeenCalledWith();
+                    expect(EventSource.mockedeventsources[0].close).toHaveBeenCalledWith();
                     expect(connection.connected).toBeFalsy();
                     expect(connection.connecting).toBeFalsy();
                     expect(connection.callbackSubscriptions).toEqual({});
@@ -198,7 +203,7 @@
                     var options = ajaxMockup.calls.argsFor(1)[1];
                     expect(options.asynchronous).toBe(false);
 
-                    expect(mockedeventsources[0].close).toHaveBeenCalledWith();
+                    expect(EventSource.mockedeventsources[0].close).toHaveBeenCalledWith();
                     expect(connection.connected).toBeFalsy();
                     expect(connection.connecting).toBeFalsy();
                     expect(connection.callbackSubscriptions).toEqual({});
@@ -218,7 +223,7 @@
 
                     expect(p).toEqual(jasmine.any(Promise));
                 }).then(function () {
-                    expect(mockedeventsources[0].close).toHaveBeenCalledWith();
+                    expect(EventSource.mockedeventsources[0].close).toHaveBeenCalledWith();
                     expect(connection.connected).toBeFalsy();
                     expect(connection.connecting).toBeFalsy();
                     expect(connection.callbackSubscriptions).toEqual({});
@@ -469,8 +474,8 @@
                 expect(proxy.connecting).toBeTruthy();
                 expect(p).toEqual(jasmine.any(Promise));
                 p.then(function () {
-                    expect(mockedeventsources[0].events.init.length).toEqual(0);
-                    expect(mockedeventsources[0].events.notification.length).toEqual(1);
+                    expect(EventSource.mockedeventsources[0].events.init.length).toEqual(0);
+                    expect(EventSource.mockedeventsources[0].events.notification.length).toEqual(1);
                     expect(proxy.connected).toBeTruthy();
                     expect(proxy.connecting).toBeFalsy();
                     done();
@@ -534,12 +539,12 @@
                     method: "POST",
                     status: 201
                 });
-                eventsourceconfs['http://ngsiproxy.example.com/eventsource/1'] = "timeout";
+                EventSource.eventsourceconfs['http://ngsiproxy.example.com/eventsource/1'] = "timeout";
 
                 var p = proxy.connect();
                 p.catch(function (error) {
                     expect(error).toEqual(jasmine.any(NGSI.ConnectionError));
-                    expect(mockedeventsources[0].close).toHaveBeenCalledWith();
+                    expect(EventSource.mockedeventsources[0].close).toHaveBeenCalledWith();
                     expect(proxy.connected).toBeFalsy();
                     expect(proxy.connecting).toBeFalsy();
                     done();
@@ -638,7 +643,7 @@
                         callback_id: "1",
                         url: "http://ngsiproxy.example.com/callback/1"
                     });
-                    mockedeventsources[0].events.notification[0]({
+                    EventSource.mockedeventsources[0].events.notification[0]({
                         data: JSON.stringify({
                             callback_id: "1",
                             payload: payload,
