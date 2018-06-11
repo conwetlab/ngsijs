@@ -49,7 +49,7 @@ provided by the ngsijs library (except receiving notifications):
 
 ```javascript
 var connection = new NGSI.Connection("http://orion.example.com:1026");
-connection.v2.listEntities().then((result) => {
+connection.v2.listEntities().then((response) => {
     response.results.forEach((entity) => {
         console.log(entity.id);
     });
@@ -84,6 +84,11 @@ After installing the ngsijs node module, you will be able to use the API as usua
 ```javascript
 var NGSI = require('ngsijs');
 var connection = new NGSI.Connection("http://orion.example.com:1026");
+connection.v2.listEntities().then((response) => {
+    response.results.forEach((entity) => {
+        console.log(entity.id);
+    });
+});
 ```
 
 > **Note:** Node.js doesn't require the usage of a ngsi-proxy as you can create
