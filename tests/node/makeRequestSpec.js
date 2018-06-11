@@ -63,8 +63,6 @@ describe("default makeRequest for browsers", function () {
     };
 
     var endRequest = function endRequest(status, statusText, headers, data) {
-        var key;
-
         var response = {
             setEncoding: jasmine.createSpy('setEncoding'),
             on: jasmine.createSpy('on'),
@@ -393,7 +391,7 @@ describe("default makeRequest for browsers", function () {
             // missing check abort is notified accordingly
         });
 
-        it("should report connection errors", function () {
+        it("should report connection errors", function (done) {
             var url = new URL("http://server:1234/path?q=1");
 
             var listener = jasmine.createSpy('listener').and.callFake((error) => {
@@ -407,7 +405,7 @@ describe("default makeRequest for browsers", function () {
             endRequest(0);
         });
 
-        it("should report connection errors", function () {
+        it("should report connection errors", function (done) {
             var url = new URL("http://server:1234/path?q=1");
 
             var listener = jasmine.createSpy('listener').and.callFake((error) => {
