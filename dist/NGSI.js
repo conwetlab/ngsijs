@@ -83,10 +83,10 @@
             var headers, name;
 
             headers = merge({
-                'Accept': 'text/javascript, text/html, application/xml, text/xml, */*'
+                'Accept': 'application/json, */*'
             }, this.options.requestHeaders);
 
-            if (!('Content-Type' in headers) && this.options.contentType != null) {
+            if (this.options.postBody != null && !('Content-Type' in headers) && this.options.contentType != null) {
                 headers['Content-Type'] = this.options.contentType;
                 if (this.options.encoding != null) {
                     headers['Content-Type'] += '; charset=' + this.options.encoding;

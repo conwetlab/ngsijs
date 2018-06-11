@@ -1,5 +1,6 @@
 /*
  *     Copyright (c) 2017 CoNWeT Lab., Universidad Politécnica de Madrid
+ *     Copyright (c) 2018 Future Internet Consulting and Development Solutions S.L.
  *
  *     This file is part of ngsijs.
  *
@@ -92,11 +93,21 @@
                 expect(request.transport.setRequestHeader).not.toHaveBeenCalledWith("empty", jasmine.anything());
             });
 
-            it("should convert the contentType option into a header", function () {
+            it("should ignore the contentType option if there is not body", function () {
                 var url = new URL("http://server:1234/path");
 
                 var request = makeRequest(url, {
                     contentType: "application/json"
+                });
+                expect(request.transport.setRequestHeader).not.toHaveBeenCalledWith("Content-Type", "application/json");
+            });
+
+            it("should convert the contentType option into a header", function () {
+                var url = new URL("http://server:1234/path");
+
+                var request = makeRequest(url, {
+                    contentType: "application/json",
+                    postBody: ""
                 });
                 expect(request.transport.setRequestHeader).toHaveBeenCalledWith("Content-Type", "application/json");
             });
@@ -106,7 +117,8 @@
 
                 var request = makeRequest(url, {
                     contentType: "application/json",
-                    encoding: "ISO-8859-1"
+                    encoding: "ISO-8859-1",
+                    postBody: ""
                 });
                 expect(request.transport.setRequestHeader).toHaveBeenCalledWith("Content-Type", "application/json; charset=ISO-8859-1");
             });
@@ -258,23 +270,6 @@
                     expect(response.getHeader("Location")).toBe(headervalue);
 
                     expect(response.transport.getResponseHeader).toHaveBeenCalledWith("Location");
-                    done();
-                };
-
-                var request = makeRequest(new URL("http://server:1234/path?q=1"));
-                request.then(listener);
-
-                endRequest(request, 200, "OK");
-            });
-
-            it("should provide a getAllResponseHeaders method on responses", function (done) {
-                var listener = function (response) {
-                    var headervalue = "value";
-                    request.transport.getAllResponseHeaders = jasmine.createSpy("getAllResponseHeaders").and.returnValue(headervalue);
-
-                    expect(response.getAllResponseHeaders()).toBe(headervalue);
-
-                    expect(response.transport.getAllResponseHeaders).toHaveBeenCalledWith();
                     done();
                 };
 
