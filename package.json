@@ -1,7 +1,7 @@
 {
   "vendor": "CoNWeT",
   "name": "ngsijs",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Node JavaScript library for Orion Context Broker",
   "main": "./ngsi-node.js",
   "repository": {

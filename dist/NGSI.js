@@ -123,10 +123,6 @@
             } catch (e) { return null; }
         };
 
-        Response.prototype.getAllResponseHeaders = function getAllResponseHeaders() {
-            return this.transport.getAllResponseHeaders();
-        };
-
         var toQueryString = function toQueryString(parameters) {
             var key, query = [];
 
