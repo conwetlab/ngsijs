@@ -262,6 +262,34 @@
                 });
             });
 
+            it("should report connection errors", function (done) {
+                var url = new URL("http://server:1234/path?q=1");
+
+                var listener = jasmine.createSpy('listener').and.callFake((error) => {
+                    expect(error).toEqual(jasmine.any(NGSI.ConnectionError));
+                    done();
+                });
+                var request = makeRequest(url);
+                request.catch(listener);
+
+                expect(listener).not.toHaveBeenCalled();
+                endRequest(request, 0);
+            });
+
+            it("should report connection errors (providing error exception)", function (done) {
+                var url = new URL("http://server:1234/path?q=1");
+
+                var listener = jasmine.createSpy('listener').and.callFake((error) => {
+                    expect(error).toEqual(jasmine.any(NGSI.ConnectionError));
+                    done();
+                });
+                var request = makeRequest(url);
+                request.catch(listener);
+
+                expect(listener).not.toHaveBeenCalled();
+                endRequest(request, 0, "Custom error message");
+            });
+
             it("should provide a getHeader method on responses", function (done) {
                 var listener = function (response) {
                     var headervalue = "value";

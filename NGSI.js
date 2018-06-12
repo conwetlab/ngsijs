@@ -64,9 +64,10 @@
          */
         var merge = function merge(object) {
 
+            /* This is a private method and we alway use a correct object parameters
             if (object == null || typeof object !== "object") {
                 throw new TypeError("object argument must be an object");
-            }
+            }*/
 
             Array.prototype.slice.call(arguments, 1).forEach(function (source) {
                 if (source != null) {

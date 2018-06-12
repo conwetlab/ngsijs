@@ -405,7 +405,7 @@ describe("default makeRequest for browsers", function () {
             endRequest(0);
         });
 
-        it("should report connection errors", function (done) {
+        it("should report connection errors (providing error exception)", function (done) {
             var url = new URL("http://server:1234/path?q=1");
 
             var listener = jasmine.createSpy('listener').and.callFake((error) => {
