@@ -2510,7 +2510,10 @@
 
                 var oldOnFailure = options.onFailure;
                 options.onFailure = function () {
-                    this.ngsi_proxy.closeCallback(proxy_callback.callback_id);
+                    this.ngsi_proxy.closeCallback(proxy_callback.callback_id).catch(function (error) {
+                        // eslint-disable-next-line no-console
+                        console.log("Error closing callback on the ngsi-proxy");
+                    });
                     if (typeof oldOnFailure === 'function') {
                         oldOnFailure.apply(this, arguments);
                     }
