@@ -499,6 +499,60 @@ if ((typeof require === 'function') && typeof global != null) {
                 });
             });
 
+            it("basic request (using the upsert option)", function (done) {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/v2/entities", {
+                    method: "POST",
+                    status: 201,
+                    headers: {
+                        'Fiware-correlator': 'correlatortoken',
+                        'Location': '/v2/entities/a?type=b'
+                    },
+                    checkRequestContent: function (url, options) {
+                        var data = JSON.parse(options.postBody);
+                        expect(data).toEqual(entity_values);
+                        expect(options.parameters.options).toEqual("upsert");
+                    }
+                });
+
+                connection.v2.createEntity(entity_values, {upsert: true}).then(function (value) {
+                    expect(value).toEqual({
+                        correlator: 'correlatortoken',
+                        entity: entity_values,
+                        location: "/v2/entities/a?type=b"
+                    });
+                    done();
+                }, function (e) {
+                    fail("Failure callback called");
+                });
+            });
+
+            it("basic request (using the upsert and the keyValues options)", function (done) {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/v2/entities", {
+                    method: "POST",
+                    status: 201,
+                    headers: {
+                        'Fiware-correlator': 'correlatortoken',
+                        'Location': '/v2/entities/a?type=b'
+                    },
+                    checkRequestContent: function (url, options) {
+                        var data = JSON.parse(options.postBody);
+                        expect(data).toEqual(entity_values);
+                        expect(options.parameters.options).toEqual("keyValues,upsert");
+                    }
+                });
+
+                connection.v2.createEntity(entity_values, {keyValues: true, upsert: true}).then(function (value) {
+                    expect(value).toEqual({
+                        correlator: 'correlatortoken',
+                        entity: entity_values,
+                        location: "/v2/entities/a?type=b"
+                    });
+                    done();
+                }, function (e) {
+                    fail("Failure callback called");
+                });
+            });
+
             it("unexpected error code", function (done) {
                 ajaxMockup.addStaticURL("http://ngsi.server.com/v2/entities", {
                     method: "POST",
