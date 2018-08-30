@@ -2510,7 +2510,10 @@
 
                 var oldOnFailure = options.onFailure;
                 options.onFailure = function () {
-                    this.ngsi_proxy.closeCallback(proxy_callback.callback_id);
+                    this.ngsi_proxy.closeCallback(proxy_callback.callback_id).catch(function (error) {
+                        // eslint-disable-next-line no-console
+                        console.log("Error closing callback on the ngsi-proxy");
+                    });
                     if (typeof oldOnFailure === 'function') {
                         oldOnFailure.apply(this, arguments);
                     }
@@ -2934,6 +2937,10 @@
      * - `keyValues` (`Boolean`; default: `false`): Use flat attributes
      * - `service` (`String`): Service/tenant to use in this operation
      * - `servicepath` (`String`): Service path to use in this operation
+     * - `upsert` (`Boolean`; default: `false`): If `true`, entity is
+     *   updated if already exits. If `upsert` is `false` this operation
+     *   will fail if the entity already exists.
+     *
      *
      * @returns {Promise}
      *
@@ -3004,7 +3011,11 @@
         var connection = privates.get(this);
         var parameters = {};
 
-        if (options.keyValues === true) {
+        if (options.keyValues === true && options.upsert === true) {
+            parameters.options = "keyValues,upsert";
+        } else if (options.upsert === true) {
+            parameters.options = "upsert";
+        } else if (options.keyValues === true) {
             parameters.options = "keyValues";
         }
 
@@ -3020,7 +3031,7 @@
             }
         }).then(function (response) {
             var correlator = response.getHeader('Fiware-correlator');
-            if (response.status !== 201) {
+            if ((options.upsert !== true && response.status !== 201) || (options.upsert === true && [201, 204].indexOf(response.status) === -1)) {
                 return Promise.reject(new NGSI.InvalidResponseError('Unexpected error code: ' + response.status, correlator));
             }
             return Promise.resolve({
