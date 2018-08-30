@@ -1,5 +1,6 @@
 /*
  *     Copyright (c) 2017 CoNWeT Lab., Universidad Politécnica de Madrid
+ *     Copyright (c) 2018 Future Internet Consulting and Development Solutions S.L.
  *
  *     This file is part of ngsijs.
  *
@@ -553,6 +554,20 @@ if ((typeof require === 'function') && typeof global != null) {
                 });
             });
 
+            it("manage already exists errors", function (done) {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/v2/entities", {
+                    method: "POST",
+                    status: 422
+                });
+
+                connection.v2.createEntity(entity).then(function (value) {
+                    fail("Success callback called");
+                }, function (e) {
+                    expect(e).toEqual(jasmine.any(NGSI.AlreadyExistsError));
+                    done();
+                });
+            });
+
             it("unexpected error code", function (done) {
                 ajaxMockup.addStaticURL("http://ngsi.server.com/v2/entities", {
                     method: "POST",
@@ -560,6 +575,34 @@ if ((typeof require === 'function') && typeof global != null) {
                 });
 
                 connection.v2.createEntity(entity).then(function (value) {
+                    fail("Success callback called");
+                }, function (e) {
+                    expect(e).toEqual(jasmine.any(NGSI.InvalidResponseError));
+                    done();
+                });
+            });
+
+            it("unexpected error code (204 when not using upsert)", function (done) {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/v2/entities", {
+                    method: "POST",
+                    status: 204
+                });
+
+                connection.v2.createEntity(entity).then(function (value) {
+                    fail("Success callback called");
+                }, function (e) {
+                    expect(e).toEqual(jasmine.any(NGSI.InvalidResponseError));
+                    done();
+                });
+            });
+
+            it("unexpected error code (422 when using upsert)", function (done) {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/v2/entities", {
+                    method: "POST",
+                    status: 422
+                });
+
+                connection.v2.createEntity(entity, {upsert: true}).then(function (value) {
                     fail("Success callback called");
                 }, function (e) {
                     expect(e).toEqual(jasmine.any(NGSI.InvalidResponseError));
