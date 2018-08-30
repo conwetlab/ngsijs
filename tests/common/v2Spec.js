@@ -1057,6 +1057,41 @@ if ((typeof require === 'function') && typeof global != null) {
                 });
             });
 
+            it("entity not found", function (done) {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/v2/entities/Spain-Road-A62", {
+                    headers: {
+                        "Content-Type": "application/json",
+                        'Fiware-correlator': 'correlatortoken',
+                    },
+                    method: "GET",
+                    status: 404,
+                    responseText: '{"error":"NotFound","description":"The requested entity has not been found. Check type and id"}'
+                });
+
+                connection.v2.getEntity("Spain-Road-A62").then(function (value) {
+                    fail("Success callback called");
+                }, function (e) {
+                    expect(e).toEqual(jasmine.any(NGSI.NotFoundError));
+                    expect(e.correlator).toBe("correlatortoken");
+                    expect(e.message).toBe("The requested entity has not been found. Check type and id");
+                    done();
+                });
+            });
+
+            it("invalid 404", function (done) {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/v2/entities/Spain-Road-A62", {
+                    method: "GET",
+                    status: 404
+                });
+
+                connection.v2.getEntity("Spain-Road-A62").then(function (value) {
+                    fail("Success callback called");
+                }, function (e) {
+                    expect(e).toEqual(jasmine.any(NGSI.InvalidResponseError));
+                    expect(e.correlator).toBeNull();
+                    done();
+                });
+            });
         });
 
         describe('getEntityAttribute(options)', function () {
@@ -1147,6 +1182,50 @@ if ((typeof require === 'function') && typeof global != null) {
                     done();
                 }, function (e) {
                     fail("Failure callback called");
+                });
+            });
+
+            it("entity not found", function (done) {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/v2/entities/Bcn_Welt/attrs/temperature", {
+                    headers: {
+                        "Content-Type": "application/json",
+                        'Fiware-correlator': 'correlatortoken',
+                    },
+                    method: "GET",
+                    status: 404,
+                    responseText: '{"error":"NotFound","description":"The requested entity has not been found. Check type and id"}'
+                });
+
+                connection.v2.getEntityAttribute({
+                    id: "Bcn_Welt",
+                    type: "Room",
+                    attribute: "temperature"
+                }).then(function (result) {
+                    fail("Success callback called");
+                }, function (e) {
+                    expect(e).toEqual(jasmine.any(NGSI.NotFoundError));
+                    expect(e.correlator).toBe("correlatortoken");
+                    expect(e.message).toBe("The requested entity has not been found. Check type and id");
+                    done();
+                });
+            });
+
+            it("invalid 404", function (done) {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/v2/entities/Bcn_Welt/attrs/temperature", {
+                    method: "GET",
+                    status: 404
+                });
+
+                connection.v2.getEntityAttribute({
+                    id: "Bcn_Welt",
+                    type: "Room",
+                    attribute: "temperature"
+                }).then(function (result) {
+                    fail("Success callback called");
+                }, function (e) {
+                    expect(e).toEqual(jasmine.any(NGSI.InvalidResponseError));
+                    expect(e.correlator).toBeNull();
+                    done();
                 });
             });
 
@@ -1314,6 +1393,42 @@ if ((typeof require === 'function') && typeof global != null) {
                 });
             });
 
+            it("entity not found", function (done) {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/v2/entities/Spain-Road-A62/attrs", {
+                    headers: {
+                        "Content-Type": "application/json",
+                        'Fiware-correlator': 'correlatortoken',
+                    },
+                    method: "GET",
+                    status: 404,
+                    responseText: '{"error":"NotFound","description":"The requested entity has not been found. Check type and id"}'
+                });
+
+                connection.v2.getEntityAttributes("Spain-Road-A62").then(function () {
+                    fail("Success callback called");
+                }, function (e) {
+                    expect(e).toEqual(jasmine.any(NGSI.NotFoundError));
+                    expect(e.correlator).toBe("correlatortoken");
+                    expect(e.message).toBe("The requested entity has not been found. Check type and id");
+                    done();
+                });
+            });
+
+            it("invalid 404", function (done) {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/v2/entities/Spain-Road-A62/attrs", {
+                    method: "GET",
+                    status: 404
+                });
+
+                connection.v2.getEntityAttributes("Spain-Road-A62").then(function () {
+                    fail("Success callback called");
+                }, function (e) {
+                    expect(e).toEqual(jasmine.any(NGSI.InvalidResponseError));
+                    expect(e.correlator).toBeNull();
+                    done();
+                });
+            });
+
             it("handles unexpected error codes", function (done) {
                 ajaxMockup.addStaticURL("http://ngsi.server.com/v2/entities/Spain-Road-A62/attrs", {
                     method: "GET",
@@ -1431,6 +1546,50 @@ if ((typeof require === 'function') && typeof global != null) {
                     done();
                 }, function (e) {
                     fail("Failure callback called");
+                });
+            });
+
+            it("entity not found", function (done) {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/v2/entities/Spain-Road-A62/attrs/refRoadSegment/value", {
+                    headers: {
+                        "Content-Type": "application/json",
+                        'Fiware-correlator': 'correlatortoken',
+                    },
+                    method: "GET",
+                    status: 404,
+                    responseText: '{"error":"NotFound","description":"The requested entity has not been found. Check type and id"}'
+                });
+
+                connection.v2.getEntityAttributeValue({
+                    id: "Spain-Road-A62",
+                    type: "Road",
+                    attribute: "refRoadSegment"
+                }).then(function (result) {
+                    fail("Success callback called");
+                }, function (e) {
+                    expect(e).toEqual(jasmine.any(NGSI.NotFoundError));
+                    expect(e.correlator).toBe("correlatortoken");
+                    expect(e.message).toBe("The requested entity has not been found. Check type and id");
+                    done();
+                });
+            });
+
+            it("invalid 404", function (done) {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/v2/entities/Spain-Road-A62/attrs/refRoadSegment/value", {
+                    method: "GET",
+                    status: 404
+                });
+
+                connection.v2.getEntityAttributeValue({
+                    id: "Spain-Road-A62",
+                    type: "Road",
+                    attribute: "refRoadSegment"
+                }).then(function (result) {
+                    fail("Success callback called");
+                }, function (e) {
+                    expect(e).toEqual(jasmine.any(NGSI.InvalidResponseError));
+                    expect(e.correlator).toBeNull();
+                    done();
                 });
             });
 
@@ -1562,6 +1721,42 @@ if ((typeof require === 'function') && typeof global != null) {
                 });
             });
 
+            it("subscription not found", function (done) {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/v2/subscriptions/abcdef", {
+                    headers: {
+                        "Content-Type": "application/json",
+                        'Fiware-correlator': 'correlatortoken',
+                    },
+                    method: "GET",
+                    status: 404,
+                    responseText: '{"error":"NotFound","description":"The requested subscription has not been found. Check id"}'
+                });
+
+                connection.v2.getSubscription({id: "abcdef", service: "mytenant"}).then(function (result) {
+                    fail("Success callback called");
+                }, function (e) {
+                    expect(e).toEqual(jasmine.any(NGSI.NotFoundError));
+                    expect(e.correlator).toBe("correlatortoken");
+                    expect(e.message).toBe("The requested subscription has not been found. Check id");
+                    done();
+                });
+            });
+
+            it("invalid 404", function (done) {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/v2/subscriptions/abcdef", {
+                    method: "GET",
+                    status: 404
+                });
+
+                connection.v2.getSubscription({id: "abcdef", service: "mytenant"}).then(function (result) {
+                    fail("Success callback called");
+                }, function (e) {
+                    expect(e).toEqual(jasmine.any(NGSI.InvalidResponseError));
+                    expect(e.correlator).toBeNull();
+                    done();
+                });
+            });
+
             it("handles unexpected error codes", function (done) {
                 ajaxMockup.addStaticURL("http://ngsi.server.com/v2/subscriptions/abcdef", {
                     method: "GET",
@@ -1670,6 +1865,42 @@ if ((typeof require === 'function') && typeof global != null) {
                     done();
                 }, function (e) {
                     fail("Failure callback called");
+                });
+            });
+
+            it("type not found", function (done) {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/v2/types/Room", {
+                    headers: {
+                        "Content-Type": "application/json",
+                        'Fiware-correlator': 'correlatortoken',
+                    },
+                    method: "GET",
+                    status: 404,
+                    responseText: '{"error":"NotFound","description":"The requested subscription has not been found. Check id"}'
+                });
+
+                connection.v2.getType({id: "Room", service: "mytenant"}).then(function (result) {
+                    fail("Success callback called");
+                }, function (e) {
+                    expect(e).toEqual(jasmine.any(NGSI.NotFoundError));
+                    expect(e.correlator).toBe("correlatortoken");
+                    expect(e.message).toBe("The requested subscription has not been found. Check id");
+                    done();
+                });
+            });
+
+            it("invalid 404", function (done) {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/v2/types/Room", {
+                    method: "GET",
+                    status: 404
+                });
+
+                connection.v2.getType({id: "Room", service: "mytenant"}).then(function (result) {
+                    fail("Success callback called");
+                }, function (e) {
+                    expect(e).toEqual(jasmine.any(NGSI.InvalidResponseError));
+                    expect(e.correlator).toBeNull();
+                    done();
                 });
             });
 
@@ -1874,6 +2105,48 @@ if ((typeof require === 'function') && typeof global != null) {
                 });
             });
 
+            it("entity not found", function (done) {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/v2/entities/Bcn-Welt/attrs", {
+                    headers: {
+                        "Content-Type": "application/json",
+                        'Fiware-correlator': 'correlatortoken',
+                    },
+                    method: "POST",
+                    status: 404,
+                    responseText: '{"error":"NotFound","description":"The requested entity has not been found. Check type and id"}'
+                });
+
+                connection.v2.appendEntityAttributes({
+                    "id": "Bcn-Welt",
+                    "temperature": 21.7
+                }).then(function (result) {
+                    fail("Success callback called");
+                }, function (e) {
+                    expect(e).toEqual(jasmine.any(NGSI.NotFoundError));
+                    expect(e.correlator).toBe("correlatortoken");
+                    expect(e.message).toBe("The requested entity has not been found. Check type and id");
+                    done();
+                });
+            });
+
+            it("invalid 404", function (done) {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/v2/entities/Bcn-Welt/attrs", {
+                    method: "POST",
+                    status: 404
+                });
+
+                connection.v2.appendEntityAttributes({
+                    "id": "Bcn-Welt",
+                    "temperature": 21.7
+                }).then(function (result) {
+                    fail("Success callback called");
+                }, function (e) {
+                    expect(e).toEqual(jasmine.any(NGSI.InvalidResponseError));
+                    expect(e.correlator).toBeNull();
+                    done();
+                });
+            });
+
             it("handles unexpected error codes", function (done) {
                 ajaxMockup.addStaticURL("http://ngsi.server.com/v2/entities/Bcn-Welt/attrs", {
                     method: "POST",
@@ -1984,6 +2257,52 @@ if ((typeof require === 'function') && typeof global != null) {
                     done();
                 }, function (e) {
                     fail("Failure callback called");
+                });
+            });
+
+            it("entity not found", function (done) {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/v2/entities/Bcn_Welt/attrs/temperature/value", {
+                    headers: {
+                        "Content-Type": "application/json",
+                        'Fiware-correlator': 'correlatortoken',
+                    },
+                    method: "PUT",
+                    status: 404,
+                    responseText: '{"error":"NotFound","description":"The requested entity has not been found. Check type and id"}'
+                });
+
+                connection.v2.replaceEntityAttributeValue({
+                    id: "Bcn_Welt",
+                    type: "Room",
+                    attribute: "temperature",
+                    value: 21
+                }).then(function (result) {
+                    fail("Success callback called");
+                }, function (e) {
+                    expect(e).toEqual(jasmine.any(NGSI.NotFoundError));
+                    expect(e.correlator).toBe("correlatortoken");
+                    expect(e.message).toBe("The requested entity has not been found. Check type and id");
+                    done();
+                });
+            });
+
+            it("invalid 404", function (done) {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/v2/entities/Bcn_Welt/attrs/temperature/value", {
+                    method: "PUT",
+                    status: 404
+                });
+
+                connection.v2.replaceEntityAttributeValue({
+                    id: "Bcn_Welt",
+                    type: "Room",
+                    attribute: "temperature",
+                    value: 21
+                }).then(function (result) {
+                    fail("Success callback called");
+                }, function (e) {
+                    expect(e).toEqual(jasmine.any(NGSI.InvalidResponseError));
+                    expect(e.correlator).toBeNull();
+                    done();
                 });
             });
 
@@ -2110,6 +2429,48 @@ if ((typeof require === 'function') && typeof global != null) {
                 });
             });
 
+            it("entity not found", function (done) {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/v2/entities/Bcn-Welt/attrs", {
+                    headers: {
+                        "Content-Type": "application/json",
+                        'Fiware-correlator': 'correlatortoken',
+                    },
+                    method: "PATCH",
+                    status: 404,
+                    responseText: '{"error":"NotFound","description":"The requested entity has not been found. Check type and id"}'
+                });
+
+                connection.v2.updateEntityAttributes({
+                    "id": "Bcn-Welt",
+                    "temperature": 21.7
+                }).then(function (result) {
+                    fail("Success callback called");
+                }, function (e) {
+                    expect(e).toEqual(jasmine.any(NGSI.NotFoundError));
+                    expect(e.correlator).toBe("correlatortoken");
+                    expect(e.message).toBe("The requested entity has not been found. Check type and id");
+                    done();
+                });
+            });
+
+            it("invalid 404", function (done) {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/v2/entities/Bcn-Welt/attrs", {
+                    method: "PATCH",
+                    status: 404
+                });
+
+                connection.v2.updateEntityAttributes({
+                    "id": "Bcn-Welt",
+                    "temperature": 21.7
+                }).then(function (result) {
+                    fail("Success callback called");
+                }, function (e) {
+                    expect(e).toEqual(jasmine.any(NGSI.InvalidResponseError));
+                    expect(e.correlator).toBeNull();
+                    done();
+                });
+            });
+
             it("handles unexpected error codes", function (done) {
                 ajaxMockup.addStaticURL("http://ngsi.server.com/v2/entities/Bcn-Welt/attrs", {
                     method: "PATCH",
@@ -2199,6 +2560,48 @@ if ((typeof require === 'function') && typeof global != null) {
                     done();
                 }, function (e) {
                     fail("Failure callback called");
+                });
+            });
+
+            it("subscription not found", function (done) {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/v2/subscriptions/abcdef", {
+                    headers: {
+                        "Content-Type": "application/json",
+                        'Fiware-correlator': 'correlatortoken',
+                    },
+                    method: "PATCH",
+                    status: 404,
+                    responseText: '{"error":"NotFound","description":"The requested subscription has not been found. Check id"}'
+                });
+
+                connection.v2.updateSubscription({
+                    "id": "abcdef",
+                    "expires": "2016-04-05T14:00:00.00Z"
+                }).then(function (result) {
+                    fail("Success callback called");
+                }, function (e) {
+                    expect(e).toEqual(jasmine.any(NGSI.NotFoundError));
+                    expect(e.correlator).toBe("correlatortoken");
+                    expect(e.message).toBe("The requested subscription has not been found. Check id");
+                    done();
+                });
+            });
+
+            it("invalid 404", function (done) {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/v2/subscriptions/abcdef", {
+                    method: "PATCH",
+                    status: 404
+                });
+
+                connection.v2.updateSubscription({
+                    "id": "abcdef",
+                    "expires": "2016-04-05T14:00:00.00Z"
+                }).then(function (result) {
+                    fail("Success callback called");
+                }, function (e) {
+                    expect(e).toEqual(jasmine.any(NGSI.InvalidResponseError));
+                    expect(e.correlator).toBeNull();
+                    done();
                 });
             });
 
@@ -2816,6 +3219,49 @@ if ((typeof require === 'function') && typeof global != null) {
                 });
             });
 
+            it("entity not found", function (done) {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/v2/entities/Bcn_Welt/attrs/temperature", {
+                    headers: {
+                        "Content-Type": "application/json",
+                        'Fiware-correlator': 'correlatortoken',
+                    },
+                    method: "PUT",
+                    status: 404,
+                    responseText: '{"error":"NotFound","description":"The requested entity has not been found. Check type and id"}'
+                });
+
+                connection.v2.replaceEntityAttribute({
+                    id: "Bcn_Welt",
+                    attribute: "temperature"
+                }).then(function () {
+                    fail("Success callback called");
+                }, function (e) {
+                    expect(e).toEqual(jasmine.any(NGSI.NotFoundError));
+                    expect(e.correlator).toBe("correlatortoken");
+                    expect(e.message).toBe("The requested entity has not been found. Check type and id");
+                    done();
+                });
+            });
+
+            it("invalid 404", function (done) {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/v2/entities/Bcn_Welt/attrs/temperature", {
+                    method: "PUT",
+                    status: 404
+                });
+
+                connection.v2.replaceEntityAttribute({
+                    id: "Bcn_Welt",
+                    attribute: "temperature"
+                }).then(function () {
+                    fail("Success callback called");
+                }, function (e) {
+                    expect(e).toEqual(jasmine.any(NGSI.InvalidResponseError));
+                    expect(e.correlator).toBeNull();
+                    done();
+                });
+            });
+
+
             it("handles unexpected error codes", function (done) {
                 ajaxMockup.addStaticURL("http://ngsi.server.com/v2/entities/Bcn_Welt/attrs/temperature", {
                     method: "PUT",
@@ -2933,6 +3379,54 @@ if ((typeof require === 'function') && typeof global != null) {
                     done();
                 }, function (e) {
                     fail("Failure callback called");
+                });
+            });
+
+            it("entity not found", function (done) {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/v2/entities/Spain-Road-A62/attrs", {
+                    headers: {
+                        "Content-Type": "application/json",
+                        'Fiware-correlator': 'correlatortoken',
+                    },
+                    method: "PUT",
+                    status: 404,
+                    responseText: '{"error":"NotFound","description":"The requested entity has not been found. Check type and id"}'
+                });
+
+                connection.v2.replaceEntityAttributes({
+                    "id": "Spain-Road-A62",
+                    "type": "Road",
+                    "attributes": {
+                        "name": "A-62"
+                    }
+                }).then(function () {
+                    fail("Success callback called");
+                }, function (e) {
+                    expect(e).toEqual(jasmine.any(NGSI.NotFoundError));
+                    expect(e.correlator).toBe("correlatortoken");
+                    expect(e.message).toBe("The requested entity has not been found. Check type and id");
+                    done();
+                });
+            });
+
+            it("invalid 404", function (done) {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/v2/entities/Spain-Road-A62/attrs", {
+                    method: "PUT",
+                    status: 404
+                });
+
+                connection.v2.replaceEntityAttributes({
+                    "id": "Spain-Road-A62",
+                    "type": "Road",
+                    "attributes": {
+                        "name": "A-62"
+                    }
+                }).then(function () {
+                    fail("Success callback called");
+                }, function (e) {
+                    expect(e).toEqual(jasmine.any(NGSI.InvalidResponseError));
+                    expect(e.correlator).toBeNull();
+                    done();
                 });
             });
 
