@@ -1568,6 +1568,23 @@
     NGSI.InvalidRequestError.prototype.constructor = NGSI.InvalidRequestError;
 
     /**
+     * Exception raised when creating an entity that already exists.
+     *
+     * @class
+     * @extends Error
+     * @name NGSI.AlreadyExistsError
+     * @summary Exception raised when creating an entity that already exists.
+     */
+    NGSI.AlreadyExistsError = function AlreadyExistsError(options) {
+        this.name = 'AlreadyExists';
+        this.message = options.message || '';
+        this.details = options.details || '';
+        this.correlator = options.correlator || null;
+    };
+    NGSI.AlreadyExistsError.prototype = new Error();
+    NGSI.AlreadyExistsError.prototype.constructor = NGSI.AlreadyExistsError;
+
+    /**
      * Exception raised when the server returns an unexpected response. This
      * usually means that the server doesn't conform to the FIWARE NGSI
      * Specification or that the server doesn't use a version supported by this
@@ -3031,7 +3048,9 @@
             }
         }).then(function (response) {
             var correlator = response.getHeader('Fiware-correlator');
-            if ((options.upsert !== true && response.status !== 201) || (options.upsert === true && [201, 204].indexOf(response.status) === -1)) {
+            if (options.upsert !== true && response.status === 422) {
+                return Promise.reject(new NGSI.AlreadyExistsError({correlator: correlator}));
+            } else if ((options.upsert !== true && response.status !== 201) || (options.upsert === true && [201, 204].indexOf(response.status) === -1)) {
                 return Promise.reject(new NGSI.InvalidResponseError('Unexpected error code: ' + response.status, correlator));
             }
             return Promise.resolve({
