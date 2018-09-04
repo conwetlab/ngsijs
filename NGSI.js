@@ -1613,6 +1613,15 @@
     NGSI.InvalidResponseError.prototype = new Error();
     NGSI.InvalidResponseError.prototype.constructor = NGSI.InvalidResponseError;
 
+    /**
+     * Exception raised when requesting a missing resource (entity, attribute,
+     * type, subscription, ...)
+     *
+     * @class
+     * @extends Error
+     * @name NGSI.NotFoundError
+     * @summary Exception raised when requesting a missing resource
+     */
     NGSI.NotFoundError = function NotFoundError(options) {
         this.name = 'NotFound';
         this.message = options.message || '';
@@ -2825,6 +2834,8 @@
      * - `values` (`Boolean`): Represent entities as an array of attribute
      *   values
      *
+     * @throws {NGSI.InvalidResponseError}
+     *
      * @returns {Promise}
      *
      * @example <caption>Retrieve first 20 entities from the Context Broker</caption>
@@ -2968,6 +2979,9 @@
      *   will fail if the entity already exists.
      *
      *
+     * @throws {NGSI.AlreadyExistsError}
+     * @throws {NGSI.InvalidResponseError}
+     *
      * @returns {Promise}
      *
      * @example <caption>Basic usage</caption>
@@ -3094,6 +3108,9 @@
      * - `type` (`String`): Entity type, to avoid ambiguity in case there are
      *   several entities with the same entity id.
      *
+     * @throws {NGSI.NotFoundError}
+     * @throws {NGSI.InvalidResponseError}
+     *
      * @returns {Promise}
      *
      * @example <caption>Basic usage</caption>
@@ -3203,6 +3220,9 @@
      * - `servicepath` (`String`): Service path to use in this operation
      * - `type` (`String`): Entity type, to avoid ambiguity in case there are
      *   several entities with the same entity id.
+     *
+     * @throws {NGSI.NotFoundError}
+     * @throws {NGSI.InvalidResponseError}
      *
      * @returns {Promise}
      *
@@ -3318,6 +3338,9 @@
      * - `servicepath` (`String`): Service path to use in this operation
      * - `type` (`String`): Entity type, to avoid ambiguity in case there are
      *   several entities with the same entity id.
+     *
+     * @throws {NGSI.InvalidResponseError}
+     * @throws {NGSI.NotFoundError}
      *
      * @returns {Promise}
      *
@@ -3438,6 +3461,9 @@
      * - `service` (`String`): Service/tenant to use in this operation
      * - `servicepath` (`String`): Service path to use in this operation
      *
+     * @throws {NGSI.InvalidResponseError}
+     * @throws {NGSI.NotFoundError}
+     *
      * @returns {Promise}
      *
      * @example <caption>Basic attribute update</caption>
@@ -3553,6 +3579,9 @@
      * - `service` (`String`): Service/tenant to use in this operation
      * - `servicepath` (`String`): Service path to use in this operation
      *
+     * @throws {NGSI.InvalidResponseError}
+     * @throws {NGSI.NotFoundError}
+     *
      * @returns {Promise}
      *
      * @example <caption>Basic usage</caption>
@@ -3664,6 +3693,9 @@
      * - `type` (`String`): Entity type, to avoid ambiguity in case there are
      *   several entities with the same entity id.
      *
+     * @throws {NGSI.InvalidResponseError}
+     * @throws {NGSI.NotFoundError}
+     *
      * @returns {Promise}
      *
      * @example <caption>Remove entity by Id</caption>
@@ -3759,6 +3791,9 @@
      * - `servicepath` (`String`): Service path to use in this operation
      * - `type` (`String`): Entity type, to avoid ambiguity in case there are
      *   several entities with the same entity id.
+     *
+     * @throws {NGSI.InvalidResponseError}
+     * @throws {NGSI.NotFoundError}
      *
      * @returns {Promise}
      *
@@ -3876,6 +3911,9 @@
      * - `servicepath` (`String`): Service path to use in this operation
      * - `type` (`String`): Entity type, to avoid ambiguity in case there are
      *   several entities with the same entity id.
+     *
+     * @throws {NGSI.InvalidResponseError}
+     * @throws {NGSI.NotFoundError}
      *
      * @returns {Promise}
      *
@@ -4015,6 +4053,9 @@
      * - `type` (`String`): Entity type, to avoid ambiguity in case there are
      *   several entities with the same entity id.
      *
+     * @throws {NGSI.InvalidResponseError}
+     * @throws {NGSI.NotFoundError}
+     *
      * @returns {Promise}
      *
      * @example <caption>Remove an attribute from an entity</caption>
@@ -4117,6 +4158,9 @@
      * - `servicepath` (`String`): Service path to use in this operation
      * - `type` (`String`): Entity type, to avoid ambiguity in case there are
      *   several entities with the same entity id.
+     *
+     * @throws {NGSI.InvalidResponseError}
+     * @throws {NGSI.NotFoundError}
      *
      * @returns {Promise}
      *
@@ -4233,6 +4277,9 @@
      * - `type` (`String`): Entity type, to avoid ambiguity in case there are
      *   several entities with the same entity id.
      *
+     * @throws {NGSI.InvalidResponseError}
+     * @throws {NGSI.NotFoundError}
+     *
      * @returns {Promise}
      *
      * @example <caption>Basic usage</caption>
@@ -4347,6 +4394,8 @@
      * - `service` (`String`): Service/tenant to use in this operation
      * - `servicepath` (`String`): Service path to use in this operation
      *
+     * @throws {NGSI.InvalidResponseError}
+     *
      * @returns {Promise}
      *
      * @example <caption>Retrieve first 20 subscriptions from the Context Broker</caption>
@@ -4443,6 +4492,9 @@
      * - `service` (`String`): Service/tenant to use in this operation
      * - `servicepath` (`String`): Service path to use in this operation
      *
+     * @throws {NGSI.InvalidResponseError}
+     * @throws {NGSI.NotFoundError}
+     *
      * @returns {Promise}
      *
      * @example <caption>Basic usage</caption>
@@ -4524,6 +4576,8 @@
      *   number of elements at the beginning
      * - `service` (`String`): Service/tenant to use in this operation
      * - `servicepath` (`String`): Service path to use in this operation
+     *
+     * @throws {NGSI.InvalidResponseError}
      *
      * @returns {Promise}
      *
@@ -4622,6 +4676,8 @@
      * - `correlator` (`String`): Transaction id
      * - `service` (`String`): Service/tenant to use in this operation
      * - `servicepath` (`String`): Service path to use in this operation
+     *
+     * @throws {NGSI.InvalidResponseError}
      *
      * @returns {Promise}
      *
@@ -4806,6 +4862,9 @@
      * - `service` (`String`): Service/tenant to use in this operation
      * - `servicepath` (`String`): Service path to use in this operation
      *
+     * @throws {NGSI.InvalidResponseError}
+     * @throws {NGSI.NotFoundError}
+     *
      * @returns {Promise}
      *
      * @example <caption>Basic usage</caption>
@@ -4882,6 +4941,9 @@
      * - `correlator` (`String`): Transaction id
      * - `service` (`String`): Service/tenant to use in this operation
      * - `servicepath` (`String`): Service path to use in this operation
+     *
+     * @throws {NGSI.InvalidResponseError}
+     * @throws {NGSI.NotFoundError}
      *
      * @returns {Promise}
      *
@@ -4973,6 +5035,9 @@
      * - `service` (`String`): Service/tenant to use in this operation
      * - `servicepath` (`String`): Service path to use in this operation
      *
+     * @throws {NGSI.InvalidResponseError}
+     * @throws {NGSI.NotFoundError}
+     *
      * @returns {Promise}
      *
      * @example
@@ -5043,6 +5108,8 @@
      * - `keyValues` (`Boolean`; default: `false`): Use flat attributes
      * - `service` (`String`): Service/tenant to use in this operation
      * - `servicepath` (`String`): Service path to use in this operation
+     *
+     * @throws {NGSI.InvalidResponseError}
      *
      * @returns {Promise}
      *
@@ -5167,6 +5234,8 @@
      *   attribute values.
      * - `values` (`Boolean`): Represent entities as an array of attribute
      *   values
+     *
+     * @throws {NGSI.InvalidResponseError}
      *
      * @returns {Promise}
      *
