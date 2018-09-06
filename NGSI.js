@@ -1608,6 +1608,14 @@
      * Specification or that the server doesn't use a version supported by this
      * library.
      *
+     * This also includes some error codes that can be returned by the server,
+     * but that are not expected when using the library. For example, a context
+     * broker server can return a `UnsupportedMediaType` error but the library
+     * always use application/json as Content-Type when sending data to the
+     * context broker. So, in case such error code is returned, ngsijs will
+     * raise this exception. Other errors handled by this exception:
+     * ContentLengthRequired.
+     *
      * @class
      * @extends Error
      * @name NGSI.InvalidResponseError
