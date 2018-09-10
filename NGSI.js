@@ -1178,6 +1178,15 @@
         return JSON.parse(response.responseText);
     };
 
+    var parse_bad_request = function parse_bad_request(response, correlator) {
+        try {
+            var error = parse_error_response(response);
+        } catch (e) {
+            return Promise.reject(new NGSI.InvalidResponseError(null, correlator));
+        }
+        return Promise.reject(new NGSI.BadRequestError({message: error.description, correlator: correlator}));
+    };
+
     var parse_not_found_response = function parse_not_found_response(response, correlator) {
         try {
             var error = parse_error_response(response);
@@ -1587,6 +1596,7 @@
 
     /**
      * Exception raised when creating an entity that already exists.
+     * Error code used by the context broker server: 422 Unprocessable
      *
      * @class
      * @extends Error
@@ -1596,11 +1606,27 @@
     NGSI.AlreadyExistsError = function AlreadyExistsError(options) {
         this.name = 'AlreadyExists';
         this.message = options.message || '';
-        this.details = options.details || '';
         this.correlator = options.correlator || null;
     };
     NGSI.AlreadyExistsError.prototype = new Error();
     NGSI.AlreadyExistsError.prototype.constructor = NGSI.AlreadyExistsError;
+
+    /**
+     * Exception raised when the provided data has errors.
+     * Error code used by the context broker server: 400 Bad Request
+     *
+     * @class
+     * @extends Error
+     * @name NGSI.BadRequestError
+     * @summary Exception raised when creating an entity that already exists.
+     */
+    NGSI.BadRequestError = function BadRequestError(options) {
+        this.name = 'BadRequest';
+        this.message = options.message || '';
+        this.correlator = options.correlator || null;
+    };
+    NGSI.BadRequestError.prototype = new Error();
+    NGSI.BadRequestError.prototype.constructor = NGSI.BadRequestError;
 
     /**
      * Exception raised when the server returns an unexpected response. This
@@ -3014,6 +3040,7 @@
      *
      *
      * @throws {NGSI.AlreadyExistsError}
+     * @throws {NGSI.BadRequestError}
      * @throws {NGSI.InvalidResponseError}
      *
      * @returns {Promise}
@@ -3105,7 +3132,9 @@
             }
         }).then(function (response) {
             var correlator = response.getHeader('Fiware-correlator');
-            if (options.upsert !== true && response.status === 422) {
+            if (response.status === 400) {
+                return parse_bad_request(response, correlator);
+            } else if (options.upsert !== true && response.status === 422) {
                 return Promise.reject(new NGSI.AlreadyExistsError({correlator: correlator}));
             } else if ((options.upsert !== true && response.status !== 201) || (options.upsert === true && [201, 204].indexOf(response.status) === -1)) {
                 return Promise.reject(new NGSI.InvalidResponseError('Unexpected error code: ' + response.status, correlator));
@@ -3379,6 +3408,7 @@
      * - `type` (`String`): Entity type, to avoid ambiguity in case there are
      *   several entities with the same entity id.
      *
+     * @throws {NGSI.BadRequestError}
      * @throws {NGSI.InvalidResponseError}
      * @throws {NGSI.NotFoundError}
      * @throws {NGSI.TooManyResultsError}
@@ -3465,7 +3495,9 @@
             }
         }).then(function (response) {
             var correlator = response.getHeader('Fiware-correlator');
-            if (response.status === 409) {
+            if (response.status === 400) {
+                return parse_bad_request(response, correlator);
+            } else if (response.status === 409) {
                 return parse_too_many_results(response, correlator);
             } else if (response.status === 404) {
                 return parse_not_found_response(response, correlator);
@@ -3504,6 +3536,7 @@
      * - `service` (`String`): Service/tenant to use in this operation
      * - `servicepath` (`String`): Service path to use in this operation
      *
+     * @throws {NGSI.BadRequestError}
      * @throws {NGSI.InvalidResponseError}
      * @throws {NGSI.NotFoundError}
      * @throws {NGSI.TooManyResultsError}
@@ -3586,7 +3619,9 @@
             }
         }).then(function (response) {
             var correlator = response.getHeader('Fiware-correlator');
-            if (response.status === 409) {
+            if (response.status === 400) {
+                return parse_bad_request(response, correlator);
+            } else if (response.status === 409) {
                 return parse_too_many_results(response, correlator);
             } else if (response.status === 404) {
                 return parse_not_found_response(response, correlator);
@@ -3625,6 +3660,7 @@
      * - `service` (`String`): Service/tenant to use in this operation
      * - `servicepath` (`String`): Service path to use in this operation
      *
+     * @throws {NGSI.BadRequestError}
      * @throws {NGSI.InvalidResponseError}
      * @throws {NGSI.NotFoundError}
      * @throws {NGSI.TooManyResultsError}
@@ -3706,7 +3742,9 @@
             }
         }).then(function (response) {
             var correlator = response.getHeader('Fiware-correlator');
-            if (response.status === 409) {
+            if (response.status === 400) {
+                return parse_bad_request(response, correlator);
+            } else if (response.status === 409) {
                 return parse_too_many_results(response, correlator);
             } else if (response.status === 404) {
                 return parse_not_found_response(response, correlator);
@@ -3967,6 +4005,7 @@
      * - `type` (`String`): Entity type, to avoid ambiguity in case there are
      *   several entities with the same entity id.
      *
+     * @throws {NGSI.BadRequestError}
      * @throws {NGSI.InvalidResponseError}
      * @throws {NGSI.NotFoundError}
      * @throws {NGSI.TooManyResultsError}
@@ -4072,7 +4111,9 @@
             }
         }).then(function (response) {
             var correlator = response.getHeader('Fiware-correlator');
-            if (response.status === 409) {
+            if (response.status === 400) {
+                return parse_bad_request(response, correlator);
+            } else if (response.status === 409) {
                 return parse_too_many_results(response, correlator);
             } else if (response.status === 404) {
                 return parse_not_found_response(response, correlator);
@@ -4341,6 +4382,7 @@
      * - `type` (`String`): Entity type, to avoid ambiguity in case there are
      *   several entities with the same entity id.
      *
+     * @throws {NGSI.BadRequestError}
      * @throws {NGSI.InvalidResponseError}
      * @throws {NGSI.NotFoundError}
      * @throws {NGSI.TooManyResultsError}
@@ -4422,7 +4464,9 @@
             }
         }).then(function (response) {
             var correlator = response.getHeader('Fiware-correlator');
-            if (response.status === 409) {
+            if (response.status === 400) {
+                return parse_bad_request(response, correlator);
+            } else if (response.status === 409) {
                 return parse_too_many_results(response, correlator);
             } else if (response.status === 404) {
                 return parse_not_found_response(response, correlator);
@@ -4744,6 +4788,7 @@
      * - `service` (`String`): Service/tenant to use in this operation
      * - `servicepath` (`String`): Service path to use in this operation
      *
+     * @throws {NGSI.BadRequestError}
      * @throws {NGSI.InvalidResponseError}
      *
      * @returns {Promise}
@@ -4885,7 +4930,9 @@
             });
         }).then(function (response) {
             var correlator = response.getHeader('Fiware-correlator');
-            if (response.status !== 201) {
+            if (response.status === 400) {
+                return parse_bad_request(response, correlator);
+            } else if (response.status !== 201) {
                 return Promise.reject(new NGSI.InvalidResponseError('Unexpected error code: ' + response.status, correlator));
             }
 
@@ -5176,6 +5223,7 @@
      * - `service` (`String`): Service/tenant to use in this operation
      * - `servicepath` (`String`): Service path to use in this operation
      *
+     * @throws {NGSI.BadRequestError}
      * @throws {NGSI.InvalidResponseError}
      *
      * @returns {Promise}
@@ -5246,7 +5294,9 @@
             }
         }).then(function (response) {
             var correlator = response.getHeader('Fiware-correlator');
-            if (response.status !== 204) {
+            if (response.status === 400) {
+                return parse_bad_request(response, correlator);
+            } else if (response.status !== 204) {
                 return Promise.reject(new NGSI.InvalidResponseError('Unexpected error code: ' + response.status, correlator));
             }
             return Promise.resolve({
@@ -5302,6 +5352,7 @@
      * - `values` (`Boolean`): Represent entities as an array of attribute
      *   values
      *
+     * @throws {NGSI.BadRequestError}
      * @throws {NGSI.InvalidResponseError}
      *
      * @returns {Promise}
@@ -5380,7 +5431,9 @@
             }
         }).then(function (response) {
             var correlator = response.getHeader('Fiware-correlator');
-            if (response.status !== 200) {
+            if (response.status === 400) {
+                return parse_bad_request(response, correlator);
+            } else if (response.status !== 200) {
                 return Promise.reject(new NGSI.InvalidResponseError('Unexpected error code: ' + response.status, correlator));
             }
 
