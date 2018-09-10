@@ -1,7 +1,7 @@
 {
   "vendor": "CoNWeT",
   "name": "ngsijs",
-  "version": "1.1.1",
+  "version": "1.2.0",
   "description": "Node JavaScript library for Orion Context Broker",
   "main": "./ngsi-node.js",
   "repository": {
@@ -36,12 +36,12 @@
     "grunt-contrib-uglify": "^2.0.0",
     "grunt-coveralls": "^2.0.0",
     "grunt-jsdoc": "^2.1.0",
-    "grunt-karma": "^2.0.0",
+    "grunt-karma": "^3.0.0",
     "gruntify-eslint": "^3.1.0",
     "istanbul": "^0.4.5",
     "jasmine": "^3.1.0",
     "jasmine-core": "^2.5.2",
-    "karma": "^1.1.0",
+    "karma": "^3.0.0",
     "karma-chrome-launcher": "^1.0.1",
     "karma-coverage": "^1.0.0",
     "karma-firefox-launcher": "^1.0.0",
