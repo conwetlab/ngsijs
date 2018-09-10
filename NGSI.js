@@ -2894,6 +2894,7 @@
      * - `values` (`Boolean`): Represent entities as an array of attribute
      *   values
      *
+     * @throws {NGSI.ConnectionError}
      * @throws {NGSI.InvalidResponseError}
      *
      * @returns {Promise}
@@ -3041,6 +3042,7 @@
      *
      * @throws {NGSI.AlreadyExistsError}
      * @throws {NGSI.BadRequestError}
+     * @throws {NGSI.ConnectionError}
      * @throws {NGSI.InvalidResponseError}
      *
      * @returns {Promise}
@@ -3171,8 +3173,9 @@
      * - `type` (`String`): Entity type, to avoid ambiguity in case there are
      *   several entities with the same entity id.
      *
-     * @throws {NGSI.NotFoundError}
+     * @throws {NGSI.ConnectionError}
      * @throws {NGSI.InvalidResponseError}
+     * @throws {NGSI.NotFoundError}
      * @throws {NGSI.TooManyResultsError}
      *
      * @returns {Promise}
@@ -3287,8 +3290,9 @@
      * - `type` (`String`): Entity type, to avoid ambiguity in case there are
      *   several entities with the same entity id.
      *
-     * @throws {NGSI.NotFoundError}
+     * @throws {NGSI.ConnectionError}
      * @throws {NGSI.InvalidResponseError}
+     * @throws {NGSI.NotFoundError}
      * @throws {NGSI.TooManyResultsError}
      *
      * @returns {Promise}
@@ -3409,6 +3413,7 @@
      *   several entities with the same entity id.
      *
      * @throws {NGSI.BadRequestError}
+     * @throws {NGSI.ConnectionError}
      * @throws {NGSI.InvalidResponseError}
      * @throws {NGSI.NotFoundError}
      * @throws {NGSI.TooManyResultsError}
@@ -3537,6 +3542,7 @@
      * - `servicepath` (`String`): Service path to use in this operation
      *
      * @throws {NGSI.BadRequestError}
+     * @throws {NGSI.ConnectionError}
      * @throws {NGSI.InvalidResponseError}
      * @throws {NGSI.NotFoundError}
      * @throws {NGSI.TooManyResultsError}
@@ -3661,6 +3667,7 @@
      * - `servicepath` (`String`): Service path to use in this operation
      *
      * @throws {NGSI.BadRequestError}
+     * @throws {NGSI.ConnectionError}
      * @throws {NGSI.InvalidResponseError}
      * @throws {NGSI.NotFoundError}
      * @throws {NGSI.TooManyResultsError}
@@ -3780,6 +3787,7 @@
      * - `type` (`String`): Entity type, to avoid ambiguity in case there are
      *   several entities with the same entity id.
      *
+     * @throws {NGSI.ConnectionError}
      * @throws {NGSI.InvalidResponseError}
      * @throws {NGSI.NotFoundError}
      * @throws {NGSI.TooManyResultsError}
@@ -3882,6 +3890,7 @@
      * - `type` (`String`): Entity type, to avoid ambiguity in case there are
      *   several entities with the same entity id.
      *
+     * @throws {NGSI.ConnectionError}
      * @throws {NGSI.InvalidResponseError}
      * @throws {NGSI.NotFoundError}
      * @throws {NGSI.TooManyResultsError}
@@ -4006,6 +4015,7 @@
      *   several entities with the same entity id.
      *
      * @throws {NGSI.BadRequestError}
+     * @throws {NGSI.ConnectionError}
      * @throws {NGSI.InvalidResponseError}
      * @throws {NGSI.NotFoundError}
      * @throws {NGSI.TooManyResultsError}
@@ -4152,6 +4162,7 @@
      * - `type` (`String`): Entity type, to avoid ambiguity in case there are
      *   several entities with the same entity id.
      *
+     * @throws {NGSI.ConnectionError}
      * @throws {NGSI.InvalidResponseError}
      * @throws {NGSI.NotFoundError}
      * @throws {NGSI.TooManyResultsError}
@@ -4261,6 +4272,7 @@
      * - `type` (`String`): Entity type, to avoid ambiguity in case there are
      *   several entities with the same entity id.
      *
+     * @throws {NGSI.ConnectionError}
      * @throws {NGSI.InvalidResponseError}
      * @throws {NGSI.NotFoundError}
      * @throws {NGSI.TooManyResultsError}
@@ -4383,6 +4395,7 @@
      *   several entities with the same entity id.
      *
      * @throws {NGSI.BadRequestError}
+     * @throws {NGSI.ConnectionError}
      * @throws {NGSI.InvalidResponseError}
      * @throws {NGSI.NotFoundError}
      * @throws {NGSI.TooManyResultsError}
@@ -4505,6 +4518,7 @@
      * - `service` (`String`): Service/tenant to use in this operation
      * - `servicepath` (`String`): Service path to use in this operation
      *
+     * @throws {NGSI.ConnectionError}
      * @throws {NGSI.InvalidResponseError}
      *
      * @returns {Promise}
@@ -4603,6 +4617,7 @@
      * - `service` (`String`): Service/tenant to use in this operation
      * - `servicepath` (`String`): Service path to use in this operation
      *
+     * @throws {NGSI.ConnectionError}
      * @throws {NGSI.InvalidResponseError}
      * @throws {NGSI.NotFoundError}
      *
@@ -4688,6 +4703,7 @@
      * - `service` (`String`): Service/tenant to use in this operation
      * - `servicepath` (`String`): Service path to use in this operation
      *
+     * @throws {NGSI.ConnectionError}
      * @throws {NGSI.InvalidResponseError}
      *
      * @returns {Promise}
@@ -4789,6 +4805,7 @@
      * - `servicepath` (`String`): Service path to use in this operation
      *
      * @throws {NGSI.BadRequestError}
+     * @throws {NGSI.ConnectionError}
      * @throws {NGSI.InvalidResponseError}
      *
      * @returns {Promise}
@@ -4976,6 +4993,7 @@
      * - `service` (`String`): Service/tenant to use in this operation
      * - `servicepath` (`String`): Service path to use in this operation
      *
+     * @throws {NGSI.ConnectionError}
      * @throws {NGSI.InvalidResponseError}
      * @throws {NGSI.NotFoundError}
      *
@@ -5056,6 +5074,7 @@
      * - `service` (`String`): Service/tenant to use in this operation
      * - `servicepath` (`String`): Service path to use in this operation
      *
+     * @throws {NGSI.ConnectionError}
      * @throws {NGSI.InvalidResponseError}
      * @throws {NGSI.NotFoundError}
      *
@@ -5149,6 +5168,7 @@
      * - `service` (`String`): Service/tenant to use in this operation
      * - `servicepath` (`String`): Service path to use in this operation
      *
+     * @throws {NGSI.ConnectionError}
      * @throws {NGSI.InvalidResponseError}
      * @throws {NGSI.NotFoundError}
      *
@@ -5224,6 +5244,7 @@
      * - `servicepath` (`String`): Service path to use in this operation
      *
      * @throws {NGSI.BadRequestError}
+     * @throws {NGSI.ConnectionError}
      * @throws {NGSI.InvalidResponseError}
      *
      * @returns {Promise}
@@ -5353,6 +5374,7 @@
      *   values
      *
      * @throws {NGSI.BadRequestError}
+     * @throws {NGSI.ConnectionError}
      * @throws {NGSI.InvalidResponseError}
      *
      * @returns {Promise}
