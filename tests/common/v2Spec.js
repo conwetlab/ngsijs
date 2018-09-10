@@ -158,6 +158,42 @@ if ((typeof require === 'function') && typeof global != null) {
                 });
             });
 
+            it("too many results", function (done) {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/v2/entities/Spain-Road-A62", {
+                    headers: {
+                        "Content-Type": "application/json",
+                        'Fiware-correlator': 'correlatortoken',
+                    },
+                    method: "DELETE",
+                    status: 409,
+                    responseText: '{"error":"TooManyResults","description":"More than one matching entity. Please refine your query"}'
+                });
+
+                connection.v2.deleteEntity("Spain-Road-A62").then(function (value) {
+                    fail("Success callback called");
+                }, function (e) {
+                    expect(e).toEqual(jasmine.any(NGSI.TooManyResultsError));
+                    expect(e.correlator).toBe("correlatortoken");
+                    expect(e.message).toBe("More than one matching entity. Please refine your query");
+                    done();
+                });
+            });
+
+            it("invalid 409", function (done) {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/v2/entities/Spain-Road-A62", {
+                    method: "DELETE",
+                    status: 409
+                });
+
+                connection.v2.deleteEntity("Spain-Road-A62").then(function (value) {
+                    fail("Success callback called");
+                }, function (e) {
+                    expect(e).toEqual(jasmine.any(NGSI.InvalidResponseError));
+                    expect(e.correlator).toBeNull();
+                    done();
+                });
+            });
+
             it("unexpected error code", function (done) {
                 ajaxMockup.addStaticURL("http://ngsi.server.com/v2/entities/Spain-Road-A62", {
                     method: "DELETE",
@@ -281,6 +317,48 @@ if ((typeof require === 'function') && typeof global != null) {
                 ajaxMockup.addStaticURL("http://ngsi.server.com/v2/entities/Bcn_Welt/attrs/temperature", {
                     method: "DELETE",
                     status: 404
+                });
+
+                connection.v2.deleteEntityAttribute({
+                    id: "Bcn_Welt",
+                    attribute: "temperature"
+                }).then(function (value) {
+                    fail("Success callback called");
+                }, function (e) {
+                    expect(e).toEqual(jasmine.any(NGSI.InvalidResponseError));
+                    expect(e.correlator).toBeNull();
+                    done();
+                });
+            });
+
+            it("too many results", function (done) {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/v2/entities/Bcn_Welt/attrs/temperature", {
+                    headers: {
+                        "Content-Type": "application/json",
+                        'Fiware-correlator': 'correlatortoken',
+                    },
+                    method: "DELETE",
+                    status: 409,
+                    responseText: '{"error":"TooManyResults","description":"More than one matching entity. Please refine your query"}'
+                });
+
+                connection.v2.deleteEntityAttribute({
+                    id: "Bcn_Welt",
+                    attribute: "temperature"
+                }).then(function (value) {
+                    fail("Success callback called");
+                }, function (e) {
+                    expect(e).toEqual(jasmine.any(NGSI.TooManyResultsError));
+                    expect(e.correlator).toBe("correlatortoken");
+                    expect(e.message).toBe("More than one matching entity. Please refine your query");
+                    done();
+                });
+            });
+
+            it("invalid 409", function (done) {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/v2/entities/Bcn_Welt/attrs/temperature", {
+                    method: "DELETE",
+                    status: 409
                 });
 
                 connection.v2.deleteEntityAttribute({
@@ -554,10 +632,48 @@ if ((typeof require === 'function') && typeof global != null) {
                 });
             });
 
+            it("bad request", function (done) {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/v2/entities", {
+                    headers: {
+                        "Content-Type": "application/json",
+                        'Fiware-correlator': 'correlatortoken'
+                    },
+                    method: "POST",
+                    status: 400,
+                    responseText: '{"error":"BadRequest","description":"Invalid characters in entity id"}'
+                });
+
+                connection.v2.createEntity({"id": "21$("}).then(function (value) {
+                    fail("Success callback called");
+                }, function (e) {
+                    expect(e).toEqual(jasmine.any(NGSI.BadRequestError));
+                    expect(e.correlator).toBe("correlatortoken");
+                    expect(e.message).toBe("Invalid characters in entity id");
+                    done();
+                });
+            });
+
+            it("invalid 400", function (done) {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/v2/entities", {
+                    method: "POST",
+                    status: 400
+                });
+
+                connection.v2.createEntity(entity_values).then(function (value) {
+                    fail("Success callback called");
+                }, function (e) {
+                    expect(e).toEqual(jasmine.any(NGSI.InvalidResponseError));
+                    expect(e.correlator).toBeNull();
+                    done();
+                });
+            });
+
             it("manage already exists errors", function (done) {
                 ajaxMockup.addStaticURL("http://ngsi.server.com/v2/entities", {
                     method: "POST",
-                    status: 422
+                    status: 422,
+                    responseText: '{"error":"Unprocessable","description":"AlreadyExists"}'
+
                 });
 
                 connection.v2.createEntity(entity).then(function (value) {
@@ -599,7 +715,9 @@ if ((typeof require === 'function') && typeof global != null) {
             it("unexpected error code (422 when using upsert)", function (done) {
                 ajaxMockup.addStaticURL("http://ngsi.server.com/v2/entities", {
                     method: "POST",
-                    status: 422
+                    status: 422,
+                    responseText: '{"error":"Unprocessable","description":"AlreadyExists"}'
+
                 });
 
                 connection.v2.createEntity(entity, {upsert: true}).then(function (value) {
@@ -863,6 +981,54 @@ if ((typeof require === 'function') && typeof global != null) {
 
                 it("502", test.bind(null, 502));
                 it("504", test.bind(null, 504));
+            });
+
+            it("bad request", function (done) {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/v2/subscriptions", {
+                    headers: {
+                        "Content-Type": "application/json",
+                        'Fiware-correlator': 'correlatortoken'
+                    },
+                    method: "POST",
+                    status: 400,
+                    responseText: '{"error":"BadRequest","description":"no subject entities specified"}'
+                });
+
+                connection.v2.createSubscription({
+                    "subject": {
+                    },
+                    "notification": {
+                        "http": {
+                            "url": "http://localhost:1234"
+                        },
+                        "attrs": [
+                            "temperature",
+                            "humidity"
+                        ]
+                    },
+                }).then(function (result) {
+                    fail("Success callback called");
+                }, function (e) {
+                    expect(e).toEqual(jasmine.any(NGSI.BadRequestError));
+                    expect(e.correlator).toBe("correlatortoken");
+                    expect(e.message).toBe("no subject entities specified");
+                    done();
+                });
+            });
+
+            it("invalid 400", function (done) {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/v2/subscriptions", {
+                    method: "POST",
+                    status: 400
+                });
+
+                connection.v2.createSubscription(subscription).then(function (result) {
+                    fail("Success callback called");
+                }, function (e) {
+                    expect(e).toEqual(jasmine.any(NGSI.InvalidResponseError));
+                    expect(e.correlator).toBeNull();
+                    done();
+                });
             });
 
             describe("handles unexpected error codes", function () {
@@ -1135,6 +1301,42 @@ if ((typeof require === 'function') && typeof global != null) {
                     done();
                 });
             });
+
+            it("too many results", function (done) {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/v2/entities/Spain-Road-A62", {
+                    headers: {
+                        "Content-Type": "application/json",
+                        'Fiware-correlator': 'correlatortoken',
+                    },
+                    method: "GET",
+                    status: 409,
+                    responseText: '{"error":"TooManyResults","description":"More than one matching entity. Please refine your query"}'
+                });
+
+                connection.v2.getEntity("Spain-Road-A62").then(function (value) {
+                    fail("Success callback called");
+                }, function (e) {
+                    expect(e).toEqual(jasmine.any(NGSI.TooManyResultsError));
+                    expect(e.correlator).toBe("correlatortoken");
+                    expect(e.message).toBe("More than one matching entity. Please refine your query");
+                    done();
+                });
+            });
+
+            it("invalid 409", function (done) {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/v2/entities/Spain-Road-A62", {
+                    method: "GET",
+                    status: 409
+                });
+
+                connection.v2.getEntity("Spain-Road-A62").then(function (value) {
+                    fail("Success callback called");
+                }, function (e) {
+                    expect(e).toEqual(jasmine.any(NGSI.InvalidResponseError));
+                    expect(e.correlator).toBeNull();
+                    done();
+                });
+            });
         });
 
         describe('getEntityAttribute(options)', function () {
@@ -1257,6 +1459,50 @@ if ((typeof require === 'function') && typeof global != null) {
                 ajaxMockup.addStaticURL("http://ngsi.server.com/v2/entities/Bcn_Welt/attrs/temperature", {
                     method: "GET",
                     status: 404
+                });
+
+                connection.v2.getEntityAttribute({
+                    id: "Bcn_Welt",
+                    type: "Room",
+                    attribute: "temperature"
+                }).then(function (result) {
+                    fail("Success callback called");
+                }, function (e) {
+                    expect(e).toEqual(jasmine.any(NGSI.InvalidResponseError));
+                    expect(e.correlator).toBeNull();
+                    done();
+                });
+            });
+
+            it("too many results", function (done) {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/v2/entities/Bcn_Welt/attrs/temperature", {
+                    headers: {
+                        "Content-Type": "application/json",
+                        'Fiware-correlator': 'correlatortoken',
+                    },
+                    method: "GET",
+                    status: 409,
+                    responseText: '{"error":"TooManyResults","description":"More than one matching entity. Please refine your query"}'
+                });
+
+                connection.v2.getEntityAttribute({
+                    id: "Bcn_Welt",
+                    type: "Room",
+                    attribute: "temperature"
+                }).then(function (result) {
+                    fail("Success callback called");
+                }, function (e) {
+                    expect(e).toEqual(jasmine.any(NGSI.TooManyResultsError));
+                    expect(e.correlator).toBe("correlatortoken");
+                    expect(e.message).toBe("More than one matching entity. Please refine your query");
+                    done();
+                });
+            });
+
+            it("invalid 409", function (done) {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/v2/entities/Bcn_Welt/attrs/temperature", {
+                    method: "GET",
+                    status: 409
                 });
 
                 connection.v2.getEntityAttribute({
@@ -1472,6 +1718,42 @@ if ((typeof require === 'function') && typeof global != null) {
                 });
             });
 
+            it("too many results", function (done) {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/v2/entities/Spain-Road-A62/attrs", {
+                    headers: {
+                        "Content-Type": "application/json",
+                        'Fiware-correlator': 'correlatortoken',
+                    },
+                    method: "GET",
+                    status: 409,
+                    responseText: '{"error":"TooManyResults","description":"More than one matching entity. Please refine your query"}'
+                });
+
+                connection.v2.getEntityAttributes("Spain-Road-A62").then(function () {
+                    fail("Success callback called");
+                }, function (e) {
+                    expect(e).toEqual(jasmine.any(NGSI.TooManyResultsError));
+                    expect(e.correlator).toBe("correlatortoken");
+                    expect(e.message).toBe("More than one matching entity. Please refine your query");
+                    done();
+                });
+            });
+
+            it("invalid 409", function (done) {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/v2/entities/Spain-Road-A62/attrs", {
+                    method: "GET",
+                    status: 409
+                });
+
+                connection.v2.getEntityAttributes("Spain-Road-A62").then(function () {
+                    fail("Success callback called");
+                }, function (e) {
+                    expect(e).toEqual(jasmine.any(NGSI.InvalidResponseError));
+                    expect(e.correlator).toBeNull();
+                    done();
+                });
+            });
+
             it("handles unexpected error codes", function (done) {
                 ajaxMockup.addStaticURL("http://ngsi.server.com/v2/entities/Spain-Road-A62/attrs", {
                     method: "GET",
@@ -1621,6 +1903,50 @@ if ((typeof require === 'function') && typeof global != null) {
                 ajaxMockup.addStaticURL("http://ngsi.server.com/v2/entities/Spain-Road-A62/attrs/refRoadSegment/value", {
                     method: "GET",
                     status: 404
+                });
+
+                connection.v2.getEntityAttributeValue({
+                    id: "Spain-Road-A62",
+                    type: "Road",
+                    attribute: "refRoadSegment"
+                }).then(function (result) {
+                    fail("Success callback called");
+                }, function (e) {
+                    expect(e).toEqual(jasmine.any(NGSI.InvalidResponseError));
+                    expect(e.correlator).toBeNull();
+                    done();
+                });
+            });
+
+            it("too many results", function (done) {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/v2/entities/Spain-Road-A62/attrs/refRoadSegment/value", {
+                    headers: {
+                        "Content-Type": "application/json",
+                        'Fiware-correlator': 'correlatortoken',
+                    },
+                    method: "GET",
+                    status: 409,
+                    responseText: '{"error":"TooManyResults","description":"More than one matching entity. Please refine your query"}'
+                });
+
+                connection.v2.getEntityAttributeValue({
+                    id: "Spain-Road-A62",
+                    type: "Road",
+                    attribute: "refRoadSegment"
+                }).then(function (result) {
+                    fail("Success callback called");
+                }, function (e) {
+                    expect(e).toEqual(jasmine.any(NGSI.TooManyResultsError));
+                    expect(e.correlator).toBe("correlatortoken");
+                    expect(e.message).toBe("More than one matching entity. Please refine your query");
+                    done();
+                });
+            });
+
+            it("invalid 409", function (done) {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/v2/entities/Spain-Road-A62/attrs/refRoadSegment/value", {
+                    method: "GET",
+                    status: 409
                 });
 
                 connection.v2.getEntityAttributeValue({
@@ -2190,6 +2516,90 @@ if ((typeof require === 'function') && typeof global != null) {
                 });
             });
 
+            it("bad request", function (done) {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/v2/entities/Bcn-Welt/attrs", {
+                    headers: {
+                        "Content-Type": "application/json",
+                        'Fiware-correlator': 'correlatortoken'
+                    },
+                    method: "POST",
+                    status: 400,
+                    responseText: '{"error":"BadRequest","description":"Invalid characters in attribute value"}'
+                });
+
+                connection.v2.appendEntityAttributes({
+                    "id": "Bcn-Welt",
+                    "temperature": "("
+                }).then(function (result) {
+                    fail("Success callback called");
+                }, function (e) {
+                    expect(e).toEqual(jasmine.any(NGSI.BadRequestError));
+                    expect(e.correlator).toBe("correlatortoken");
+                    expect(e.message).toBe("Invalid characters in attribute value");
+                    done();
+                });
+            });
+
+            it("invalid 400", function (done) {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/v2/entities/Bcn-Welt/attrs", {
+                    method: "POST",
+                    status: 400
+                });
+
+                connection.v2.appendEntityAttributes({
+                    "id": "Bcn-Welt",
+                    "temperature": 21.7
+                }).then(function (result) {
+                    fail("Success callback called");
+                }, function (e) {
+                    expect(e).toEqual(jasmine.any(NGSI.InvalidResponseError));
+                    expect(e.correlator).toBeNull();
+                    done();
+                });
+            });
+
+            it("too many results", function (done) {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/v2/entities/Bcn-Welt/attrs", {
+                    headers: {
+                        "Content-Type": "application/json",
+                        'Fiware-correlator': 'correlatortoken',
+                    },
+                    method: "POST",
+                    status: 409,
+                    responseText: '{"error":"TooManyResults","description":"More than one matching entity. Please refine your query"}'
+                });
+
+                connection.v2.appendEntityAttributes({
+                    "id": "Bcn-Welt",
+                    "temperature": 21.7
+                }).then(function (result) {
+                    fail("Success callback called");
+                }, function (e) {
+                    expect(e).toEqual(jasmine.any(NGSI.TooManyResultsError));
+                    expect(e.correlator).toBe("correlatortoken");
+                    expect(e.message).toBe("More than one matching entity. Please refine your query");
+                    done();
+                });
+            });
+
+            it("invalid 409", function (done) {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/v2/entities/Bcn-Welt/attrs", {
+                    method: "POST",
+                    status: 409
+                });
+
+                connection.v2.appendEntityAttributes({
+                    "id": "Bcn-Welt",
+                    "temperature": 21.7
+                }).then(function (result) {
+                    fail("Success callback called");
+                }, function (e) {
+                    expect(e).toEqual(jasmine.any(NGSI.InvalidResponseError));
+                    expect(e.correlator).toBeNull();
+                    done();
+                });
+            });
+
             it("handles unexpected error codes", function (done) {
                 ajaxMockup.addStaticURL("http://ngsi.server.com/v2/entities/Bcn-Welt/attrs", {
                     method: "POST",
@@ -2349,9 +2759,101 @@ if ((typeof require === 'function') && typeof global != null) {
                 });
             });
 
+            it("bad request", function (done) {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/v2/entities/Bcn_Welt/attrs/temperature/value", {
+                    headers: {
+                        "Content-Type": "application/json",
+                        'Fiware-correlator': 'correlatortoken'
+                    },
+                    method: "PUT",
+                    status: 400,
+                    responseText: '{"error":"BadRequest","description":"Invalid characters in attribute value"}'
+                });
+
+                connection.v2.replaceEntityAttributeValue({
+                    id: "Bcn_Welt",
+                    type: "Room",
+                    attribute: "temperature",
+                    value: "("
+                }).then(function (result) {
+                    fail("Success callback called");
+                }, function (e) {
+                    expect(e).toEqual(jasmine.any(NGSI.BadRequestError));
+                    expect(e.correlator).toBe("correlatortoken");
+                    expect(e.message).toBe("Invalid characters in attribute value");
+                    done();
+                });
+            });
+
+            it("invalid 400", function (done) {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/v2/entities/Bcn_Welt/attrs/temperature/value", {
+                    method: "PUT",
+                    status: 400
+                });
+
+                connection.v2.replaceEntityAttributeValue({
+                    id: "Bcn_Welt",
+                    type: "Room",
+                    attribute: "temperature",
+                    value: 21
+                }).then(function (result) {
+                    fail("Success callback called");
+                }, function (e) {
+                    expect(e).toEqual(jasmine.any(NGSI.InvalidResponseError));
+                    expect(e.correlator).toBeNull();
+                    done();
+                });
+            });
+
+            it("too many results", function (done) {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/v2/entities/Bcn_Welt/attrs/temperature/value", {
+                    headers: {
+                        "Content-Type": "application/json",
+                        'Fiware-correlator': 'correlatortoken',
+                    },
+                    method: "PUT",
+                    status: 409,
+                    responseText: '{"error":"TooManyResults","description":"More than one matching entity. Please refine your query"}'
+                });
+
+                connection.v2.replaceEntityAttributeValue({
+                    id: "Bcn_Welt",
+                    type: "Room",
+                    attribute: "temperature",
+                    value: 21
+                }).then(function (result) {
+                    fail("Success callback called");
+                }, function (e) {
+                    expect(e).toEqual(jasmine.any(NGSI.TooManyResultsError));
+                    expect(e.correlator).toBe("correlatortoken");
+                    expect(e.message).toBe("More than one matching entity. Please refine your query");
+                    done();
+                });
+            });
+
+            it("invalid 409", function (done) {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/v2/entities/Bcn_Welt/attrs/temperature/value", {
+                    method: "PUT",
+                    status: 409
+                });
+
+                connection.v2.replaceEntityAttributeValue({
+                    id: "Bcn_Welt",
+                    type: "Room",
+                    attribute: "temperature",
+                    value: 21
+                }).then(function (result) {
+                    fail("Success callback called");
+                }, function (e) {
+                    expect(e).toEqual(jasmine.any(NGSI.InvalidResponseError));
+                    expect(e.correlator).toBeNull();
+                    done();
+                });
+            });
+
             it("handles unexpected error codes", function (done) {
                 ajaxMockup.addStaticURL("http://ngsi.server.com/v2/entities/Bcn_Welt/attrs/temperature/value", {
-                    method: "GET",
+                    method: "PUT",
                     status: 201
                 });
 
@@ -2500,6 +3002,90 @@ if ((typeof require === 'function') && typeof global != null) {
                 ajaxMockup.addStaticURL("http://ngsi.server.com/v2/entities/Bcn-Welt/attrs", {
                     method: "PATCH",
                     status: 404
+                });
+
+                connection.v2.updateEntityAttributes({
+                    "id": "Bcn-Welt",
+                    "temperature": 21.7
+                }).then(function (result) {
+                    fail("Success callback called");
+                }, function (e) {
+                    expect(e).toEqual(jasmine.any(NGSI.InvalidResponseError));
+                    expect(e.correlator).toBeNull();
+                    done();
+                });
+            });
+
+            it("bad request", function (done) {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/v2/entities/Bcn-Welt/attrs", {
+                    headers: {
+                        "Content-Type": "application/json",
+                        'Fiware-correlator': 'correlatortoken'
+                    },
+                    method: "PATCH",
+                    status: 400,
+                    responseText: '{"error":"BadRequest","description":"Invalid characters in attribute value"}'
+                });
+
+                connection.v2.updateEntityAttributes({
+                    "id": "Bcn-Welt",
+                    "temperature": "("
+                }).then(function (result) {
+                    fail("Success callback called");
+                }, function (e) {
+                    expect(e).toEqual(jasmine.any(NGSI.BadRequestError));
+                    expect(e.correlator).toBe("correlatortoken");
+                    expect(e.message).toBe("Invalid characters in attribute value");
+                    done();
+                });
+            });
+
+            it("invalid 400", function (done) {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/v2/entities/Bcn-Welt/attrs", {
+                    method: "PATCH",
+                    status: 400
+                });
+
+                connection.v2.updateEntityAttributes({
+                    "id": "Bcn-Welt",
+                    "temperature": 21.7
+                }).then(function (result) {
+                    fail("Success callback called");
+                }, function (e) {
+                    expect(e).toEqual(jasmine.any(NGSI.InvalidResponseError));
+                    expect(e.correlator).toBeNull();
+                    done();
+                });
+            });
+
+            it("too many results", function (done) {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/v2/entities/Bcn-Welt/attrs", {
+                    headers: {
+                        "Content-Type": "application/json",
+                        'Fiware-correlator': 'correlatortoken',
+                    },
+                    method: "PATCH",
+                    status: 409,
+                    responseText: '{"error":"TooManyResults","description":"More than one matching entity. Please refine your query"}'
+                });
+
+                connection.v2.updateEntityAttributes({
+                    "id": "Bcn-Welt",
+                    "temperature": 21.7
+                }).then(function (result) {
+                    fail("Success callback called");
+                }, function (e) {
+                    expect(e).toEqual(jasmine.any(NGSI.TooManyResultsError));
+                    expect(e.correlator).toBe("correlatortoken");
+                    expect(e.message).toBe("More than one matching entity. Please refine your query");
+                    done();
+                });
+            });
+
+            it("invalid 409", function (done) {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/v2/entities/Bcn-Welt/attrs", {
+                    method: "PATCH",
+                    status: 409
                 });
 
                 connection.v2.updateEntityAttributes({
@@ -3304,6 +3890,91 @@ if ((typeof require === 'function') && typeof global != null) {
                 });
             });
 
+            it("bad request", function (done) {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/v2/entities/Bcn_Welt/attrs/temperature", {
+                    headers: {
+                        "Content-Type": "application/json",
+                        'Fiware-correlator': 'correlatortoken'
+                    },
+                    method: "PUT",
+                    status: 400,
+                    responseText: '{"error":"BadRequest","description":"Invalid characters in attribute value"}'
+                });
+
+                connection.v2.replaceEntityAttribute({
+                    id: "Bcn_Welt",
+                    attribute: "temperature",
+                    value: "(",
+                }).then(function (result) {
+                    fail("Success callback called");
+                }, function (e) {
+                    expect(e).toEqual(jasmine.any(NGSI.BadRequestError));
+                    expect(e.correlator).toBe("correlatortoken");
+                    expect(e.message).toBe("Invalid characters in attribute value");
+                    done();
+                });
+            });
+
+            it("invalid 400", function (done) {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/v2/entities/Bcn_Welt/attrs/temperature", {
+                    method: "PUT",
+                    status: 400
+                });
+
+                connection.v2.replaceEntityAttribute({
+                    id: "Bcn_Welt",
+                    attribute: "temperature",
+                    value: 25,
+                }).then(function (result) {
+                    fail("Success callback called");
+                }, function (e) {
+                    expect(e).toEqual(jasmine.any(NGSI.InvalidResponseError));
+                    expect(e.correlator).toBeNull();
+                    done();
+                });
+            });
+
+            it("too many results", function (done) {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/v2/entities/Bcn_Welt/attrs/temperature", {
+                    headers: {
+                        "Content-Type": "application/json",
+                        'Fiware-correlator': 'correlatortoken',
+                    },
+                    method: "PUT",
+                    status: 409,
+                    responseText: '{"error":"TooManyResults","description":"More than one matching entity. Please refine your query"}'
+                });
+
+                connection.v2.replaceEntityAttribute({
+                    id: "Bcn_Welt",
+                    attribute: "temperature"
+                }).then(function () {
+                    fail("Success callback called");
+                }, function (e) {
+                    expect(e).toEqual(jasmine.any(NGSI.TooManyResultsError));
+                    expect(e.correlator).toBe("correlatortoken");
+                    expect(e.message).toBe("More than one matching entity. Please refine your query");
+                    done();
+                });
+            });
+
+            it("invalid 409", function (done) {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/v2/entities/Bcn_Welt/attrs/temperature", {
+                    method: "PUT",
+                    status: 409
+                });
+
+                connection.v2.replaceEntityAttribute({
+                    id: "Bcn_Welt",
+                    attribute: "temperature"
+                }).then(function () {
+                    fail("Success callback called");
+                }, function (e) {
+                    expect(e).toEqual(jasmine.any(NGSI.InvalidResponseError));
+                    expect(e.correlator).toBeNull();
+                    done();
+                });
+            });
 
             it("handles unexpected error codes", function (done) {
                 ajaxMockup.addStaticURL("http://ngsi.server.com/v2/entities/Bcn_Welt/attrs/temperature", {
@@ -3473,6 +4144,122 @@ if ((typeof require === 'function') && typeof global != null) {
                 });
             });
 
+            it("bad request", function (done) {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/v2/entities/Spain-Road-A62/attrs", {
+                    headers: {
+                        "Content-Type": "application/json",
+                        'Fiware-correlator': 'correlatortoken'
+                    },
+                    method: "PUT",
+                    status: 400,
+                    responseText: '{"error":"BadRequest","description":"Invalid characters in attribute value"}'
+                });
+
+                connection.v2.replaceEntityAttributes({
+                    "id": "Spain-Road-A62",
+                    "type": "Road",
+                    "attributes": {
+                        "name": "("
+                    }
+                }).then(function () {
+                    fail("Success callback called");
+                }, function (e) {
+                    expect(e).toEqual(jasmine.any(NGSI.BadRequestError));
+                    expect(e.correlator).toBe("correlatortoken");
+                    expect(e.message).toBe("Invalid characters in attribute value");
+                    done();
+                });
+            });
+
+            it("invalid 400", function (done) {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/v2/entities/Spain-Road-A62/attrs", {
+                    method: "PUT",
+                    status: 400
+                });
+
+                connection.v2.replaceEntityAttributes({
+                    "id": "Spain-Road-A62",
+                    "type": "Road",
+                    "attributes": {
+                        "name": "A-62"
+                    }
+                }).then(function () {
+                    fail("Success callback called");
+                }, function (e) {
+                    expect(e).toEqual(jasmine.any(NGSI.InvalidResponseError));
+                    expect(e.correlator).toBeNull();
+                    done();
+                });
+            });
+
+            it("too many results", function (done) {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/v2/entities/Spain-Road-A62/attrs", {
+                    headers: {
+                        "Content-Type": "application/json",
+                        'Fiware-correlator': 'correlatortoken',
+                    },
+                    method: "PUT",
+                    status: 409,
+                    responseText: '{"error":"TooManyResults","description":"More than one matching entity. Please refine your query"}'
+                });
+
+                connection.v2.replaceEntityAttributes({
+                    "id": "Spain-Road-A62",
+                    "type": "Road",
+                    "attributes": {
+                        "name": "A-62"
+                    }
+                }).then(function () {
+                    fail("Success callback called");
+                }, function (e) {
+                    expect(e).toEqual(jasmine.any(NGSI.TooManyResultsError));
+                    expect(e.correlator).toBe("correlatortoken");
+                    expect(e.message).toBe("More than one matching entity. Please refine your query");
+                    done();
+                });
+            });
+
+            it("invalid 409", function (done) {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/v2/entities/Spain-Road-A62/attrs", {
+                    method: "PUT",
+                    status: 409
+                });
+
+                connection.v2.replaceEntityAttributes({
+                    "id": "Spain-Road-A62",
+                    "type": "Road",
+                    "attributes": {
+                        "name": "A-62"
+                    }
+                }).then(function () {
+                    fail("Success callback called");
+                }, function (e) {
+                    expect(e).toEqual(jasmine.any(NGSI.InvalidResponseError));
+                    expect(e.correlator).toBeNull();
+                    done();
+                });
+            });
+
+            it("handles unexpected error codes", function (done) {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/v2/entities/Spain-Road-A62/attrs", {
+                    method: "PUT",
+                    status: 201
+                });
+
+                connection.v2.replaceEntityAttributes({
+                    "id": "Spain-Road-A62",
+                    "type": "Road",
+                    "attributes": {
+                        "name": "A-62"
+                    }
+                }).then(function () {
+                    fail("Success callback called");
+                }, function (e) {
+                    expect(e).toEqual(jasmine.any(NGSI.InvalidResponseError));
+                    done();
+                });
+            });
+
             it("handles unexpected error codes", function (done) {
                 ajaxMockup.addStaticURL("http://ngsi.server.com/v2/entities/Spain-Road-A62/attrs", {
                     method: "PUT",
@@ -3583,6 +4370,45 @@ if ((typeof require === 'function') && typeof global != null) {
                     done();
                 }, function (e) {
                     fail("Failure callback called");
+                });
+            });
+
+            it("bad request", function (done) {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/v2/op/update", {
+                    headers: {
+                        "Content-Type": "application/json",
+                        'Fiware-correlator': 'correlatortoken'
+                    },
+                    method: "POST",
+                    status: 400,
+                    responseText: '{"error":"BadRequest","description":"not a JSON array"}'
+                });
+
+                connection.v2.batchUpdate({
+                    "actionType": "APPEND",
+                    "entities": {}
+                }).then(function (result) {
+                    fail("Success callback called");
+                }, function (e) {
+                    expect(e).toEqual(jasmine.any(NGSI.BadRequestError));
+                    expect(e.correlator).toBe("correlatortoken");
+                    expect(e.message).toBe("not a JSON array");
+                    done();
+                });
+            });
+
+            it("invalid 400", function (done) {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/v2/op/update", {
+                    method: "POST",
+                    status: 400
+                });
+
+                connection.v2.batchUpdate(changes).then(function (value) {
+                    fail("Success callback called");
+                }, function (e) {
+                    expect(e).toEqual(jasmine.any(NGSI.InvalidResponseError));
+                    expect(e.correlator).toBeNull();
+                    done();
                 });
             });
 
@@ -3884,6 +4710,44 @@ if ((typeof require === 'function') && typeof global != null) {
                     done();
                 }, function (e) {
                     fail("Failure callback called");
+                });
+            });
+
+            it("bad request", function (done) {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/v2/op/query", {
+                    headers: {
+                        "Content-Type": "application/json",
+                        'Fiware-correlator': 'correlatortoken'
+                    },
+                    method: "POST",
+                    status: 400,
+                    responseText: '{"error":"BadRequest","description":"not a JSON array"}'
+                });
+
+                connection.v2.batchQuery({
+                    "entities": {}
+                }).then(function (result) {
+                    fail("Success callback called");
+                }, function (e) {
+                    expect(e).toEqual(jasmine.any(NGSI.BadRequestError));
+                    expect(e.correlator).toBe("correlatortoken");
+                    expect(e.message).toBe("not a JSON array");
+                    done();
+                });
+            });
+
+            it("invalid 400", function (done) {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/v2/op/query", {
+                    method: "POST",
+                    status: 400
+                });
+
+                connection.v2.batchQuery(query, {count: true}).then(function (value) {
+                    fail("Success callback called");
+                }, function (e) {
+                    expect(e).toEqual(jasmine.any(NGSI.InvalidResponseError));
+                    expect(e.correlator).toBeNull();
+                    done();
                 });
             });
 
