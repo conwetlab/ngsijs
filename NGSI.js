@@ -4953,9 +4953,14 @@
                 return Promise.reject(new NGSI.InvalidResponseError('Unexpected error code: ' + response.status, correlator));
             }
 
-            var subscription_url = response.getHeader('Location');
-            var subscription_id = subscription_url.split('/').pop();
-            subscription.id = subscription_id;
+            var location_header = response.getHeader('Location');
+            try {
+                var subscription_url = new URL(location_header, connection.url);
+                var subscription_id = subscription_url.pathname.split('/').pop();
+                subscription.id = subscription_id;
+            } catch (e) {
+                return Promise.reject(new NGSI.InvalidResponseError('Unexpected location header: ' + location_header, correlator));
+            }
 
             if (proxy_callback) {
                 this.ngsi_proxy.associateSubscriptionId(proxy_callback.callback_id, subscription_id);
@@ -4964,7 +4969,7 @@
             return Promise.resolve({
                 correlator: correlator,
                 subscription: subscription,
-                location: subscription_url
+                location: location_header
             });
         }.bind(connection), function (error) {
             if (proxy_callback) {
