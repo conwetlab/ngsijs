@@ -584,6 +584,30 @@ if ((typeof require === 'function') && typeof global != null) {
                 });
             });
 
+            it("handles invalid location headers", function (done) {
+                var proxy = new NGSI.ProxyConnection("http://ngsiproxy.example.com/", ajaxMockup);
+                ajaxMockup.addStaticURL("http://ngsiproxy.example.com/eventsource", {
+                    headers: {
+                        'Location': '//a'
+                    },
+                    method: "POST",
+                    status: 201
+                });
+
+                var p = proxy.connect();
+                p.then(
+                    () => {
+                        fail("Success callback called");
+                    },
+                    (error) => {
+                        expect(error).toEqual(jasmine.any(NGSI.InvalidResponseError));
+                        expect(proxy.connected).toBeFalsy();
+                        expect(proxy.connecting).toBeFalsy();
+                        done();
+                    }
+                );
+            });
+
         });
 
         describe("requestCallback(listener)", function () {

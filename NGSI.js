@@ -1228,11 +1228,12 @@
                 }
 
                 var priv = privates.get(this);
-                priv.source_url = response.getHeader('Location');
-                if (priv.source_url == null) {
-                    return Promise.reject(new NGSI.InvalidResponseError('Missing Location Header'));
+                try {
+                    priv.source_url = new URL(response.getHeader('Location'));
+                } catch (e) {
+                    privates.get(this).promise = null;
+                    return Promise.reject(new NGSI.InvalidResponseError('Invalid/missing Location Header'));
                 }
-                priv.source_url = new URL(priv.source_url);
                 return connect_to_eventsource.call(this);
             }.bind(this),
             function (error) {
