@@ -813,6 +813,34 @@ if ((typeof require === 'function') && typeof global != null) {
                 });
             });
 
+            it("basic request (get parameter on location header)", function (done) {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/v2/subscriptions", {
+                    method: "POST",
+                    status: 201,
+                    headers: {
+                        'Fiware-correlator': 'correlatortoken',
+                        'Location': '/v2/subscriptions/abcde98765?api_key=mykey'
+                    },
+                    checkRequestContent: function (url, options) {
+                        var data = JSON.parse(options.postBody);
+                        expect(data).toEqual(subscription);
+                        expect(options.parameters).toEqual(undefined);
+                    }
+                });
+
+                connection.v2.createSubscription(subscription).then(function (result) {
+                    expect(result).toEqual({
+                        correlator: 'correlatortoken',
+                        subscription: subscription,
+                        location: "/v2/subscriptions/abcde98765?api_key=mykey"
+                    });
+                    expect(result.subscription.id).toBe("abcde98765");
+                    done();
+                }, function (e) {
+                    fail("Failure callback called");
+                });
+            });
+
             it("basic request providing a custom correlator", function (done) {
                 ajaxMockup.addStaticURL("http://ngsi.server.com/v2/subscriptions", {
                     method: "POST",
@@ -1049,6 +1077,24 @@ if ((typeof require === 'function') && typeof global != null) {
 
                 it("204", test.bind(null, 204));
                 it("404", test.bind(null, 404));
+            });
+
+            it("handles invalid location header values", function (done) {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/v2/subscriptions", {
+                    method: "POST",
+                    status: 201,
+                    headers: {
+                        'Fiware-correlator': 'correlatortoken',
+                        'Location': '//?a'
+                    }
+                });
+
+                connection.v2.createSubscription(subscription).then(function (result) {
+                    fail("Success callback called");
+                }, function (e) {
+                    expect(e).toEqual(jasmine.any(NGSI.InvalidResponseError));
+                    done();
+                });
             });
 
             it("close ngsi-proxy callbacks on error", function (done) {
