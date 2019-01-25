@@ -1079,6 +1079,24 @@ if ((typeof require === 'function') && typeof global != null) {
                 it("404", test.bind(null, 404));
             });
 
+            it("handles invalid location header values", function (done) {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/v2/subscriptions", {
+                    method: "POST",
+                    status: 201,
+                    headers: {
+                        'Fiware-correlator': 'correlatortoken',
+                        'Location': '//?a'
+                    }
+                });
+
+                connection.v2.createSubscription(subscription).then(function (result) {
+                    fail("Success callback called");
+                }, function (e) {
+                    expect(e).toEqual(jasmine.any(NGSI.InvalidResponseError));
+                    done();
+                });
+            });
+
             it("close ngsi-proxy callbacks on error", function (done) {
                 var listener = jasmine.createSpy("listener");
                 var subscription = {
