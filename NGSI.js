@@ -1249,10 +1249,9 @@
     };
 
     var connect_to_eventsource = function connect_to_eventsource() {
+        var priv = privates.get(this);
         return new Promise(function (resolve, reject) {
             var closeTimeout;
-            var _wait_event_source_init = null;
-            var priv = privates.get(this);
             var wait_event_source_init = function wait_event_source_init(e) {
                 var data = JSON.parse(e.data);
 
@@ -1261,26 +1260,42 @@
                 priv.promise = null;
                 priv.connection_id = data.id;
 
-                priv.source.removeEventListener('init', _wait_event_source_init, true);
+                priv.source.removeEventListener('error', handle_connection_rejected, true);
+                priv.source.removeEventListener('init', wait_event_source_init, true);
+                priv.source.addEventListener('error', function (e) {
+                    priv.connected = false;
+                    priv.source = null;
+                    priv.connection_id = null;
+                    var oldCallbacks = priv.callbacks;
+                    priv.callbacks = {};
+                    priv.callbacksBySubscriptionId = {};
+
+                    for (var key in oldCallbacks) {
+                        oldCallbacks[key].method(null, null, true);
+                    }
+                }, true);
                 priv.source.addEventListener('notification', function (e) {
                     var data = JSON.parse(e.data);
                     priv.callbacks[data.callback_id].method(data.payload, data.headers);
-                }.bind(this), true);
+                }, true);
 
                 resolve();
             };
-
-            _wait_event_source_init = wait_event_source_init.bind(this);
-            priv.source = new EventSource(priv.source_url);
-            priv.source.addEventListener('init', _wait_event_source_init, true);
-
-            closeTimeout = setTimeout(function () {
+            var abort_event_source = function abort_event_source(message) {
                 priv.promise = null;
                 priv.source.close();
                 priv.source = null;
-                reject(new NGSI.ConnectionError("Connection timeout"));
-            }.bind(this), 30000);
-        }.bind(this));
+                reject(new NGSI.ConnectionError(message));
+            };
+            var handle_connection_rejected = abort_event_source.bind(null, "Connection rejected");
+            var handle_connection_timeout = abort_event_source.bind(null, "Connection timeout");
+
+            priv.source = new EventSource(priv.source_url);
+            priv.source.addEventListener('error', handle_connection_rejected, true);
+            priv.source.addEventListener('init', wait_event_source_init, true);
+
+            closeTimeout = setTimeout(handle_connection_timeout, 30000);
+        });
     };
 
     var on_callback_subscriptions_get = function on_callback_subscriptions_get() {
@@ -4874,11 +4889,15 @@
      *        }
      *    },
      *    "notification": {
-     *        "callback": function (notification) {
+     *        "callback": function (notification, headers, error) {
      *            // notification.attrsformat provides information about the format used by notification.data
      *            // notification.data contains the modified entities
      *            // notification.subscriptionId provides the associated subscription id
      *            // etc...
+     *
+     *            // In case of disconnection from the ngsi-proxy, this method
+     *            // will be called with error = true and notification and
+     *            // header being null
      *        },
      *        "attrs": [
      *            "temperature",

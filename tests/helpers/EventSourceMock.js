@@ -9,18 +9,19 @@
 
         EventSource.mockedeventsources.push(this);
         this.events = {
+            error: [],
             init: [],
             close: [],
             notification: []
         };
 
-        if (!EventSource.eventsourceconfs[url]) {
+        if (EventSource.eventsourceconfs[url] !== "timeout") {
             setTimeout(function () {
                 var i;
-
-                for (i = 0; i < this.events.init.length; i++) {
+                var event = !EventSource.eventsourceconfs[url] ? this.events.init : this.events.error;
+                for (i = 0; i < event.length; i++) {
                     try {
-                        this.events.init[i]({data: "{\"id\": 1}"});
+                        event[i]({data: "{\"id\": 1}"});
                     } catch (e) {}
                 }
             }.bind(this), 0);
