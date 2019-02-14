@@ -402,7 +402,7 @@ if ((typeof require === 'function') && typeof global != null) {
 
         });
 
-        describe("closeSubscriptionCallback", function () {
+        describe("closeSubscriptionCallback(id)", function () {
 
             var connection;
             var listener = function () {};
@@ -542,13 +542,49 @@ if ((typeof require === 'function') && typeof global != null) {
                 EventSource.eventsourceconfs['http://ngsiproxy.example.com/eventsource/1'] = "timeout";
 
                 var p = proxy.connect();
-                p.catch(function (error) {
-                    expect(error).toEqual(jasmine.any(NGSI.ConnectionError));
-                    expect(EventSource.mockedeventsources[0].close).toHaveBeenCalledWith();
-                    expect(proxy.connected).toBeFalsy();
-                    expect(proxy.connecting).toBeFalsy();
-                    done();
+                p.then(
+                    () => {
+                        fail("fulfill callback called");
+                    },
+                    function (error) {
+                        expect(error).toEqual(jasmine.any(NGSI.ConnectionError));
+                        expect(EventSource.mockedeventsources[0].close).toHaveBeenCalledWith();
+                        expect(proxy.connected).toBeFalsy();
+                        expect(proxy.connecting).toBeFalsy();
+                        done();
+                    }
+                );
+            });
+
+            it("handles error responses", function (done) {
+                // Emulate http://ngsiproxy.example.com/eventsource/1 returns an error code (e.g. 404)
+                EventSource.eventsourceconfs["http://ngsiproxy.example.com/eventsource/1"] = "error";
+
+                var proxy = new NGSI.ProxyConnection("http://ngsiproxy.example.com/", ajaxMockup);
+                ajaxMockup.addStaticURL("http://ngsiproxy.example.com/eventsource", {
+                    headers: {
+                        'Location': 'http://ngsiproxy.example.com/eventsource/1'
+                    },
+                    method: "POST",
+                    status: 201
                 });
+
+                var p = proxy.connect();
+
+                expect(proxy.connecting).toBeTruthy();
+                expect(p).toEqual(jasmine.any(Promise));
+                p.then(
+                    () => {
+                        fail("fulfill callback called");
+                    },
+                    (error) => {
+                        expect(error).toEqual(jasmine.any(NGSI.ConnectionError));
+                        expect(EventSource.mockedeventsources[0].close).toHaveBeenCalledWith();
+                        expect(proxy.connected).toBeFalsy();
+                        expect(proxy.connecting).toBeFalsy();
+                        done();
+                    }
+                );
             });
 
             it("handles normal connection errors", function (done) {
@@ -675,6 +711,25 @@ if ((typeof require === 'function') && typeof global != null) {
                         })
                     });
                     expect(listener).toHaveBeenCalledWith(payload, headers);
+                    done();
+                });
+            });
+
+            it("reports disconnection events", (done) => {
+                ajaxMockup.addStaticURL("http://ngsiproxy.example.com/callbacks", {
+                    status: 201,
+                    responseText: '{"callback_id": "1", "url": "http://ngsiproxy.example.com/callback/1"}'
+                });
+                var listener = jasmine.createSpy("listener");
+
+                var p = connection.requestCallback(listener);
+
+                expect(p).toEqual(jasmine.any(Promise));
+                p.then(function (proxy_callback) {
+                    EventSource.mockedeventsources[0].events.error[0]();
+                    expect(listener).toHaveBeenCalledWith(null, null, true);
+                    expect(connection.connected).toBeFalsy();
+                    expect(connection.connecting).toBeFalsy();
                     done();
                 });
             });
