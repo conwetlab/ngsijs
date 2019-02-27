@@ -960,7 +960,7 @@ if ((typeof require === 'function') && typeof global != null) {
                     expect(connection.ngsi_proxy.requestCallback)
                         .toHaveBeenCalledWith(jasmine.any(Function));
                     expect(connection.ngsi_proxy.associateSubscriptionId)
-                        .toHaveBeenCalledWith("1", "abcde98765");
+                        .toHaveBeenCalledWith("1", "abcde98765", "v2");
                     connection.ngsi_proxy.requestCallback.calls.argsFor(0)[0](
                         JSON.stringify({
                             "subscriptionId": "abcde98765",

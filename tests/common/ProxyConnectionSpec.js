@@ -125,7 +125,7 @@ if ((typeof require === 'function') && typeof global != null) {
             });
 
             it("ignores non managed callbacks", function () {
-                expect(connection.associateSubscriptionId("nonmanaged", "1")).toBe(connection);
+                expect(connection.associateSubscriptionId("nonmanaged", "1", "v2")).toBe(connection);
                 expect(connection.callbackSubscriptions).toEqual({
                     "1": null
                 });
@@ -133,9 +133,15 @@ if ((typeof require === 'function') && typeof global != null) {
             });
 
             it("associates managed callbacks", function () {
-                expect(connection.associateSubscriptionId("1", "abcdef")).toBe(connection);
+                expect(connection.associateSubscriptionId("1", "abcdef", "v2")).toBe(connection);
                 expect(connection.callbackSubscriptions).toEqual({
                     "1": "abcdef"
+                });
+                expect(connection.callbackSubscriptionsVersioned).toEqual({
+                    "1": {
+                        "id": "abcdef",
+                        "version": "v2"
+                    }
                 });
                 expect(connection.subscriptionCallbacks).toEqual({
                     "abcdef": "1"
@@ -143,9 +149,9 @@ if ((typeof require === 'function') && typeof global != null) {
             });
 
             it("throws a TypeError when trying to associated a taken callback", function () {
-                connection.associateSubscriptionId("1", "1");
+                connection.associateSubscriptionId("1", "1", "v2");
                 expect(function () {
-                    connection.associateSubscriptionId("1", "2");
+                    connection.associateSubscriptionId("1", "2", "v2");
                 }).toThrowError(TypeError);
 
                 expect(connection.callbackSubscriptions).toEqual({
@@ -339,7 +345,7 @@ if ((typeof require === 'function') && typeof global != null) {
                     var p = connection.closeCallback(1);
                     p.then(function () {
                         // callback 1 should not be associated with subscription 1
-                        connection.associateSubscriptionId(1, 1);
+                        connection.associateSubscriptionId(1, 1, "v2");
                         expect(connection.subscriptionCallbacks).toEqual({});
                         done();
                     });
@@ -348,7 +354,7 @@ if ((typeof require === 'function') && typeof global != null) {
 
             it("closes managed callbacks", function (done) {
                 connection.requestCallback(function () {}).then(function (proxy_callback) {
-                    connection.associateSubscriptionId(1, 1);
+                    connection.associateSubscriptionId(1, 1, "v2");
                     var p = connection.closeCallback(1);
                     p.then(function () {
                         expect(connection.subscriptionCallbacks).toEqual({});
@@ -430,7 +436,7 @@ if ((typeof require === 'function') && typeof global != null) {
 
             it("ignore non-managed subcriptions", function (done) {
                 connection.requestCallback(listener).then(function (proxy_callback) {
-                    connection.associateSubscriptionId(proxy_callback.callback_id, "1");
+                    connection.associateSubscriptionId(proxy_callback.callback_id, "1", "v2");
                     return connection.closeSubscriptionCallback("2");
                 }).then(function () {
                     expect(connection.subscriptionCallbacks).toEqual({
@@ -447,7 +453,7 @@ if ((typeof require === 'function') && typeof global != null) {
                 });
 
                 connection.requestCallback(listener).then(function (proxy_callback) {
-                    connection.associateSubscriptionId(proxy_callback.callback_id, "1");
+                    connection.associateSubscriptionId(proxy_callback.callback_id, "1", "v2");
                     return connection.closeSubscriptionCallback("1");
                 }).then(function () {
                     expect(connection.subscriptionCallbacks).toEqual({});
