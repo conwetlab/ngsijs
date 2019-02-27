@@ -1302,6 +1302,15 @@
         var mapping = {};
         var callbacks = privates.get(this).callbacks;
         for (var key in callbacks) {
+            mapping[key] = callbacks[key].subscription != null ? callbacks[key].subscription.id : null;
+        }
+        return mapping;
+    };
+
+    var on_callback_subscriptions_versioned_get = function on_callback_subscriptions_versioned_get() {
+        var mapping = {};
+        var callbacks = privates.get(this).callbacks;
+        for (var key in callbacks) {
             mapping[key] = callbacks[key].subscription;
         }
         return mapping;
@@ -1358,6 +1367,9 @@
         Object.defineProperties(this, {
             callbackSubscriptions: {
                 get: on_callback_subscriptions_get
+            },
+            callbackSubscriptionsVersioned: {
+                get: on_callback_subscriptions_versioned_get
             },
             connected: {
                 get: on_connected_get
@@ -1519,9 +1531,11 @@
      *     id of the callback to associate
      * @param {String} subscription
      *     id of the subscription to associate
+     * @param {String} version
+     *     version of the API used for creating the subscription
      * @returns {NGSI.ProxyConnection}
      */
-    NGSI.ProxyConnection.prototype.associateSubscriptionId = function associateSubscriptionId(callback, subscription) {
+    NGSI.ProxyConnection.prototype.associateSubscriptionId = function associateSubscriptionId(callback, subscription, version) {
         var priv = privates.get(this);
 
         if (!(callback in priv.callbacks)) {
@@ -1533,7 +1547,10 @@
         }
 
         priv.callbacksBySubscriptionId[subscription] = priv.callbacks[callback];
-        priv.callbacks[callback].subscription = subscription;
+        priv.callbacks[callback].subscription = {
+            id: subscription,
+            version: version
+        };
 
         return this;
     };
@@ -1566,7 +1583,7 @@
         if (callback in priv.callbacks) {
             var subscription = priv.callbacks[callback].subscription;
             if (subscription != null) {
-                delete priv.callbacksBySubscriptionId[subscription];
+                delete priv.callbacksBySubscriptionId[subscription.id];
             }
             delete priv.callbacks[callback];
         }
@@ -2184,7 +2201,7 @@
 
                 var oldOnSuccess = options.onSuccess;
                 options.onSuccess = function (data) {
-                    this.ngsi_proxy.associateSubscriptionId(proxy_callback.callback_id, data.subscriptionId);
+                    this.ngsi_proxy.associateSubscriptionId(proxy_callback.callback_id, data.subscriptionId, "v1-availability");
                     if (typeof oldOnSuccess === 'function') {
                         oldOnSuccess(data);
                     }
@@ -2632,7 +2649,7 @@
 
                 var oldOnSuccess = options.onSuccess;
                 options.onSuccess = function (data) {
-                    this.ngsi_proxy.associateSubscriptionId(proxy_callback.callback_id, data.subscriptionId);
+                    this.ngsi_proxy.associateSubscriptionId(proxy_callback.callback_id, data.subscriptionId, "v1");
                     if (typeof oldOnSuccess === 'function') {
                         oldOnSuccess(data);
                     }
@@ -4894,6 +4911,10 @@
      *            // notification.data contains the modified entities
      *            // notification.subscriptionId provides the associated subscription id
      *            // etc...
+     *
+     *            // In case of disconnection from the ngsi-proxy, this method
+     *            // will be called with error = true and notification and
+     *            // header being null
      *        },
      *        "attrs": [
      *            "temperature",
@@ -4979,7 +5000,7 @@
             }
 
             if (proxy_callback) {
-                this.ngsi_proxy.associateSubscriptionId(proxy_callback.callback_id, subscription_id);
+                this.ngsi_proxy.associateSubscriptionId(proxy_callback.callback_id, subscription_id, "v2");
             }
 
             return Promise.resolve({
