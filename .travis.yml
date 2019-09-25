@@ -9,12 +9,8 @@ matrix:
               firefox: latest-esr
           before_install:
               - npm install grunt-cli -g
-          before_script:
-              - export DISPLAY=:99.0
-              - sh -e /etc/init.d/xvfb start
-              - sleep 3 # give xvfb some time to start
           script:
-              - grunt ci
+              - xvfb-run grunt ci
         - node_js: "6"
           before_install:
               - npm install grunt-cli -g
