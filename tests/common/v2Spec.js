@@ -797,11 +797,40 @@ if ((typeof require === 'function') && typeof global != null) {
                     checkRequestContent: function (url, options) {
                         var data = JSON.parse(options.postBody);
                         expect(data).toEqual(subscription);
-                        expect(options.parameters).toEqual(undefined);
+                        expect(options.parameters).toEqual({});
                     }
                 });
 
                 connection.v2.createSubscription(subscription).then(function (result) {
+                    expect(result).toEqual({
+                        correlator: 'correlatortoken',
+                        subscription: subscription,
+                        location: "/v2/subscriptions/abcde98765"
+                    });
+                    done();
+                }, function (e) {
+                    fail("Failure callback called");
+                });
+            });
+
+            it("basic request (skip Initial Notification)", function (done) {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/v2/subscriptions", {
+                    method: "POST",
+                    status: 201,
+                    headers: {
+                        'Fiware-correlator': 'correlatortoken',
+                        'Location': '/v2/subscriptions/abcde98765'
+                    },
+                    checkRequestContent: function (url, options) {
+                        var data = JSON.parse(options.postBody);
+                        expect(data).toEqual(subscription);
+                        expect(options.parameters.options).toBe("skipInitialNotification");
+                    }
+                });
+
+                connection.v2.createSubscription(subscription, {
+                    skipInitialNotification: true
+                }).then(function (result) {
                     expect(result).toEqual({
                         correlator: 'correlatortoken',
                         subscription: subscription,
@@ -824,7 +853,7 @@ if ((typeof require === 'function') && typeof global != null) {
                     checkRequestContent: function (url, options) {
                         var data = JSON.parse(options.postBody);
                         expect(data).toEqual(subscription);
-                        expect(options.parameters).toEqual(undefined);
+                        expect(options.parameters).toEqual({});
                     }
                 });
 
@@ -852,7 +881,7 @@ if ((typeof require === 'function') && typeof global != null) {
                     checkRequestContent: function (url, options) {
                         var data = JSON.parse(options.postBody);
                         expect(data).toEqual(subscription);
-                        expect(options.parameters).toEqual(undefined);
+                        expect(options.parameters).toEqual({});
                     }
                 });
 
@@ -946,7 +975,7 @@ if ((typeof require === 'function') && typeof global != null) {
                     checkRequestContent: function (url, options) {
                         var data = JSON.parse(options.postBody);
                         expect(data).toEqual(subscription);
-                        expect(options.parameters).toEqual(undefined);
+                        expect(options.parameters).toEqual({});
                     }
                 });
 
