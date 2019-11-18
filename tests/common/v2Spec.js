@@ -1,6 +1,6 @@
 /*
  *     Copyright (c) 2017 CoNWeT Lab., Universidad Politécnica de Madrid
- *     Copyright (c) 2018 Future Internet Consulting and Development Solutions S.L.
+ *     Copyright (c) 2018-2019 Future Internet Consulting and Development Solutions S.L.
  *
  *     This file is part of ngsijs.
  *
