@@ -268,6 +268,8 @@
             ENTITY_ENTRY: 'v2/entities/%(entityId)s',
             SUBSCRIPTION_COLLECTION: 'v2/subscriptions',
             SUBSCRIPTION_ENTRY: 'v2/subscriptions/%(subscriptionId)s',
+            REGISTRATION_COLLECTION: 'v2/registrations',
+            REGISTRATION_ENTRY: 'v2/registrations/%(registrationId)s',
             TYPE_COLLECTION: 'v2/types',
             TYPE_ENTRY: 'v2/types/%(typeId)s'
         }
