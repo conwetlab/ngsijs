@@ -3550,6 +3550,72 @@ if ((typeof require === 'function') && typeof global != null) {
 
         });
 
+        describe('listRegistrations([options])', function () {
+
+            it("basic request", function (done) {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/v2/registrations", {
+                    headers: {
+                        'Fiware-correlator': 'correlatortoken'
+                    },
+                    method: "GET",
+                    status: 200,
+                    responseText: '[]'
+                });
+
+                connection.v2.listRegistrations().then(function (result) {
+                    expect(result).toEqual({
+                        correlator: "correlatortoken",
+                        limit: 20,
+                        offset: 0,
+                        results: []
+                    });
+                    done();
+                }, function (e) {
+                    fail("Failure callback called");
+                });
+            });
+
+            it("basic request using the count option", function (done) {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/v2/registrations", {
+                    headers: {
+                        'Fiware-correlator': 'correlatortoken',
+                        'Fiware-Total-Count': '0'
+                    },
+                    method: "GET",
+                    status: 200,
+                    responseText: '[]'
+                });
+
+                connection.v2.listRegistrations({count: true}).then(function (result) {
+                    expect(result).toEqual({
+                        correlator: "correlatortoken",
+                        count: 0,
+                        limit: 20,
+                        offset: 0,
+                        results: []
+                    });
+                    done();
+                }, function (e) {
+                    fail("Failure callback called");
+                });
+            });
+
+            it("unexpected error code", function (done) {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/v2/registrations", {
+                    method: "GET",
+                    status: 204
+                });
+
+                connection.v2.listRegistrations().then(function (value) {
+                    fail("Success callback called");
+                }, function (e) {
+                    expect(e).toEqual(jasmine.any(NGSI.InvalidResponseError));
+                    done();
+                });
+            });
+
+        });
+
         describe('listSubscriptions([options])', function () {
 
             it("basic request", function (done) {

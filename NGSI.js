@@ -5279,6 +5279,109 @@
     };
 
     /**
+     * Retrieves the available registrations (using pagination).
+     *
+     * > This method uses v2 of the FIWARE's NGSI Specification
+     *
+     * @since 1.2.3
+     *
+     * @name NGSI.Connection#v2.listRegistrations
+     * @method "v2.listRegistrations"
+     * @memberof NGSI.Connection
+     *
+     * @param {Object} [options]
+     *
+     * Object with extra options:
+     *
+     * - `correlator` (`String`): Transaction id
+     * - `count` (`Boolean`; default: `false`): request total count
+     * - `limit` (`Number`; default: `20`): This option allow you to specify
+     *   the maximum number of registrations you want to receive from the
+     *   server
+     * - `offset` (`Number`; default: `0`): Allows you to skip a given
+     *   number of elements at the beginning
+     * - `service` (`String`): Service/tenant to use in this operation
+     * - `servicepath` (`String`): Service path to use in this operation
+     *
+     * @throws {NGSI.ConnectionError}
+     * @throws {NGSI.InvalidResponseError}
+     *
+     * @returns {Promise}
+     *
+     * @example <caption>Retrieve first 20 registrations from the Context Broker</caption>
+     *
+     * connection.v2.listRegistrations().then(
+     *     (response) => {
+     *         // Registrations retrieved successfully
+     *         // response.results is an array with the retrieved registrations
+     *     }, (error) => {
+     *         // Error retrieving registrations
+     *         // If the error was reported by Orion, error.correlator will be
+     *         // filled with the associated transaction id
+     *     }
+     * );
+     *
+     * @example <caption>Retrieve second page from the Context Broker requesting pagination details</caption>
+     *
+     * connection.v2.listRegistrations({offset: 20, count: true}).then(
+     *     (response) => {
+     *         // Registrations retrieved successfully
+     *         // response.correlator transaction id associated with the server response
+     *         // response.limit contains the used page size
+     *         // response.results is an array with the retrieved registrations
+     *         // response.count contains the number of available registrations
+     *         // response.offset contains the offset used in the request
+     *     }, (error) => {
+     *         // Error retrieving registrations
+     *         // If the error was reported by Orion, error.correlator will be
+     *         // filled with the associated transaction id
+     *     }
+     * );
+     *
+     */
+    NGSI.Connection.V2.prototype.listRegistrations = function listRegistrations(options) {
+        if (options == null) {
+            options = {};
+        }
+
+        var connection = privates.get(this);
+        var url = new URL(NGSI.endpoints.v2.REGISTRATION_COLLECTION, connection.url);
+        var optionsparams = [];
+        var parameters = parse_pagination_options2(options, optionsparams);
+
+        if (optionsparams.length !== 0) {
+            parameters.options = optionsparams.join(',');
+        }
+
+        return makeJSONRequest2.call(connection, url, {
+            method: "GET",
+            parameters: parameters,
+            requestHeaders: {
+                "FIWARE-Correlator": options.correlator,
+                "FIWARE-Service": options.service,
+                "FIWARE-ServicePath": options.servicepath
+            }
+        }).then(function (response) {
+            var correlator = response.getHeader('Fiware-correlator');
+            if (response.status !== 200) {
+                return Promise.reject(new NGSI.InvalidResponseError('Unexpected error code: ' + response.status, correlator));
+            }
+
+            var result = {
+                correlator: correlator,
+                limit: options.limit,
+                offset: options.offset,
+                results: JSON.parse(response.responseText),
+            };
+            if (options.count === true) {
+                result.count = parseInt(response.getHeader("Fiware-Total-Count"), 10);
+            }
+
+            return Promise.resolve(result);
+        });
+    };
+
+    /**
      * This operation allows to create, update and/or delete several entities
      * in a single batch operation.
      *
