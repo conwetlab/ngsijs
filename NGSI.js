@@ -5382,6 +5382,114 @@
     };
 
     /**
+     * Creates a new registration.
+     *
+     * > This method uses v2 of the FIWARE's NGSI Specification
+     *
+     * @since 1.2.3
+     *
+     * @name NGSI.Connection#v2.createRegistration
+     * @method "v2.createRegistration"
+     * @memberof NGSI.Connection
+     *
+     * @param {Object}
+     *
+     * registration values to be used for creating it
+     *
+     * @param {Object} [options]
+     *
+     * Object with extra options:
+     * - `correlator` (`String`): Transaction id
+     * - `service` (`String`): Service/tenant to use in this operation
+     * - `servicepath` (`String`): Service path to use in this operation
+     *
+     * @throws {NGSI.BadRequestError}
+     * @throws {NGSI.ConnectionError}
+     * @throws {NGSI.InvalidResponseError}
+     *
+     * @returns {Promise}
+     *
+     * @example <caption>Basic usage</caption>
+     *
+     * connection.v2.createRegistration({
+     *    "description": "One registration to rule them all",
+     *    "dataProvided": {
+     *      "entities": [
+     *        {
+     *          "id": "room1",
+     *          "type": "Room"
+     *        }
+     *      ],
+     *      "attrs": [
+     *        "temperature",
+     *        "humidity"
+     *      ]
+     *    },
+     *    "provider": {
+     *      "http": {
+     *        "url": "http://localhost:1234"
+     *      },
+     *      "legacyForwarding": true,
+     *      "supportedForwardingMode": "all"
+     *    }
+     * }).then(
+     *     (response) => {
+     *         // Registration created successfully
+     *         // response.correlator transaction id associated with the server response
+     *     }, (error) => {
+     *         // Error creating the registration
+     *         // If the error was reported by Orion, error.correlator will be
+     *         // filled with the associated transaction id
+     *     }
+     * );
+     *
+     */
+    NGSI.Connection.V2.prototype.createRegistration = function createRegistration(registration, options) {
+        if (options == null) {
+            options = {};
+        }
+
+        if (typeof registration !== 'object' || Array.isArray(registration)) {
+            throw new TypeError('invalid registration parameter');
+        }
+
+        var connection = privates.get(this);
+        var url = new URL(NGSI.endpoints.v2.REGISTRATION_COLLECTION, connection.url);
+
+        return makeJSONRequest2.call(connection, url, {
+            method: "POST",
+            postBody: registration,
+            requestHeaders: {
+                "FIWARE-Correlator": options.correlator,
+                "FIWARE-Service": options.service,
+                "FIWARE-ServicePath": options.servicepath
+            }
+        }).then(function (response) {
+            var correlator = response.getHeader('Fiware-correlator');
+            if (response.status === 400) {
+                return parse_bad_request(response, correlator);
+            } else if (response.status !== 201) {
+                return Promise.reject(new NGSI.InvalidResponseError('Unexpected error code: ' + response.status, correlator));
+            }
+
+            var location_header = response.getHeader('Location');
+            try {
+                var registration_url = new URL(location_header, connection.url);
+                var registration_id = registration_url.pathname.split('/').pop();
+                registration.id = registration_id;
+            } catch (e) {
+                return Promise.reject(new NGSI.InvalidResponseError('Unexpected location header: ' + location_header, correlator));
+            }
+
+            return Promise.resolve({
+                correlator: correlator,
+                registration: registration,
+                location: location_header
+            });
+        });
+    };
+
+    /**
      * This operation allows to create, update and/or delete several entities
      * in a single batch operation.
      *
