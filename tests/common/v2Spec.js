@@ -3627,6 +3627,75 @@ if ((typeof require === 'function') && typeof global != null) {
 
         });
 
+        describe('updateRegistration(changes[, options])', function () {
+
+            it("throws a TypeError exception when not passing the changes parameter", function () {
+                expect(function () {
+                    connection.v2.updateRegistration();
+                }).toThrowError(TypeError);
+            });
+
+            it("registration not found", function (done) {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/v2/registrations/abcdef", {
+                    headers: {
+                        "Content-Type": "application/json",
+                        'Fiware-correlator': 'correlatortoken',
+                    },
+                    method: "PATCH",
+                    status: 404,
+                    responseText: '{"error":"NotFound","description":"The requested registration has not been found. Check id"}'
+                });
+
+                connection.v2.updateRegistration({
+                    "id": "abcdef",
+                    "expires": "2016-04-05T14:00:00.00Z"
+                }).then(function (result) {
+                    fail("Success callback called");
+                }, function (e) {
+                    expect(e).toEqual(jasmine.any(NGSI.NotFoundError));
+                    expect(e.correlator).toBe("correlatortoken");
+                    expect(e.message).toBe("The requested registration has not been found. Check id");
+                    done();
+                });
+            });
+
+            it("invalid 404", function (done) {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/v2/registrations/abcdef", {
+                    method: "PATCH",
+                    status: 404
+                });
+
+                connection.v2.updateRegistration({
+                    "id": "abcdef",
+                    "expires": "2016-04-05T14:00:00.00Z"
+                }).then(function (result) {
+                    fail("Success callback called");
+                }, function (e) {
+                    expect(e).toEqual(jasmine.any(NGSI.InvalidResponseError));
+                    expect(e.correlator).toBeNull();
+                    done();
+                });
+            });
+
+            it("handles unexpected error codes", function (done) {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/v2/registrations/abcdef", {
+                    method: "PATCH",
+                    status: 201
+                });
+
+                connection.v2.updateRegistration({
+                    "id": "abcdef",
+                    "expires": "2016-04-05T14:00:00.00Z"
+                }).then(function () {
+                    fail("Success callback called");
+                }, function (e) {
+                    expect(e).toEqual(jasmine.any(NGSI.InvalidResponseError));
+                    done();
+                });
+            });
+
+        });
+
         describe('updateSubscription(changes[, options])', function () {
 
             it("throws a TypeError exception when not passing the changes parameter", function () {

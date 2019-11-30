@@ -5570,6 +5570,103 @@
     };
 
     /**
+     * Updates a registration.
+     *
+     * > This method uses v2 of the FIWARE's NGSI Specification
+     *
+     * @since 1.2.3
+     *
+     * @name NGSI.Connection#v2.updateRegistration
+     * @method "v2.updateRegistration"
+     * @memberof NGSI.Connection
+     *
+     * @param {Object} changes
+     * @param {Object} [options]
+     *
+     * Object with extra options:
+     *
+     * - `correlator` (`String`): Transaction id
+     * - `service` (`String`): Service/tenant to use in this operation
+     * - `servicepath` (`String`): Service path to use in this operation
+     *
+     * @throws {NGSI.ConnectionError}
+     * @throws {NGSI.InvalidResponseError}
+     * @throws {NGSI.NotFoundError}
+     *
+     * @returns {Promise}
+     *
+     * @example <caption>Update registration expiration time</caption>
+     *
+     * connection.v2.updateRegistration({
+     *     "id": "abcdef",
+     *     "description": "Context Source"
+     * }).then(
+     *     (response) => {
+     *         // Registration updated successfully
+     *         // response.correlator transaction id associated with the server response
+     *     }, (error) => {
+     *         // Error updating registration
+     *         // If the error was reported by Orion, error.correlator will be
+     *         // filled with the associated transaction id
+     *     }
+     * );
+     *
+     * @example <caption>Use a custom service path for the update operation</caption>
+     *
+     * connection.v2.updateRegistration({
+     *     "id": "abcdef",
+     *     "description": "Context Source"
+     * }, {
+     *     servicepath: "/Spain/Madrid"
+     * }).then(
+     *     (response) => {
+     *         // Registration updated successfully
+     *         // response.correlator transaction id associated with the server response
+     *     }, (error) => {
+     *         // Error updating registration
+     *         // If the error was reported by Orion, error.correlator will be
+     *         // filled with the associated transaction id
+     *     }
+     * );
+     *
+     * Note: PATCH /v2/registration/<id> is not implemented in FIWARE Orion 2.3
+     *       See https://fiware-orion.readthedocs.io/en/master/user/ngsiv2_implementation_notes/index.html#registrations,
+     *           https://github.com/telefonicaid/fiware-orion/issues/3007
+     *
+     */
+    NGSI.Connection.V2.prototype.updateRegistration = function updateRegistration(changes, options) {
+        if (options == null) {
+            options = {};
+        }
+
+        var connection = privates.get(this);
+        var url = new URL(interpolate(NGSI.endpoints.v2.REGISTRATION_ENTRY, {registrationId: encodeURIComponent(changes.id)}), connection.url);
+
+        // Remove id from the payload
+        delete changes.id;
+
+        return makeJSONRequest2.call(connection, url, {
+            method: "PATCH",
+            postBody: changes,
+            requestHeaders: {
+                "FIWARE-Correlator": options.correlator,
+                "FIWARE-Service": options.service,
+                "FIWARE-ServicePath": options.servicepath
+            }
+        }).then(function (response) {
+            var correlator = response.getHeader('Fiware-correlator');
+            if (response.status === 404) {
+                return parse_not_found_response(response, correlator);
+            } else if (response.status !== 204) {
+                return Promise.reject(new NGSI.InvalidResponseError('Unexpected error code: ' + response.status, correlator));
+            }
+            return Promise.resolve({
+                correlator: correlator
+            });
+        });
+    };
+
+    /**
      * This operation allows to create, update and/or delete several entities
      * in a single batch operation.
      *
