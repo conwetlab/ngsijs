@@ -5490,6 +5490,86 @@
     };
 
     /**
+     * Gets all the details of a registration.
+     *
+     * > This method uses v2 of the FIWARE's NGSI Specification
+     *
+     * @since 1.2.3
+     *
+     * @name NGSI.Connection#v2.getRegistration
+     * @method "v2.getRegistration"
+     * @memberof NGSI.Connection
+     *
+     * @param {String|Object} options
+     *
+     * Object with extra options:
+     *
+     * - `correlator` (`String`): Transaction id
+     * - `service` (`String`): Service/tenant to use in this operation
+     * - `servicepath` (`String`): Service path to use in this operation
+     *
+     * @throws {NGSI.ConnectionError}
+     * @throws {NGSI.InvalidResponseError}
+     * @throws {NGSI.NotFoundError}
+     *
+     * @returns {Promise}
+     *
+     * @example <caption>Basic usage</caption>
+     *
+     * connection.v2.getRegistration("abcdef").then(
+     *     (response) => {
+     *         // Registration details retrieved successfully
+     *         // response.registration registration details
+     *         // response.correlator transaction id associated with the server response
+     *     }, (error) => {
+     *         // Error retrieving registration
+     *         // If the error was reported by Orion, error.correlator will be
+     *         // filled with the associated transaction id
+     *     }
+     * );
+     *
+     */
+    NGSI.Connection.V2.prototype.getRegistration = function getRegistration(options) {
+        if (options == null) {
+            throw new TypeError("missing options parameter");
+        }
+
+        if (typeof options === "string") {
+            options = {
+                id: options
+            };
+        }
+
+        var connection = privates.get(this);
+        var url = new URL(interpolate(NGSI.endpoints.v2.REGISTRATION_ENTRY, {registrationId: encodeURIComponent(options.id)}), connection.url);
+
+        return makeJSONRequest2.call(connection, url, {
+            method: "GET",
+            requestHeaders: {
+                "FIWARE-Correlator": options.correlator,
+                "FIWARE-Service": options.service,
+                "FIWARE-ServicePath": options.servicepath
+            }
+        }).then(function (response) {
+            var correlator = response.getHeader('Fiware-correlator');
+            if (response.status === 404) {
+                return parse_not_found_response(response, correlator);
+            } else if (response.status !== 200) {
+                return Promise.reject(new NGSI.InvalidResponseError('Unexpected error code: ' + response.status, correlator));
+            }
+            try {
+                var data = JSON.parse(response.responseText);
+            } catch (e) {
+                throw new NGSI.InvalidResponseError('Server returned invalid JSON content', correlator);
+            }
+            return Promise.resolve({
+                correlator: correlator,
+                registration: data
+            });
+        });
+    };
+
+    /**
      * This operation allows to create, update and/or delete several entities
      * in a single batch operation.
      *
