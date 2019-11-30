@@ -5667,6 +5667,80 @@
     };
 
     /**
+     * Removes a registration from the orion context broker server.
+     *
+     * > This method uses v2 of the FIWARE's NGSI Specification
+     *
+     * @since 1.2.3
+     *
+     * @name NGSI.Connection#v2.deleteRegistration
+     * @method "v2.deleteRegistration"
+     * @memberof NGSI.Connection
+     *
+     * @param {String|Object} options
+     *
+     * String with the id of the registration to remove or an object with
+     * options:
+     *
+     * - `correlator` (`String`): Transaction id
+     * - `id` (`String`): Id of the registration to remove
+     * - `service` (`String`): Service/tenant to use in this operation
+     * - `servicepath` (`String`): Service path to use in this operation
+     *
+     * @throws {NGSI.ConnectionError}
+     * @throws {NGSI.InvalidResponseError}
+     * @throws {NGSI.NotFoundError}
+     *
+     * @returns {Promise}
+     *
+     * @example
+     *
+     * connection.v2.deleteRegistration("57f7787a5f817988e4eb3dda").then(
+     *     (response) => {
+     *         // Registration deleted successfully
+     *         // response.correlator transaction id associated with the server response
+     *     }, (error) => {
+     *         // Error deleting registration
+     *         // If the error was reported by Orion, error.correlator will be
+     *         // filled with the associated transaction id
+     *     }
+     * );
+     */
+    NGSI.Connection.V2.prototype.deleteRegistration = function deleteRegistration(options) {
+        if (options == null) {
+            throw new TypeError("missing options parameter");
+        }
+
+        if (typeof options === "string") {
+            options = {
+                id: options
+            };
+        }
+
+        var connection = privates.get(this);
+        var url = new URL(interpolate(NGSI.endpoints.v2.REGISTRATION_ENTRY, {registrationId: encodeURIComponent(options.id)}), connection.url);
+
+        return makeJSONRequest2.call(connection, url, {
+            method: "DELETE",
+            requestHeaders: {
+                "FIWARE-Correlator": options.correlator,
+                "FIWARE-Service": options.service,
+                "FIWARE-ServicePath": options.servicepath
+            }
+        }).then(function (response) {
+            var correlator = response.getHeader('Fiware-correlator');
+            if (response.status === 404) {
+                return parse_not_found_response(response, correlator);
+            } else if (response.status !== 204) {
+                return Promise.reject(new NGSI.InvalidResponseError('Unexpected error code: ' + response.status, correlator));
+            }
+            return Promise.resolve({
+                correlator: correlator
+            });
+        });
+    };
+
+    /**
      * This operation allows to create, update and/or delete several entities
      * in a single batch operation.
      *

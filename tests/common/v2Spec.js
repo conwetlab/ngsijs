@@ -394,6 +394,114 @@ if ((typeof require === 'function') && typeof global != null) {
 
         });
 
+        describe('deleteRegistration(options)', function () {
+
+            it("throws a TypeError exception when not passing the options parameter", function () {
+                expect(function () {
+                    connection.v2.deleteRegistration();
+                }).toThrowError(TypeError);
+            });
+
+            it("basic request", function (done) {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/v2/registrations/57f7787a5f817988e4eb3dda", {
+                    headers: {
+                        'Fiware-correlator': 'correlatortoken',
+                    },
+                    method: "DELETE",
+                    status: 204
+                });
+
+                connection.v2.deleteRegistration("57f7787a5f817988e4eb3dda").then(function (result) {
+                    expect(result).toEqual({
+                        correlator: 'correlatortoken'
+                    });
+                    done();
+                }, function (e) {
+                    fail("Failure callback called");
+                });
+            });
+
+            it("basic request (custom correlator)", function (done) {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/v2/registrations/57f7787a5f817988e4eb3dda", {
+                    checkRequestContent: function (url, options) {
+                        expect(options.requestHeaders).toEqual(jasmine.objectContaining({
+                            'FIWARE-Correlator': 'customcorrelator'
+                        }));
+                    },
+                    headers: {
+                        'Fiware-correlator': 'customcorrelator',
+                    },
+                    method: "DELETE",
+                    status: 204
+                });
+
+                connection.v2.deleteRegistration({
+                    id: "57f7787a5f817988e4eb3dda",
+                    correlator: "customcorrelator"
+                }).then(function (result) {
+                    expect(result).toEqual({
+                        correlator: 'customcorrelator'
+                    });
+                    done();
+                }, function (e) {
+                    fail("Failure callback called");
+                });
+            });
+
+            it("registraion not found", function (done) {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/v2/registrations/57f7787a5f817988e4eb3dda", {
+                    headers: {
+                        "Content-Type": "application/json",
+                        'Fiware-correlator': 'correlatortoken'
+                    },
+                    method: "DELETE",
+                    status: 404,
+                    responseText: '{"error":"NotFound","description":"The requested registration has not been found. Check id"}'
+                });
+
+                connection.v2.deleteRegistration("57f7787a5f817988e4eb3dda").then(function (value) {
+                    fail("Success callback called");
+                }, function (e) {
+                    expect(e).toEqual(jasmine.any(NGSI.NotFoundError));
+                    expect(e.correlator).toBe("correlatortoken");
+                    expect(e.message).toBe("The requested registration has not been found. Check id");
+                    done();
+                });
+            });
+
+            it("invalid 404", function (done) {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/v2/registrations/57f7787a5f817988e4eb3dda", {
+                    method: "DELETE",
+                    status: 404
+                });
+
+                connection.v2.deleteRegistration("57f7787a5f817988e4eb3dda").then(function (value) {
+                    fail("Success callback called");
+                }, function (e) {
+                    expect(e).toEqual(jasmine.any(NGSI.InvalidResponseError));
+                    expect(e.correlator).toBeNull();
+                    done();
+                });
+            });
+
+            it("unexpected error code", function (done) {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/v2/registrations/57f7787a5f817988e4eb3dda", {
+                    method: "DELETE",
+                    status: 200
+                });
+
+                connection.v2.deleteRegistration("57f7787a5f817988e4eb3dda").then(function (value) {
+                    fail("Success callback called");
+                }, function (e) {
+                    expect(e).toEqual(jasmine.any(NGSI.InvalidResponseError));
+                    expect(e.correlator).toBeNull();
+                    done();
+                });
+
+            });
+
+        });
+
         describe('deleteSubscription(options)', function () {
 
             it("throws a TypeError exception when not passing the options parameter", function () {
