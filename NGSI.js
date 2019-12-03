@@ -266,6 +266,8 @@
             ENTITY_ATTR_VALUE_ENTRY: 'v2/entities/%(entityId)s/attrs/%(attribute)s/value',
             ENTITY_COLLECTION: 'v2/entities',
             ENTITY_ENTRY: 'v2/entities/%(entityId)s',
+            REGISTRATION_COLLECTION: 'v2/registrations',
+            REGISTRATION_ENTRY: 'v2/registrations/%(registrationId)s',
             SUBSCRIPTION_COLLECTION: 'v2/subscriptions',
             SUBSCRIPTION_ENTRY: 'v2/subscriptions/%(subscriptionId)s',
             TYPE_COLLECTION: 'v2/types',
@@ -5283,7 +5285,7 @@
      *
      * > This method uses v2 of the FIWARE's NGSI Specification
      *
-     * @since 1.2.3
+     * @since 1.3.0
      *
      * @name NGSI.Connection#v2.listRegistrations
      * @method "v2.listRegistrations"
@@ -5386,7 +5388,7 @@
      *
      * > This method uses v2 of the FIWARE's NGSI Specification
      *
-     * @since 1.2.3
+     * @since 1.3.0
      *
      * @name NGSI.Connection#v2.createRegistration
      * @method "v2.createRegistration"
@@ -5494,7 +5496,7 @@
      *
      * > This method uses v2 of the FIWARE's NGSI Specification
      *
-     * @since 1.2.3
+     * @since 1.3.0
      *
      * @name NGSI.Connection#v2.getRegistration
      * @method "v2.getRegistration"
@@ -5574,7 +5576,7 @@
      *
      * > This method uses v2 of the FIWARE's NGSI Specification
      *
-     * @since 1.2.3
+     * @since 1.3.0
      *
      * @name NGSI.Connection#v2.updateRegistration
      * @method "v2.updateRegistration"
@@ -5671,7 +5673,7 @@
      *
      * > This method uses v2 of the FIWARE's NGSI Specification
      *
-     * @since 1.2.3
+     * @since 1.3.0
      *
      * @name NGSI.Connection#v2.deleteRegistration
      * @method "v2.deleteRegistration"
