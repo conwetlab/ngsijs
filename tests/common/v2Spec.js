@@ -394,6 +394,114 @@ if ((typeof require === 'function') && typeof global != null) {
 
         });
 
+        describe('deleteRegistration(options)', function () {
+
+            it("throws a TypeError exception when not passing the options parameter", function () {
+                expect(function () {
+                    connection.v2.deleteRegistration();
+                }).toThrowError(TypeError);
+            });
+
+            it("basic request", function (done) {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/v2/registrations/57f7787a5f817988e4eb3dda", {
+                    headers: {
+                        'Fiware-correlator': 'correlatortoken',
+                    },
+                    method: "DELETE",
+                    status: 204
+                });
+
+                connection.v2.deleteRegistration("57f7787a5f817988e4eb3dda").then(function (result) {
+                    expect(result).toEqual({
+                        correlator: 'correlatortoken'
+                    });
+                    done();
+                }, function (e) {
+                    fail("Failure callback called");
+                });
+            });
+
+            it("basic request (custom correlator)", function (done) {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/v2/registrations/57f7787a5f817988e4eb3dda", {
+                    checkRequestContent: function (url, options) {
+                        expect(options.requestHeaders).toEqual(jasmine.objectContaining({
+                            'FIWARE-Correlator': 'customcorrelator'
+                        }));
+                    },
+                    headers: {
+                        'Fiware-correlator': 'customcorrelator',
+                    },
+                    method: "DELETE",
+                    status: 204
+                });
+
+                connection.v2.deleteRegistration({
+                    id: "57f7787a5f817988e4eb3dda",
+                    correlator: "customcorrelator"
+                }).then(function (result) {
+                    expect(result).toEqual({
+                        correlator: 'customcorrelator'
+                    });
+                    done();
+                }, function (e) {
+                    fail("Failure callback called");
+                });
+            });
+
+            it("registraion not found", function (done) {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/v2/registrations/57f7787a5f817988e4eb3dda", {
+                    headers: {
+                        "Content-Type": "application/json",
+                        'Fiware-correlator': 'correlatortoken'
+                    },
+                    method: "DELETE",
+                    status: 404,
+                    responseText: '{"error":"NotFound","description":"The requested registration has not been found. Check id"}'
+                });
+
+                connection.v2.deleteRegistration("57f7787a5f817988e4eb3dda").then(function (value) {
+                    fail("Success callback called");
+                }, function (e) {
+                    expect(e).toEqual(jasmine.any(NGSI.NotFoundError));
+                    expect(e.correlator).toBe("correlatortoken");
+                    expect(e.message).toBe("The requested registration has not been found. Check id");
+                    done();
+                });
+            });
+
+            it("invalid 404", function (done) {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/v2/registrations/57f7787a5f817988e4eb3dda", {
+                    method: "DELETE",
+                    status: 404
+                });
+
+                connection.v2.deleteRegistration("57f7787a5f817988e4eb3dda").then(function (value) {
+                    fail("Success callback called");
+                }, function (e) {
+                    expect(e).toEqual(jasmine.any(NGSI.InvalidResponseError));
+                    expect(e.correlator).toBeNull();
+                    done();
+                });
+            });
+
+            it("unexpected error code", function (done) {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/v2/registrations/57f7787a5f817988e4eb3dda", {
+                    method: "DELETE",
+                    status: 200
+                });
+
+                connection.v2.deleteRegistration("57f7787a5f817988e4eb3dda").then(function (value) {
+                    fail("Success callback called");
+                }, function (e) {
+                    expect(e).toEqual(jasmine.any(NGSI.InvalidResponseError));
+                    expect(e.correlator).toBeNull();
+                    done();
+                });
+
+            });
+
+        });
+
         describe('deleteSubscription(options)', function () {
 
             it("throws a TypeError exception when not passing the options parameter", function () {
@@ -721,6 +829,286 @@ if ((typeof require === 'function') && typeof global != null) {
                 });
 
                 connection.v2.createEntity(entity, {upsert: true}).then(function (value) {
+                    fail("Success callback called");
+                }, function (e) {
+                    expect(e).toEqual(jasmine.any(NGSI.InvalidResponseError));
+                    done();
+                });
+            });
+
+        });
+
+        describe('createRegistration(registration[, options])', function () {
+
+            var registration = {
+                "description": "One registration to rule them all",
+                "dataProvided": {
+                    "entities": [
+                        {
+                            "id": "room1",
+                            "type": "Room"
+                        }
+                    ],
+                    "attrs": [
+                        "temperature",
+                        "humidity"
+                    ]
+                },
+                "provider": {
+                    "http": {
+                        "url": "http://localhost:1234"
+                    },
+                    "legacyForwarding": true,
+                    "supportedForwardingMode": "all"
+                }
+            };
+
+            describe("throws a TypeError when passing invalid data on the registration parameter", function () {
+                var test = function (label, value) {
+                    it(label, function () {
+                        expect(function () {
+                            connection.v2.createRegistration(value);
+                        }).toThrowError(TypeError);
+                    });
+                };
+
+                test("number", 5);
+                test("string", "abc");
+                test("array", []);
+            });
+
+            it("bad request when passing empty object on the registration parameter", function (done) {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/v2/registrations", {
+                    headers: {
+                        "Content-Type": "application/json",
+                        'Fiware-correlator': 'correlatortoken'
+                    },
+                    method: "POST",
+                    status: 400,
+                    responseText: '{"error":"BadRequest","description":"empty payload"}'
+                });
+
+                connection.v2.createRegistration({}).then(function (result) {
+                    fail("Success callback called");
+                }, function (e) {
+                    expect(e).toEqual(jasmine.any(NGSI.BadRequestError));
+                    expect(e.correlator).toBe("correlatortoken");
+                    expect(e.message).toBe("empty payload");
+                    done();
+                });
+            });
+
+            it("bad request when passing id on the registration parameter", function (done) {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/v2/registrations", {
+                    headers: {
+                        "Content-Type": "application/json",
+                        'Fiware-correlator': 'correlatortoken'
+                    },
+                    method: "POST",
+                    status: 400,
+                    responseText: '{"error":"BadRequest","description":"the field /dataProvided/ is missing in payload"}'
+                });
+
+                connection.v2.createRegistration({id: "abc"}).then(function (result) {
+                    fail("Success callback called");
+                }, function (e) {
+                    expect(e).toEqual(jasmine.any(NGSI.BadRequestError));
+                    expect(e.correlator).toBe("correlatortoken");
+                    expect(e.message).toBe("the field /dataProvided/ is missing in payload");
+                    done();
+                });
+            });
+
+            it("basic request", function (done) {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/v2/registrations", {
+                    method: "POST",
+                    status: 201,
+                    headers: {
+                        'Fiware-correlator': 'correlatortoken',
+                        'Location': '/v2/registrations/abcde98765'
+                    },
+                    checkRequestContent: function (url, options) {
+                        var data = JSON.parse(options.postBody);
+                        expect(data).toEqual(registration);
+                        expect(options.parameters).toEqual(undefined);
+                    }
+                });
+
+                connection.v2.createRegistration(registration).then(function (result) {
+                    expect(result).toEqual({
+                        correlator: 'correlatortoken',
+                        registration: registration,
+                        location: "/v2/registrations/abcde98765"
+                    });
+                    done();
+                }, function (e) {
+                    fail("Failure callback called");
+                });
+            });
+
+            it("basic request (get parameter on location header)", function (done) {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/v2/registrations", {
+                    method: "POST",
+                    status: 201,
+                    headers: {
+                        'Fiware-correlator': 'correlatortoken',
+                        'Location': '/v2/registrations/abcde98765?api_key=mykey'
+                    },
+                    checkRequestContent: function (url, options) {
+                        var data = JSON.parse(options.postBody);
+                        expect(data).toEqual(registration);
+                        expect(options.parameters).toEqual(undefined);
+                    }
+                });
+
+                connection.v2.createRegistration(registration).then(function (result) {
+                    expect(result).toEqual({
+                        correlator: 'correlatortoken',
+                        registration: registration,
+                        location: "/v2/registrations/abcde98765?api_key=mykey"
+                    });
+                    expect(result.registration.id).toBe("abcde98765");
+                    done();
+                }, function (e) {
+                    fail("Failure callback called");
+                });
+            });
+
+            it("basic request providing a custom correlator", function (done) {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/v2/registrations", {
+                    method: "POST",
+                    status: 201,
+                    headers: {
+                        'Fiware-correlator': 'customcorrelator',
+                        'Location': '/v2/registrations/abcde98765'
+                    },
+                    checkRequestContent: function (url, options) {
+                        var data = JSON.parse(options.postBody);
+                        expect(data).toEqual(registration);
+                        expect(options.parameters).toEqual(undefined);
+                    }
+                });
+
+                connection.v2.createRegistration(registration, {correlator: "customcorrelator"}).then(function (result) {
+                    expect(result).toEqual({
+                        correlator: 'customcorrelator',
+                        registration: registration,
+                        location: "/v2/registrations/abcde98765"
+                    });
+                    done();
+                }, function (e) {
+                    fail("Failure callback called");
+                });
+            });
+
+            describe("handles connection errors:", function () {
+
+                it("normal connection error", function (done) {
+                    connection.v2.createRegistration(registration).then(function (value) {
+                        fail("Success callback called");
+                    }, function (e) {
+                        expect(e).toEqual(jasmine.any(NGSI.ConnectionError));
+                        done();
+                    });
+                })
+
+                var test = function test(code, done) {
+                    ajaxMockup.addStaticURL("http://ngsi.server.com/v2/registrations", {
+                        method: "POST",
+                        status: code
+                    });
+
+                    connection.v2.createRegistration(registration).then(function (value) {
+                        fail("Success callback called");
+                    }, function (e) {
+                        expect(e).toEqual(jasmine.any(NGSI.ConnectionError));
+                        done();
+                    });
+                };
+
+                it("502", test.bind(null, 502));
+                it("504", test.bind(null, 504));
+            });
+
+            it("bad request", function (done) {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/v2/registrations", {
+                    headers: {
+                        "Content-Type": "application/json",
+                        'Fiware-correlator': 'correlatortoken'
+                    },
+                    method: "POST",
+                    status: 400,
+                    responseText: '{"error":"BadRequest","description":"no subject entities specified"}'
+                });
+
+                connection.v2.createRegistration({
+                    "subject": {
+                    },
+                    "notification": {
+                        "http": {
+                            "url": "http://localhost:1234"
+                        },
+                        "attrs": [
+                            "temperature",
+                            "humidity"
+                        ]
+                    },
+                }).then(function (result) {
+                    fail("Success callback called");
+                }, function (e) {
+                    expect(e).toEqual(jasmine.any(NGSI.BadRequestError));
+                    expect(e.correlator).toBe("correlatortoken");
+                    expect(e.message).toBe("no subject entities specified");
+                    done();
+                });
+            });
+
+            it("invalid 400", function (done) {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/v2/registrations", {
+                    method: "POST",
+                    status: 400
+                });
+
+                connection.v2.createRegistration(registration).then(function (result) {
+                    fail("Success callback called");
+                }, function (e) {
+                    expect(e).toEqual(jasmine.any(NGSI.InvalidResponseError));
+                    expect(e.correlator).toBeNull();
+                    done();
+                });
+            });
+
+            describe("handles unexpected error codes", function () {
+
+                var test = function test(code, done) {
+                    ajaxMockup.addStaticURL("http://ngsi.server.com/v2/registrations", {
+                        method: "POST",
+                        status: code
+                    });
+
+                    connection.v2.createRegistration(registration).then(function (value) {
+                        fail("Success callback called");
+                    }, function (e) {
+                        expect(e).toEqual(jasmine.any(NGSI.InvalidResponseError));
+                        done();
+                    });
+                };
+
+                it("204", test.bind(null, 204));
+                it("404", test.bind(null, 404));
+            });
+
+            it("handles invalid location header values", function (done) {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/v2/registrations", {
+                    method: "POST",
+                    status: 201,
+                    headers: {
+                        'Fiware-correlator': 'correlatortoken',
+                        'Location': '//?a'
+                    }
+                });
+
+                connection.v2.createRegistration(registration).then(function (result) {
                     fail("Success callback called");
                 }, function (e) {
                     expect(e).toEqual(jasmine.any(NGSI.InvalidResponseError));
@@ -2074,6 +2462,157 @@ if ((typeof require === 'function') && typeof global != null) {
 
         });
 
+        describe('getRegistration(options)', function () {
+
+            var registration_data = {
+                "id": "abcdef",
+                "description": "One registration to rule them all",
+                "dataProvided": {
+                    "entities": [
+                        {
+                            "id": "room1",
+                            "type": "Room"
+                        }
+                    ],
+                    "attrs": [
+                        "temperature",
+                        "humidity"
+                    ]
+                },
+                "provider": {
+                    "http": {
+                        "url": "http://localhost:1234"
+                    },
+                    "supportedForwardingMode": "all",
+                    "legacyForwarding": true
+                },
+                "status": "active"
+            };
+
+            it("throws a TypeError exception when not passing the options parameter", function () {
+                expect(function () {
+                    connection.v2.getRegistration();
+                }).toThrowError(TypeError);
+            });
+
+            it("basic usage", function (done) {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/v2/registrations/abcdef", {
+                    headers: {
+                        'Fiware-correlator': 'correlatortoken',
+                    },
+                    method: 'GET',
+                    status: 200,
+                    responseText: JSON.stringify(registration_data),
+                    checkRequestContent: function (url, options) {
+                        expect(options.parameters == null).toBeTruthy();
+                    }
+                });
+
+                connection.v2.getRegistration("abcdef").then(function (result) {
+                    expect(result).toEqual({
+                        registration: registration_data,
+                        correlator: 'correlatortoken'
+                    });
+                    done();
+                }, function (e) {
+                    fail("Failure callback called");
+                });
+            });
+
+            it("basic request using the service option", function (done) {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/v2/registrations/abcdef", {
+                    headers: {
+                        'Fiware-correlator': 'correlatortoken',
+                    },
+                    method: 'GET',
+                    status: 200,
+                    responseText: JSON.stringify(registration_data),
+                    checkRequestContent: function (url, options) {
+                        expect(options.parameters == null).toBeTruthy();
+                        expect(options.requestHeaders).toEqual(jasmine.objectContaining({
+                            'FIWARE-Service': 'mytenant'
+                        }));
+                    }
+                });
+
+                connection.v2.getRegistration({id: "abcdef", service: "mytenant"}).then(function (result) {
+                    expect(result).toEqual({
+                        registration: registration_data,
+                        correlator: 'correlatortoken'
+                    });
+                    done();
+                }, function (e) {
+                    fail("Failure callback called");
+                });
+            });
+
+            it("registration not found", function (done) {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/v2/registrations/abcdef", {
+                    headers: {
+                        "Content-Type": "application/json",
+                        'Fiware-correlator': 'correlatortoken',
+                    },
+                    method: "GET",
+                    status: 404,
+                    responseText: '{"error":"NotFound","description":"The requested registration has not been found. Check id"}'
+                });
+
+                connection.v2.getRegistration({id: "abcdef", service: "mytenant"}).then(function (result) {
+                    fail("Success callback called");
+                }, function (e) {
+                    expect(e).toEqual(jasmine.any(NGSI.NotFoundError));
+                    expect(e.correlator).toBe("correlatortoken");
+                    expect(e.message).toBe("The requested registration has not been found. Check id");
+                    done();
+                });
+            });
+
+            it("invalid 404", function (done) {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/v2/registrations/abcdef", {
+                    method: "GET",
+                    status: 404
+                });
+
+                connection.v2.getRegistration({id: "abcdef", service: "mytenant"}).then(function (result) {
+                    fail("Success callback called");
+                }, function (e) {
+                    expect(e).toEqual(jasmine.any(NGSI.InvalidResponseError));
+                    expect(e.correlator).toBeNull();
+                    done();
+                });
+            });
+
+            it("handles unexpected error codes", function (done) {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/v2/registrations/abcdef", {
+                    method: "GET",
+                    status: 201
+                });
+
+                connection.v2.getRegistration("abcdef").then(function () {
+                    fail("Success callback called");
+                }, function (e) {
+                    expect(e).toEqual(jasmine.any(NGSI.InvalidResponseError));
+                    done();
+                });
+            });
+
+            it("handles responses with invalid payloads", function (done) {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/v2/registrations/abcdef", {
+                    method: "GET",
+                    status: 200,
+                    responseText: "invalid json content"
+                });
+
+                connection.v2.getRegistration("abcdef").then(function () {
+                    fail("Success callback called");
+                }, function (e) {
+                    expect(e).toEqual(jasmine.any(NGSI.InvalidResponseError));
+                    done();
+                });
+            });
+
+        });
+
         describe('getSubscription(options)', function () {
 
             var subscription_data = {
@@ -3196,6 +3735,75 @@ if ((typeof require === 'function') && typeof global != null) {
 
         });
 
+        describe('updateRegistration(changes[, options])', function () {
+
+            it("throws a TypeError exception when not passing the changes parameter", function () {
+                expect(function () {
+                    connection.v2.updateRegistration();
+                }).toThrowError(TypeError);
+            });
+
+            it("registration not found", function (done) {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/v2/registrations/abcdef", {
+                    headers: {
+                        "Content-Type": "application/json",
+                        'Fiware-correlator': 'correlatortoken',
+                    },
+                    method: "PATCH",
+                    status: 404,
+                    responseText: '{"error":"NotFound","description":"The requested registration has not been found. Check id"}'
+                });
+
+                connection.v2.updateRegistration({
+                    "id": "abcdef",
+                    "expires": "2016-04-05T14:00:00.00Z"
+                }).then(function (result) {
+                    fail("Success callback called");
+                }, function (e) {
+                    expect(e).toEqual(jasmine.any(NGSI.NotFoundError));
+                    expect(e.correlator).toBe("correlatortoken");
+                    expect(e.message).toBe("The requested registration has not been found. Check id");
+                    done();
+                });
+            });
+
+            it("invalid 404", function (done) {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/v2/registrations/abcdef", {
+                    method: "PATCH",
+                    status: 404
+                });
+
+                connection.v2.updateRegistration({
+                    "id": "abcdef",
+                    "expires": "2016-04-05T14:00:00.00Z"
+                }).then(function (result) {
+                    fail("Success callback called");
+                }, function (e) {
+                    expect(e).toEqual(jasmine.any(NGSI.InvalidResponseError));
+                    expect(e.correlator).toBeNull();
+                    done();
+                });
+            });
+
+            it("handles unexpected error codes", function (done) {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/v2/registrations/abcdef", {
+                    method: "PATCH",
+                    status: 201
+                });
+
+                connection.v2.updateRegistration({
+                    "id": "abcdef",
+                    "expires": "2016-04-05T14:00:00.00Z"
+                }).then(function () {
+                    fail("Success callback called");
+                }, function (e) {
+                    expect(e).toEqual(jasmine.any(NGSI.InvalidResponseError));
+                    done();
+                });
+            });
+
+        });
+
         describe('updateSubscription(changes[, options])', function () {
 
             it("throws a TypeError exception when not passing the changes parameter", function () {
@@ -3541,6 +4149,72 @@ if ((typeof require === 'function') && typeof global != null) {
                 });
 
                 connection.v2.listEntities().then(function () {
+                    fail("Success callback called");
+                }, function (e) {
+                    expect(e).toEqual(jasmine.any(NGSI.InvalidResponseError));
+                    done();
+                });
+            });
+
+        });
+
+        describe('listRegistrations([options])', function () {
+
+            it("basic request", function (done) {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/v2/registrations", {
+                    headers: {
+                        'Fiware-correlator': 'correlatortoken'
+                    },
+                    method: "GET",
+                    status: 200,
+                    responseText: '[]'
+                });
+
+                connection.v2.listRegistrations().then(function (result) {
+                    expect(result).toEqual({
+                        correlator: "correlatortoken",
+                        limit: 20,
+                        offset: 0,
+                        results: []
+                    });
+                    done();
+                }, function (e) {
+                    fail("Failure callback called");
+                });
+            });
+
+            it("basic request using the count option", function (done) {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/v2/registrations", {
+                    headers: {
+                        'Fiware-correlator': 'correlatortoken',
+                        'Fiware-Total-Count': '0'
+                    },
+                    method: "GET",
+                    status: 200,
+                    responseText: '[]'
+                });
+
+                connection.v2.listRegistrations({count: true}).then(function (result) {
+                    expect(result).toEqual({
+                        correlator: "correlatortoken",
+                        count: 0,
+                        limit: 20,
+                        offset: 0,
+                        results: []
+                    });
+                    done();
+                }, function (e) {
+                    fail("Failure callback called");
+                });
+            });
+
+            it("unexpected error code", function (done) {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/v2/registrations", {
+                    method: "GET",
+                    status: 204
+                });
+
+                connection.v2.listRegistrations().then(function (value) {
                     fail("Success callback called");
                 }, function (e) {
                     expect(e).toEqual(jasmine.any(NGSI.InvalidResponseError));
