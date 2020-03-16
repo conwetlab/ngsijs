@@ -1,6 +1,6 @@
 /*
  *     Copyright (c) 2013-2017 CoNWeT Lab., Universidad Politécnica de Madrid
- *     Copyright (c) 2018 Future Internet Consulting and Development Solutions S.L.
+ *     Copyright (c) 2018-2020 Future Internet Consulting and Development Solutions S.L.
  *
  *     This file is part of ngsijs.
  *
@@ -272,7 +272,12 @@
             SUBSCRIPTION_ENTRY: 'v2/subscriptions/%(subscriptionId)s',
             TYPE_COLLECTION: 'v2/types',
             TYPE_ENTRY: 'v2/types/%(typeId)s'
+        },
+
+        ld: {
+            ENTITY_ENTRY: 'ngsi-ld/v1/entities/%(entityId)s',
         }
+
     };
 
     NGSI.proxy_endpoints = {
@@ -376,12 +381,16 @@
 
     var makeJSONRequest2 = function makeJSONRequest2(url, options) {
         if (options.postBody != null) {
-            options.contentType = 'application/json';
+            if (options.contentType == null) {
+                options.contentType = 'application/json';
+            }
             options.postBody = JSON.stringify(options.postBody);
         }
 
         var requestHeaders = JSON.parse(JSON.stringify(this.headers));
-        requestHeaders.Accept = 'application/json';
+        if (requestHeaders.Accept == null) {
+            requestHeaders.Accept = 'application/json';
+        }
 
         for (var headerName in options.requestHeaders) {
             if (options.requestHeaders[headerName] != null) {
@@ -1208,6 +1217,15 @@
         return Promise.reject(new NGSI.TooManyResultsError({message: error.description, correlator: correlator}));
     };
 
+    var parse_not_found_response_ld = function parse_not_found_response_ld(response) {
+        try {
+            var error = parse_error_response(response);
+        } catch (e) {
+            return Promise.reject(new NGSI.InvalidResponseError());
+        }
+        return Promise.reject(new NGSI.NotFoundError({message: error.title, details: error.detail}));
+    };
+
     NGSI.parseNotifyContextRequest = function parseNotifyContextRequest(data, options) {
         return {
             elements: parse_context_response_list_json(data.contextResponses, false, options)[0],
@@ -1822,7 +1840,8 @@
         Object.defineProperties(this, {
             url: {value: url},
             v1: {value: this},
-            v2: {value: new NGSI.Connection.V2(this)}
+            v2: {value: new NGSI.Connection.V2(this)},
+            ld: {value: new NGSI.Connection.LD(this)}
         });
     };
 
@@ -6000,6 +6019,121 @@
         });
     };
 
+    NGSI.Connection.LD = function LD(connection) {
+        privates.set(this, connection);
+    };
+
+    /**
+     * Gets all the details of an entity.
+     *
+     * > This method uses ld of the FIWARE's NGSI Specification
+     *
+     * @since 1.4
+     *
+     * @name NGSI.Connection#ld.getEntity
+     * @method "ld.getEntity"
+     * @memberof NGSI.Connection
+     *
+     * @param {String|Object} options
+     *
+     * String with the id of the entity to query or an object with extra
+     * options:
+     *
+     * - `attrs` (`String`): Comma-separated list of attribute names whose data
+     *   are to be included in the response. The attributes are retrieved in the
+     *   order specified by this parameter. If this parameter is not included,
+     *   the attributes are retrieved in arbitrary order.
+     * - `@context` (`String`): URI pointing to the JSON-LD document which
+     *   contains the `@context` to be used to expand the terms when retrieving
+     *   entity details.
+     * - `keyValues` (`Boolean`; default: `false`): Use flat attributes
+     * - `id` (`String`, required): Id of the entity to query
+     * - `service` (`String`): Service/tenant to use in this operation
+     *
+     * @throws {NGSI.ConnectionError}
+     * @throws {NGSI.InvalidResponseError}
+     * @throws {NGSI.NotFoundError}
+     *
+     * @returns {Promise}
+     *
+     * @example <caption>Basic usage</caption>
+     *
+     * connection.ld.getEntity("urn:ngsi-ld:Road:Spain-Road-A62").then(
+     *     (response) => {
+     *         // Entity details retrieved successfully
+     *         // response.entity entity details
+     *     }, (error) => {
+     *         // Error retrieving entity
+     *         // filled with the associated transaction id
+     *     }
+     * );
+     *
+     * @example <caption>Retrieve an entity using the keyValues option</caption>
+     *
+     * connection.ld.getEntity({
+     *     id: "urn:ngsi-ld:Road:Spain-Road-A62",
+     *     keyValues: true
+     * }).then(
+     *     (response) => {
+     *         // Entity details retrieved successfully
+     *         // response.entity entity details
+     *     }, (error) => {
+     *         // Error retrieving entity
+     *     }
+     * );
+     *
+     */
+    NGSI.Connection.LD.prototype.getEntity = function getEntity(options) {
+        if (options == null) {
+            throw new TypeError("missing options parameter");
+        }
+
+        if (typeof options === "string") {
+            options = {
+                id: options
+            };
+        } else if (options.id == null) {
+            throw new TypeError("missing id option");
+        }
+
+        const connection = privates.get(this);
+        const url = new URL(interpolate(NGSI.endpoints.ld.ENTITY_ENTRY, {entityId: encodeURIComponent(options.id)}), connection.url);
+        const parameters = {
+            attrs: options.attrs
+        };
+        if (options.keyValues === true) {
+            parameters.options = "keyValues";
+        }
+
+        const headers = {
+            "Accept": "application/ld+json, application/json",
+            "FIWARE-Service": options.service
+        };
+        if (typeof options["@context"] === "string") {
+            headers.Link = '<' + encodeURI(options["@context"]) + '>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"';
+        }
+
+        return makeJSONRequest2.call(connection, url, {
+            method: "GET",
+            parameters: parameters,
+            requestHeaders: headers
+        }).then(function (response) {
+            if (response.status === 404) {
+                return parse_not_found_response_ld(response);
+            } else if (response.status !== 200) {
+                return Promise.reject(new NGSI.InvalidResponseError('Unexpected error code: ' + response.status));
+            }
+            try {
+                var data = JSON.parse(response.responseText);
+            } catch (e) {
+                throw new NGSI.InvalidResponseError('Server returned invalid JSON content');
+            }
+            return Promise.resolve({
+                format: response.getHeader('Content-Type'),
+                entity: data
+            });
+        });
+    };
 
     /* istanbul ignore else */
     if (typeof window !== 'undefined') {
