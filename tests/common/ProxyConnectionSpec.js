@@ -55,10 +55,6 @@ if ((typeof require === 'function') && typeof global != null) {
             EventSource.clear();
         });
 
-        afterEach(function () {
-            jasmine.clock().uninstall();
-        });
-
         describe("new NGSI.ProxyConnection(url, makeRequest)", function () {
 
             it("normalizes provided urls", function () {
@@ -552,14 +548,14 @@ if ((typeof require === 'function') && typeof global != null) {
                     () => {
                         fail("fulfill callback called");
                     },
-                    function (error) {
+                    (error) => {
                         expect(error).toEqual(jasmine.any(NGSI.ConnectionError));
                         expect(EventSource.mockedeventsources[0].close).toHaveBeenCalledWith();
                         expect(proxy.connected).toBeFalsy();
                         expect(proxy.connecting).toBeFalsy();
-                        done();
+                        jasmine.clock().uninstall();
                     }
-                );
+                ).finally(done);
             });
 
             it("handles error responses", function (done) {

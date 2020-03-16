@@ -16,7 +16,7 @@
         };
 
         if (EventSource.eventsourceconfs[url] !== "timeout") {
-            setTimeout(function () {
+            var timeout = setTimeout(() => {
                 var i;
                 var event = !EventSource.eventsourceconfs[url] ? this.events.init : this.events.error;
                 for (i = 0; i < event.length; i++) {
@@ -24,12 +24,16 @@
                         event[i]({data: "{\"id\": 1}"});
                     } catch (e) {}
                 }
-            }.bind(this), 0);
+            }, 0);
+            EventSource.timeouts.push(timeout);
         }
         this.close = jasmine.createSpy('close');
     };
+    EventSource.timeouts = [];
 
     EventSource.clear = function clear() {
+        EventSource.timeouts.forEach(clearTimeout);
+        EventSource.timeouts = [];
         EventSource.mockedeventsources = [];
         EventSource.eventsourceconfs = {};
     };

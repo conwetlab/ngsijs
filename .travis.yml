@@ -11,7 +11,7 @@ matrix:
               - npm install grunt-cli -g
           script:
               - xvfb-run grunt ci
-        - node_js: "6"
+        - node_js: "8"
           before_install:
               - npm install grunt-cli -g
           script:
@@ -25,7 +25,7 @@ matrix:
               - ./node_modules/istanbul/lib/cli.js cover -- ./node_modules/jasmine/bin/jasmine.js --config=jasmine.json
           after_script:
               - grunt coveralls:librarynode
-        - node_js: "10"
+        - node_js: "13"
           before_install:
               - npm install grunt-cli -g
           script:
