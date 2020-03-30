@@ -275,6 +275,7 @@
         },
 
         ld: {
+            ENTITY_COLLECTION: 'ngsi-ld/v1/entities',
             ENTITY_ENTRY: 'ngsi-ld/v1/entities/%(entityId)s',
         }
 
@@ -1224,6 +1225,21 @@
             return Promise.reject(new NGSI.InvalidResponseError());
         }
         return Promise.reject(new NGSI.NotFoundError({message: error.title, details: error.detail}));
+    };
+
+    var parse_bad_request_ld = function parse_bad_request_ld(response) {
+        try {
+            var error = parse_error_response(response);
+        } catch (e) {
+            return Promise.reject(new NGSI.InvalidResponseError());
+        }
+        var exc;
+        if (error.type === "https://uri.etsi.org/ngsi-ld/errors/InvalidRequest") {
+            exc = new NGSI.InvalidRequestError(undefined, error.title, error.detail);
+        } else {
+            exc = new NGSI.BadRequestError({message: error.title, details: error.detail});
+        }
+        return Promise.reject(exc);
     };
 
     NGSI.parseNotifyContextRequest = function parseNotifyContextRequest(data, options) {
@@ -6024,9 +6040,180 @@
     };
 
     /**
+     * Creates a new entity.
+     *
+     * > This method uses ld of the FIWARE's NGSI Specification (CIM v1.1.1)
+     *
+     * @since 1.4
+     *
+     * @name NGSI.Connection#ld.createEntity
+     * @method "ld.createEntity"
+     * @memberof NGSI.Connection
+     *
+     * @param {Object}
+     *
+     * entity values to be used for creating the new entity. Requires at least
+     * the `id` value for the new entity.
+     *
+     * @param {Object} [options]
+     *
+     * Object with extra options:
+     *
+     * - `service` (`String`): Service/tenant to use in this operation
+     *
+     *
+     * @throws {NGSI.AlreadyExistsError}
+     * @throws {NGSI.BadRequestError}
+     * @throws {NGSI.ConnectionError}
+     * @throws {NGSI.InvalidResponseError}
+     *
+     * @returns {Promise}
+     *
+     * @example <caption>Basic usage</caption>
+     *
+     * connection.ld.createEntity({
+     *     "id": "urn:ngsi-ld:Road:Spain-Road-A62",
+     *     "type": "Road",
+     *     "name": {
+     *          "type": "Property",
+     *          "value": "A-62"
+     *     },
+     *     "alternateName": {
+     *          "type": "Property",
+     *          "value": "E-80"
+     *     },
+     *     "description": {
+     *          "type": "Property",
+     *          "value": "Autovía de Castilla"
+     *     },
+     *     "roadClass": {
+     *          "type": "Property",
+     *          "value": "motorway"
+     *     },
+     *     "length": {
+     *          "type": "Property",
+     *          "value": 355
+     *     },
+     *     "refRoadSegment": {
+     *         "type": "Relationship",
+     *         "object": [
+     *             "urn:ngsi-ld:RoadSegment:Spain-RoadSegment-A62-0-355-forwards",
+     *             "urn:ngsi-ld:RoadSegment:Spain-RoadSegment-A62-0-355-backwards"
+     *         ]
+     *     },
+     *     "responsible": {
+     *          "type": "Property",
+     *          "value": "Ministerio de Fomento - Gobierno de España"
+     *     },
+     *     "@context": [
+     *        "https://schema.lab.fiware.org/ld/context",
+     *        "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+     *     ]
+     * }).then(
+     *     (response) => {
+     *         // Entity created successfully
+     *         // response.correlator transaction id associated with the server response
+     *     }, (error) => {
+     *         // Error creating the entity
+     *         // If the error was reported by Orion, error.correlator will be
+     *         // filled with the associated transaction id
+     *     }
+     * );
+     *
+     * @example <caption>Using the service option</caption>
+     *
+     * connection.ld.createEntity({
+     *     "id": "urn:ngsi-ld:Road:Spain-Road-A62",
+     *     "type": "Road",
+     *     "name": {
+     *          "type": "Property",
+     *          "value": "A-62"
+     *     },
+     *     "alternateName": {
+     *          "type": "Property",
+     *          "value": "E-80"
+     *     },
+     *     "description": {
+     *          "type": "Property",
+     *          "value": "Autovía de Castilla"
+     *     },
+     *     "roadClass": {
+     *          "type": "Property",
+     *          "value": "motorway"
+     *     },
+     *     "length": {
+     *          "type": "Property",
+     *          "value": 355
+     *     },
+     *     "refRoadSegment": {
+     *         "type": "Relationship",
+     *         "object": [
+     *             "urn:ngsi-ld:RoadSegment:Spain-RoadSegment-A62-0-355-forwards",
+     *             "urn:ngsi-ld:RoadSegment:Spain-RoadSegment-A62-0-355-backwards"
+     *         ]
+     *     },
+     *     "responsible": {
+     *          "type": "Property",
+     *          "value": "Ministerio de Fomento - Gobierno de España"
+     *     },
+     *     "@context": [
+     *        "https://schema.lab.fiware.org/ld/context",
+     *        "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+     *     ]
+     * }, {service: "mytenant"}).then(
+     *     (response) => {
+     *         // Entity created successfully
+     *         // response.correlator transaction id associated with the server response
+     *     }, (error) => {
+     *         // Error creating the entity
+     *         // If the error was reported by Orion, error.correlator will be
+     *         // filled with the associated transaction id
+     *     }
+     * );
+     *
+     */
+    NGSI.Connection.LD.prototype.createEntity = function createEntity(entity, options) {
+        if (options == null) {
+            options = {};
+        }
+
+        if (entity.id == null) {
+            throw new TypeError('missing entity id');
+        }
+
+        if (entity.type == null) {
+            throw new TypeError('missing entity type');
+        }
+
+        var connection = privates.get(this);
+
+        var url = new URL(NGSI.endpoints.ld.ENTITY_COLLECTION, connection.url);
+        return makeJSONRequest2.call(connection, url, {
+            method: "POST",
+            postBody: entity,
+            contentType: "@context" in entity ? "application/ld+json" : "application/json",
+            requestHeaders: {
+                "FIWARE-Service": options.service
+            }
+        }).then(function (response) {
+            if (response.status === 400) {
+                return parse_bad_request_ld(response);
+            } else if (response.status === 409) {
+                return Promise.reject(new NGSI.AlreadyExistsError({}));
+            } else if (response.status !== 201) {
+                return Promise.reject(new NGSI.InvalidResponseError('Unexpected error code: ' + response.status));
+            }
+            return Promise.resolve({
+                entity: entity,
+                location: response.getHeader('Location')
+            });
+        });
+    };
+
+    /**
      * Gets all the details of an entity.
      *
-     * > This method uses ld of the FIWARE's NGSI Specification
+     * > This method uses ld of the FIWARE's NGSI Specification (CIM v1.1.1)
      *
      * @since 1.4
      *

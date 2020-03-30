@@ -50,8 +50,8 @@ if ((typeof require === 'function') && typeof global != null) {
 
     describe("Connecton.ld", () => {
 
-        var connection;
-        var ajaxMockup = ajaxMockFactory.createFunction();
+        let connection;
+        let ajaxMockup = ajaxMockFactory.createFunction();
 
         beforeEach(() => {
             const options = {
@@ -59,6 +59,215 @@ if ((typeof require === 'function') && typeof global != null) {
             };
             connection = new NGSI.Connection('http://ngsi.server.com', options);
             ajaxMockup.clear();
+        });
+
+        describe('createEntity(entity[, options])', () => {
+
+            const entity = {
+                "id": "urn:ngsi-ld:Road:Spain-Road-A62",
+                "type": "Road",
+                "name": {
+                    "type": "Property",
+                    "value": "A-62"
+                },
+                "alternateName": {
+                    "type": "Property",
+                    "value": "E-80"
+                },
+                "description": {
+                    "type": "Property",
+                    "value": "Autovía de Castilla"
+                },
+                "roadClass": {
+                    "type": "Property",
+                    "value": "motorway"
+                },
+                "length": {
+                    "type": "Property",
+                    "value": 355
+                },
+                "refRoadSegment": {
+                    "type": "Relationship",
+                    "object": [
+                        "urn:ngsi-ld:RoadSegment:Spain-RoadSegment-A62-0-355-forwards",
+                        "urn:ngsi-ld:RoadSegment:Spain-RoadSegment-A62-0-355-backwards"
+                    ]
+                },
+                "responsible": {
+                    "type": "Property",
+                    "value": "Ministerio de Fomento - Gobierno de España"
+                },
+                "@context": [
+                    "https://schema.lab.fiware.org/ld/context",
+                    "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+                ]
+            };
+
+            let entity_values = {
+                "id": "a",
+                "type": "b",
+                "attr": "value"
+            };
+
+            it("throws a TypeError exception when not passing the id option", () => {
+                expect(() => {
+                    connection.ld.createEntity({});
+                }).toThrowError(TypeError);
+            });
+
+            it("throws a TypeError exception when not passing the type option", () => {
+                expect(() => {
+                    connection.ld.createEntity({id: "urn:A"});
+                }).toThrowError(TypeError);
+            });
+
+            it("basic request", (done) => {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/entities", {
+                    method: "POST",
+                    status: 201,
+                    headers: {
+                        'Location': '/ngsi-ld/v1/entities/a?type=b'
+                    },
+                    checkRequestContent: (url, options) => {
+                        let data = JSON.parse(options.postBody);
+                        expect(data).toEqual(entity);
+                    }
+                });
+
+                connection.ld.createEntity(entity).then(
+                    (result) => {
+                        expect(result).toEqual({
+                            entity: entity,
+                            location: "/ngsi-ld/v1/entities/a?type=b"
+                        });
+                    },
+                    fail
+                ).finally(done);
+            });
+
+            it("basic request (using the service option)", (done) => {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/entities", {
+                    method: "POST",
+                    status: 201,
+                    headers: {
+                        'Location': '/ngsi-ld/v1/entities/a?type=b'
+                    },
+                    checkRequestContent: (url, options) => {
+                        expect(options.requestHeaders).toEqual(jasmine.objectContaining({
+                            'FIWARE-Service': 'mytenant'
+                        }));
+                    }
+                });
+
+                connection.ld.createEntity(entity, {service: "mytenant"}).then(
+                    (result) => {
+                        expect(result).toEqual({
+                            entity: entity,
+                            location: "/ngsi-ld/v1/entities/a?type=b"
+                        });
+                    },
+                    fail
+                ).finally(done);
+            });
+
+            it("invalid request", (done) => {
+                // Invalid Request error should not be possible when using the library, but code can always have bugs.
+                ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/entities", {
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    method: "POST",
+                    status: 400,
+                    responseText: '{"type": "https://uri.etsi.org/ngsi-ld/errors/InvalidRequest", "title": "Request payload body is not a valid JSON document", "detail": "no detail"}'
+                });
+
+                connection.ld.createEntity({id: "car1", type: "Car"}).then(
+                    fail,
+                    (e) => {
+                        expect(e).toEqual(jasmine.any(NGSI.InvalidRequestError));
+                        expect(e.message).toBe("Request payload body is not a valid JSON document");
+                        done();
+                    }
+                ).finally(done);
+            });
+
+            it("bad request", (done) => {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/entities", {
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    method: "POST",
+                    status: 400,
+                    responseText: '{"type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData", "title": "Invalid characters in entity id", "detail": "no detail"}'
+                });
+
+                connection.ld.createEntity({id: "21$(", type: "Car"}).then(
+                    fail,
+                    (e) => {
+                        expect(e).toEqual(jasmine.any(NGSI.BadRequestError));
+                        expect(e.message).toBe("Invalid characters in entity id");
+                        done();
+                    }
+                ).finally(done);
+            });
+
+            it("invalid 400", (done) => {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/entities", {
+                    method: "POST",
+                    status: 400
+                });
+
+                connection.ld.createEntity(entity_values).then(
+                    fail,
+                    (e) => {
+                        expect(e).toEqual(jasmine.any(NGSI.InvalidResponseError));
+                    }
+                ).finally(done);
+            });
+
+            it("manage already exists errors", (done) => {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/entities", {
+                    method: "POST",
+                    status: 409,
+                    responseText: '{"type": "https://uri.etsi.org/ngsi-ld/errors/AlreadyExists", "title": "The referred element already exists", "detail": "no detail"}'
+                });
+
+                connection.ld.createEntity(entity).then(
+                    fail,
+                    (e) => {
+                        expect(e).toEqual(jasmine.any(NGSI.AlreadyExistsError));
+                    }
+                ).finally(done);
+            });
+
+            it("unexpected error code", (done) => {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/entities", {
+                    method: "POST",
+                    status: 204
+                });
+
+                connection.ld.createEntity(entity).then(
+                    fail,
+                    (e) => {
+                        expect(e).toEqual(jasmine.any(NGSI.InvalidResponseError));
+                    }
+                ).finally(done);
+            });
+
+            it("unexpected error code (204)", (done) => {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/entities", {
+                    method: "POST",
+                    status: 204
+                });
+
+                connection.ld.createEntity(entity).then(
+                    fail,
+                    (e) => {
+                        expect(e).toEqual(jasmine.any(NGSI.InvalidResponseError));
+                    }
+                ).finally(done);
+            });
+
         });
 
         describe('getEntity(options)', () => {
@@ -200,7 +409,7 @@ if ((typeof require === 'function') && typeof global != null) {
                 }).finally(done);
             });
 
-            it("handles unexpected error codes", function (done) {
+            it("handles unexpected error codes", (done) => {
                 ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/entities/urn%3Angsi-ld%3ARoad%3ASpain-Road-A62", {
                     method: "GET",
                     status: 201
@@ -213,7 +422,7 @@ if ((typeof require === 'function') && typeof global != null) {
                 }).finally(done);
             });
 
-            it("handles responses with invalid payloads", function (done) {
+            it("handles responses with invalid payloads", (done) => {
                 ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/entities/urn%3Angsi-ld%3ARoad%3ASpain-Road-A62", {
                     method: "GET",
                     status: 200,
@@ -227,7 +436,7 @@ if ((typeof require === 'function') && typeof global != null) {
                 }).finally(done);
             });
 
-            it("entity not found", function (done) {
+            it("entity not found", (done) => {
                 ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/entities/urn%3Angsi-ld%3ARoad%3ASpain-Road-A62", {
                     headers: {
                         "Content-Type": "application/json",
