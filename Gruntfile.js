@@ -131,7 +131,7 @@ module.exports = function (grunt) {
             }
         },
 
-        uglify: {
+        terser: {
             library: {
                 options: {
                     sourceMap: true
@@ -146,7 +146,7 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks("gruntify-eslint");
     grunt.loadNpmTasks("grunt-bump");
     grunt.loadNpmTasks("grunt-contrib-copy");
-    grunt.loadNpmTasks("grunt-contrib-uglify");
+    grunt.loadNpmTasks("grunt-terser");
     grunt.loadNpmTasks("grunt-coveralls");
     grunt.loadNpmTasks('grunt-karma');
     grunt.loadNpmTasks("grunt-jsdoc");
@@ -155,7 +155,7 @@ module.exports = function (grunt) {
         'eslint',
         'karma:library',
         'copy',
-        'uglify',
+        'terser',
         'jsdoc'
     ]);
 
@@ -168,7 +168,7 @@ module.exports = function (grunt) {
         'karma:libraryci',
         'coveralls:library',
         'copy',
-        'uglify',
+        'terser',
         'jsdoc'
     ]);
 
