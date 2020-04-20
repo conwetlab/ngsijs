@@ -49,7 +49,7 @@
      */
     var NGSI;
 
-    var privates = new WeakMap();
+    const privates = new WeakMap();
 
     /* Detect Node.js */
     /* istanbul ignore if */
@@ -288,14 +288,14 @@
 
     /* Request utility functions */
 
-    var interpolate = function interpolate(pattern, attributes) {
+    const interpolate = function interpolate(pattern, attributes) {
         return pattern.replace(/%\(\w+\)s/g,
             function (match) {
                 return String(attributes[match.slice(2, -2)]);
             });
     };
 
-    var makeJSONRequest = function makeJSONRequest(url, payload, parse_func, callbacks, parameters) {
+    const makeJSONRequest = function makeJSONRequest(url, payload, parse_func, callbacks, parameters) {
         var body = null, contentType = null, requestHeaders;
 
         if (payload != null) {
@@ -369,7 +369,7 @@
         );
     };
 
-    var deleteHeader = function deleteHeader(headerName, requestHeaders) {
+    const deleteHeader = function deleteHeader(headerName, requestHeaders) {
         var headerNameLow = headerName.trim().toLowerCase();
         var keys = Object.keys(requestHeaders);
         var index = keys.map(function (headerName) {
@@ -380,7 +380,7 @@
         }
     };
 
-    var makeJSONRequest2 = function makeJSONRequest2(url, options) {
+    const makeJSONRequest2 = function makeJSONRequest2(url, options) {
         if (options.postBody != null) {
             if (options.contentType == null) {
                 options.contentType = 'application/json';
@@ -418,7 +418,7 @@
         );
     };
 
-    var ngsi_build_entity_id_element_json = function ngsi_build_entity_id_element_json(entity) {
+    const ngsi_build_entity_id_element_json = function ngsi_build_entity_id_element_json(entity) {
         var entityId, isPattern;
 
         isPattern = (typeof entity.isPattern === 'string' && entity.isPattern.trim().toLowerCase() === 'true') || (entity.isPattern === true);
@@ -434,7 +434,7 @@
         return entityId;
     };
 
-    var ngsi_build_scope_restriction_element_json = function ngsi_build_scope_restriction_element_json(scope) {
+    const ngsi_build_scope_restriction_element_json = function ngsi_build_scope_restriction_element_json(scope) {
         var result, i, vertice;
 
         if ('polygon' in scope.value) {
@@ -471,7 +471,7 @@
         return result;
     };
 
-    var ngsi_build_restriction_element_json = function ngsi_build_restriction_element_json(restriction) {
+    const ngsi_build_restriction_element_json = function ngsi_build_restriction_element_json(restriction) {
         var result, i;
 
         result = {
@@ -490,7 +490,7 @@
         return result;
     };
 
-    var ngsi_build_attribute_metadata_element = function ngsi_build_attribute_metadata_element(metadata) {
+    const ngsi_build_attribute_metadata_element = function ngsi_build_attribute_metadata_element(metadata) {
         var result, i;
 
         result = [];
@@ -507,7 +507,7 @@
 
     /* Request builders */
 
-    var ngsi_build_register_context_request = function ngsi_build_register_context_request(e, attr, duration, providingApplication, regId) {
+    const ngsi_build_register_context_request = function ngsi_build_register_context_request(e, attr, duration, providingApplication, regId) {
         var doc, i, attribute, attributeElement;
 
         doc = {
@@ -546,7 +546,7 @@
         return doc;
     };
 
-    var ngsi_build_query_context_request = function ngsi_build_query_context_request(e, attrNames, restriction) {
+    const ngsi_build_query_context_request = function ngsi_build_query_context_request(e, attrNames, restriction) {
         var body, i;
 
         body = {
@@ -572,7 +572,7 @@
         return body;
     };
 
-    var ngsi_build_update_context_request = function ngsi_build_update_context_request(updateAction, update) {
+    const ngsi_build_update_context_request = function ngsi_build_update_context_request(updateAction, update) {
         var body, i, j, contextElement, attributeListElement, attributes,
             attribute, attributeElement, value;
 
@@ -627,7 +627,7 @@
         return body;
     };
 
-    var ngsi_build_discover_context_availability_request = function ngsi_build_discover_context_availability_request(e, attr) {
+    const ngsi_build_discover_context_availability_request = function ngsi_build_discover_context_availability_request(e, attr) {
         var doc, i;
 
         doc = {
@@ -642,7 +642,7 @@
         return doc;
     };
 
-    var ngsi_build_subscribe_update_context_availability_request = function ngsi_build_subscribe_update_context_availability_request(e, attr, duration, restriction, subscriptionId, onNotify) {
+    const ngsi_build_subscribe_update_context_availability_request = function ngsi_build_subscribe_update_context_availability_request(e, attr, duration, restriction, subscriptionId, onNotify) {
         var doc, i;
 
         if (subscriptionId) {
@@ -676,13 +676,13 @@
         return doc;
     };
 
-    var ngsi_build_unsubscribe_context_availability_request = function ngsi_build_unsubscribe_context_availability_request(subId) {
+    const ngsi_build_unsubscribe_context_availability_request = function ngsi_build_unsubscribe_context_availability_request(subId) {
         return {
             "subscriptionId": subId
         };
     };
 
-    var ngsi_build_subscribe_update_context_request = function ngsi_build_subscribe_update_context_request(subscriptionId, e, attr, duration, throttling, conditions, onNotify) {
+    const ngsi_build_subscribe_update_context_request = function ngsi_build_subscribe_update_context_request(subscriptionId, e, attr, duration, throttling, conditions, onNotify) {
         var doc, i, condition, notifyConditionElement;
 
         if (subscriptionId) {
@@ -731,13 +731,13 @@
         return doc;
     };
 
-    var ngsi_build_unsubscribe_context_request = function ngsi_build_unsubscribe_context_request(subId) {
+    const ngsi_build_unsubscribe_context_request = function ngsi_build_unsubscribe_context_request(subId) {
         return {
             'subscriptionId': subId
         };
     };
 
-    var ngsi_build_replace_entity_request = function ngsi_build_replace_entity_request(entity, options, parameters) {
+    const ngsi_build_replace_entity_request = function ngsi_build_replace_entity_request(entity, options, parameters) {
         if (entity.type != null) {
             parameters.type = entity.type;
             delete entity.type;
@@ -752,7 +752,7 @@
 
     /* Response parsers */
 
-    var parse_register_context_response =  function parse_register_context_response(data) {
+    const parse_register_context_response =  function parse_register_context_response(data) {
 
         process_error_code_json(data);
 
@@ -763,7 +763,7 @@
         return [data];
     };
 
-    var parse_context_registration_response_list = function parse_context_registration_response_list(registrationResponses) {
+    const parse_context_registration_response_list = function parse_context_registration_response_list(registrationResponses) {
         var registrationResponse, registration, i, data = [];
 
         for (i = 0; i < registrationResponses.length; i += 1) {
@@ -790,7 +790,7 @@
         return data;
     };
 
-    var parse_discover_context_availability_response = function parse_discover_context_availability_response(data) {
+    const parse_discover_context_availability_response = function parse_discover_context_availability_response(data) {
 
         if (typeof data !== 'object' || Array.isArray(data)) {
             throw new NGSI.InvalidResponseError('The server returned an invalid json structure');
@@ -805,7 +805,7 @@
         return [parse_context_registration_response_list(data.contextRegistrationResponses)];
     };
 
-    var parse_subscribe_update_context_availability_response = function parse_subscribe_update_context_availability_response(data) {
+    const parse_subscribe_update_context_availability_response = function parse_subscribe_update_context_availability_response(data) {
 
         process_error_code_json(data);
 
@@ -820,7 +820,7 @@
         return [data];
     };
 
-    var parse_unsubscribe_context_availability_response = function parse_unsubscribe_context_availability_response(data) {
+    const parse_unsubscribe_context_availability_response = function parse_unsubscribe_context_availability_response(data) {
 
         if (typeof data !== 'object' || Array.isArray(data) || !('subscriptionId' in data)) {
             throw new NGSI.InvalidResponseError('The server returned an invalid json structure');
@@ -832,7 +832,7 @@
         }];
     };
 
-    var parse_context_response_list_json = function parse_context_response_list_json(elements, update_response, options) {
+    const parse_context_response_list_json = function parse_context_response_list_json(elements, update_response, options) {
         var contextResponse, entry, flat, i, j, value, data,
             attribute_info, attribute_entry, status_info, error_data;
 
@@ -914,7 +914,7 @@
         return [data, error_data];
     };
 
-    var parse_available_types_response = function parse_available_types_response(data, options) {
+    const parse_available_types_response = function parse_available_types_response(data, options) {
         var parsed_details, status_info, details;
 
         status_info = process_status_info_json(data);
@@ -952,7 +952,7 @@
         return [data.types, details];
     };
 
-    var parse_type_info_response = function parse_type_info_response(data) {
+    const parse_type_info_response = function parse_type_info_response(data) {
         var status_info;
 
         if (typeof data !== 'object' || Array.isArray(data)) {
@@ -974,7 +974,7 @@
         return [data];
     };
 
-    var process_status_info_json = function process_status_info_json(obj) {
+    const process_status_info_json = function process_status_info_json(obj) {
         if (!("statusCode" in obj)) {
             throw new NGSI.InvalidResponseError('missing response status code info');
         }
@@ -984,16 +984,16 @@
         return obj.statusCode;
     };
 
-    var process_error_code_json = function process_error_code_json(data) {
+    const process_error_code_json = function process_error_code_json(data) {
         if ('errorCode' in data) {
             throw new NGSI.InvalidRequestError(parseInt(data.errorCode.code, 10), data.errorCode.reasonPhrase, data.errorCode.details);
         }
     };
 
-    var NGSI_QUERY_COUNT_RE = new RegExp('Count: (\\d+)');
-    var NGSI_INVALID_OFFSET_RE = new RegExp('Number of matching entities: (\\d+). Offset is (\\d+)');
+    const NGSI_QUERY_COUNT_RE = new RegExp('Count: (\\d+)');
+    const NGSI_INVALID_OFFSET_RE = new RegExp('Number of matching entities: (\\d+). Offset is (\\d+)');
 
-    var parse_query_context_response = function parse_query_context_response(doc, options) {
+    const parse_query_context_response = function parse_query_context_response(doc, options) {
         var details, parsed_details, data;
 
         if (typeof doc !== 'object' || Array.isArray(doc)) {
@@ -1045,14 +1045,14 @@
         return [parse_context_response_list_json(doc.contextResponses, false, options)[0], details];
     };
 
-    var parse_update_context_response = function parse_update_context_response(data, options) {
+    const parse_update_context_response = function parse_update_context_response(data, options) {
 
         process_error_code_json(data);
 
         return parse_context_response_list_json(data.contextResponses, true, options);
     };
 
-    var parse_subscribe_response_element = function parse_subscribe_response_element(data) {
+    const parse_subscribe_response_element = function parse_subscribe_response_element(data) {
 
         process_error_code_json(data);
 
@@ -1071,7 +1071,7 @@
         return data;
     };
 
-    var parse_subscribe_context_response = function parse_subscribe_context_response(data) {
+    const parse_subscribe_context_response = function parse_subscribe_context_response(data) {
 
         process_error_code_json(data);
 
@@ -1082,7 +1082,7 @@
         return [parse_subscribe_response_element(data.subscribeResponse)];
     };
 
-    var parse_update_context_subscription_response = function parse_update_context_subscription_response(data) {
+    const parse_update_context_subscription_response = function parse_update_context_subscription_response(data) {
 
         process_error_code_json(data);
 
@@ -1093,7 +1093,7 @@
         return [parse_subscribe_response_element(data.subscribeResponse)];
     };
 
-    var parse_unsubscribe_context_response = function parse_unsubscribe_context_response(data) {
+    const parse_unsubscribe_context_response = function parse_unsubscribe_context_response(data) {
 
         process_error_code_json(data);
 
@@ -1105,7 +1105,7 @@
         return [data];
     };
 
-    var parse_notify_context_availability_request = function parse_notify_context_availability_request(data, options) {
+    const parse_notify_context_availability_request = function parse_notify_context_availability_request(data, options) {
 
         if (typeof data !== 'object' || Array.isArray(data) || !Array.isArray(data.contextRegistrationResponses)) {
             throw new NGSI.InvalidResponseError('The server returned an invalid json structure');
@@ -1114,7 +1114,7 @@
         return [parse_context_registration_response_list(data.contextRegistrationResponses)];
     };
 
-    var parse_pagination_options = function parse_pagination_options(options, default_details) {
+    const parse_pagination_options = function parse_pagination_options(options, default_details) {
         var parameters = {};
 
         if (options.limit != null) {
@@ -1152,7 +1152,7 @@
         return parameters;
     };
 
-    var parse_pagination_options2 = function parse_pagination_options2(options, optionsparams) {
+    const parse_pagination_options2 = function parse_pagination_options2(options, optionsparams) {
         var parameters = {};
 
         if (options.limit != null) {
@@ -1183,7 +1183,7 @@
         return parameters;
     };
 
-    var parse_error_response = function parse_error_response(response) {
+    const parse_error_response = function parse_error_response(response) {
         if (response.getHeader('Content-Type') !== 'application/json') {
             throw new TypeError("Unexpected response mimetype");
         }
@@ -1191,7 +1191,7 @@
         return JSON.parse(response.responseText);
     };
 
-    var parse_bad_request = function parse_bad_request(response, correlator) {
+    const parse_bad_request = function parse_bad_request(response, correlator) {
         try {
             var error = parse_error_response(response);
         } catch (e) {
@@ -1200,7 +1200,7 @@
         return Promise.reject(new NGSI.BadRequestError({message: error.description, correlator: correlator}));
     };
 
-    var parse_not_found_response = function parse_not_found_response(response, correlator) {
+    const parse_not_found_response = function parse_not_found_response(response, correlator) {
         try {
             var error = parse_error_response(response);
         } catch (e) {
@@ -1209,7 +1209,7 @@
         return Promise.reject(new NGSI.NotFoundError({message: error.description, correlator: correlator}));
     };
 
-    var parse_too_many_results = function parse_too_many_results(response, correlator) {
+    const parse_too_many_results = function parse_too_many_results(response, correlator) {
         try {
             var error = parse_error_response(response);
         } catch (e) {
@@ -1218,7 +1218,7 @@
         return Promise.reject(new NGSI.TooManyResultsError({message: error.description, correlator: correlator}));
     };
 
-    var parse_not_found_response_ld = function parse_not_found_response_ld(response) {
+    const parse_not_found_response_ld = function parse_not_found_response_ld(response) {
         try {
             var error = parse_error_response(response);
         } catch (e) {
@@ -1227,7 +1227,7 @@
         return Promise.reject(new NGSI.NotFoundError({message: error.title, details: error.detail}));
     };
 
-    var parse_bad_request_ld = function parse_bad_request_ld(response) {
+    const parse_bad_request_ld = function parse_bad_request_ld(response) {
         try {
             var error = parse_error_response(response);
         } catch (e) {
@@ -1250,7 +1250,7 @@
         };
     };
 
-    var init = function init() {
+    const init = function init() {
         return this.makeRequest(new URL(NGSI.proxy_endpoints.EVENTSOURCE_COLLECTION, this.url), {
             supportsAccessControl: true,  // required for using CORS on WireCloud
             method: 'POST'
@@ -1285,7 +1285,7 @@
         );
     };
 
-    var connect_to_eventsource = function connect_to_eventsource() {
+    const connect_to_eventsource = function connect_to_eventsource() {
         var priv = privates.get(this);
         return new Promise(function (resolve, reject) {
             var closeTimeout;
@@ -1335,7 +1335,7 @@
         });
     };
 
-    var on_callback_subscriptions_get = function on_callback_subscriptions_get() {
+    const on_callback_subscriptions_get = function on_callback_subscriptions_get() {
         var mapping = {};
         var callbacks = privates.get(this).callbacks;
         for (var key in callbacks) {
@@ -1344,7 +1344,7 @@
         return mapping;
     };
 
-    var on_callback_subscriptions_versioned_get = function on_callback_subscriptions_versioned_get() {
+    const on_callback_subscriptions_versioned_get = function on_callback_subscriptions_versioned_get() {
         var mapping = {};
         var callbacks = privates.get(this).callbacks;
         for (var key in callbacks) {
@@ -1353,20 +1353,20 @@
         return mapping;
     };
 
-    var on_connected_get = function on_connected_get() {
+    const on_connected_get = function on_connected_get() {
         var priv = privates.get(this);
         return priv.source != null && priv.connection_id != null
     };
 
-    var on_connecting_get = function on_connecting_get() {
+    const on_connecting_get = function on_connecting_get() {
         return privates.get(this).promise !== null;
     };
 
-    var on_connection_id_get = function on_connection_id_get() {
+    const on_connection_id_get = function on_connection_id_get() {
         return privates.get(this).connection_id;
     };
 
-    var on_subscription_callbacks_get = function on_subscription_callbacks_get() {
+    const on_subscription_callbacks_get = function on_subscription_callbacks_get() {
         var mapping = {};
         var subscriptions = privates.get(this).callbacksBySubscriptionId;
         for (var key in subscriptions) {
@@ -6185,9 +6185,8 @@
             throw new TypeError('missing entity type');
         }
 
-        var connection = privates.get(this);
-
-        var url = new URL(NGSI.endpoints.ld.ENTITY_COLLECTION, connection.url);
+        const connection = privates.get(this);
+        const url = new URL(NGSI.endpoints.ld.ENTITY_COLLECTION, connection.url);
         return makeJSONRequest2.call(connection, url, {
             method: "POST",
             postBody: entity,
@@ -6310,8 +6309,9 @@
             } else if (response.status !== 200) {
                 return Promise.reject(new NGSI.InvalidResponseError('Unexpected error code: ' + response.status));
             }
+            let data;
             try {
-                var data = JSON.parse(response.responseText);
+                data = JSON.parse(response.responseText);
             } catch (e) {
                 throw new NGSI.InvalidResponseError('Server returned invalid JSON content');
             }
