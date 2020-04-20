@@ -6040,9 +6040,172 @@
     };
 
     /**
+     * Retrieves the available entities using pagination.
+     *
+     * > This method is aligned with NGSI-LD (CIM Specification v1.2.2)
+     *
+     * @since 1.4
+     *
+     * @name NGSI.Connection#ld.queryEntities
+     * @method "ld.queryEntities"
+     * @memberof NGSI.Connection
+     *
+     * @param {Object} [options]
+     *
+     * Object with extra options:
+     *
+     * - `attrs` (`String`): Comma-separated list of attribute names whose data
+     *   are to be included in the response. The attributes are retrieved in the
+     *   order specified by this parameter. If this parameter is not included,
+     *   the attributes are retrieved in arbitrary order.
+     * - `@context` (`String`): URI pointing to the JSON-LD document which
+     *   contains the `@context` to be used to expand the terms when retrieving
+     *   entity details.
+     * - `coordinates` (`String`): Coordinates serialized as a string.
+     * - `csf` (`String`): Context Source filter.
+     * - `id` (`String`): A comma-separated list of entity ids to retrieve.
+     *   Incompatible with the `idPattern` option.
+     * - `idPattern` (`String`): A correctly formated regular expression.
+     *   Retrieve entities whose ID matches the regular expression. Incompatible
+     *   with the `id` option
+     * - `limit` (`Number`; default: `20`): This option allow you to specify
+     *   the maximum number of entities you want to receive from the server
+     * - `offset` (`Number`; default: `0`): Allows you to skip a given number of
+     *   elements at the beginning
+     * - `orderBy` (`String`): Criteria for ordering results
+     * - `q` (`String`): A query expression, composed of a list of statements
+     *   separated by semicolons (`;`)
+     * - `georel` (`String`): Spatial relationship between matching entities and
+     *   a reference shape. See "Geographical Queries" section in NGSIv2 specification
+     *   for details.
+     * - `geometry` (`String`): Geographical area to which the query is restricted.
+     *   See "Geographical Queries" section in NGSIv2 specification for details.
+     * - `geoproperty` (`String`): The name of the Property that contains the
+     *   geospatial data that will be used to resolve the geoquery.
+     * - `service` (`String`): Service/tenant to use in this operation
+     * - `sysAttrs` (`Boolean`): Request system-generated attributes (`createdAt`,
+     *   `modifiedAt`).
+     * - `type` (`String`): A comma-separated list of entity types to retrieve.
+     *   Incompatible with the `typePattern` option.
+     * - `typePattern` (`String`): A correctly formated regular expression.
+     *   Retrieve entities whose type matches the regular expression.
+     *   Incompatible with the `type` option.
+     *
+     * @throws {NGSI.ConnectionError}
+     * @throws {NGSI.InvalidResponseError}
+     *
+     * @returns {Promise}
+     *
+     * @example <caption>Retrieve first 20 entities from the Context Broker</caption>
+     *
+     * connection.ld.queryEntities({limit: 20}).then(
+     *     (response) => {
+     *         // Entities retrieved successfully
+     *         // response.results is an array with the retrieved entities
+     *         // response.limit contains the used page size
+     *         // response.offset contains the offset used in the request
+     *     }, (error) => {
+     *         // Error retrieving entities
+     *     }
+     * );
+     *
+     * @example <caption>Retrieve second page from the Context Broker requesting pagination details</caption>
+     *
+     * connection.ld.queryEntities({type: "Road"}).then(
+     *     (response) => {
+     *         // Entities retrieved successfully
+     *         // response.results is an array with the retrieved entities
+     *         //   by this query
+     *         // response.offset contains the offset used in the request
+     *     }, (error) => {
+     *         // Error retrieving entities
+     *     }
+     * );
+     */
+    NGSI.Connection.LD.prototype.queryEntities = function queryEntities(options) {
+        if (options == null) {
+            options = {};
+        }
+
+        if (options.id != null && options.idPattern != null) {
+            throw new TypeError('id and idPattern options cannot be used at the same time');
+        }
+
+        if (options.type != null && options.typePattern != null) {
+            throw new TypeError('type and typePattern options cannot be used at the same time');
+        }
+
+        if (options.id == null && options.idPattern == null && options.type == null && options.typePattern == null) {
+            options.idPattern = ".*";
+        }
+
+        const connection = privates.get(this);
+        const url = new URL(NGSI.endpoints.ld.ENTITY_COLLECTION, connection.url);
+        const optionsparams = [];
+        const parameters = parse_pagination_options2(options, optionsparams);
+
+        if (options.keyValues === true) {
+            optionsparams.push("keyValues");
+        }
+        if (options.sysAttrs === true) {
+            optionsparams.push("sysAttrs");
+        }
+        if (optionsparams.length !== 0) {
+            parameters.options = optionsparams.join(',');
+        }
+
+        parameters.attrs = options.attrs;
+        parameters.csf = options.csf;
+        parameters.id = options.id;
+        parameters.idPattern = options.idPattern;
+        parameters.q = options.q;
+        parameters.type = options.type;
+        parameters.typePattern = options.typePattern;
+        parameters.georel = options.georel;
+        parameters.geometry = options.geometry;
+        parameters.coordinates = options.coordinates;
+
+        const headers = {
+            "Accept": "application/ld+json, application/json",
+            "FIWARE-Service": options.service
+        };
+
+        if (typeof options["@context"] === "string") {
+            headers.Link = '<' + encodeURI(options["@context"]) + '>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"';
+        }
+
+        return makeJSONRequest2.call(connection, url, {
+            method: "GET",
+            parameters: parameters,
+            requestHeaders: headers
+        }).then((response) => {
+            if (response.status === 400) {
+                return parse_bad_request_ld(response);
+            } else if (response.status !== 200) {
+                return Promise.reject(new NGSI.InvalidResponseError('Unexpected error code: ' + response.status));
+            }
+
+            try {
+                var data = JSON.parse(response.responseText);
+            } catch (e) {
+                return Promise.reject(new NGSI.InvalidResponseError('Server returned invalid JSON content'));
+            }
+
+            const result = {
+                format: response.getHeader('Content-Type'),
+                results: data,
+                limit: options.limit,
+                offset: options.offset
+            };
+
+            return Promise.resolve(result);
+        });
+    };
+
+    /**
      * Creates a new entity.
      *
-     * > This method uses ld of the FIWARE's NGSI Specification (CIM v1.1.1)
+     * > This method is aligned with NGSI-LD (CIM Specification v1.2.2)
      *
      * @since 1.4
      *
@@ -6112,11 +6275,8 @@
      * }).then(
      *     (response) => {
      *         // Entity created successfully
-     *         // response.correlator transaction id associated with the server response
      *     }, (error) => {
      *         // Error creating the entity
-     *         // If the error was reported by Orion, error.correlator will be
-     *         // filled with the associated transaction id
      *     }
      * );
      *
@@ -6163,11 +6323,8 @@
      * }, {service: "mytenant"}).then(
      *     (response) => {
      *         // Entity created successfully
-     *         // response.correlator transaction id associated with the server response
      *     }, (error) => {
      *         // Error creating the entity
-     *         // If the error was reported by Orion, error.correlator will be
-     *         // filled with the associated transaction id
      *     }
      * );
      *
@@ -6212,7 +6369,7 @@
     /**
      * Gets all the details of an entity.
      *
-     * > This method uses ld of the FIWARE's NGSI Specification (CIM v1.1.1)
+     * > This method is aligned with NGSI-LD (CIM Specification v1.2.2)
      *
      * @since 1.4
      *

@@ -48,6 +48,59 @@ if ((typeof require === 'function') && typeof global != null) {
 
     "use strict";
 
+    const LD_JSON_ENTITY = {
+        "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+        "id": "urn:ngsi-ld:Road:Spain-Road-A62",
+        "type": "https://uri.fiware.org/ns/data-models#Road",
+        "https://schema.org/alternateName": {
+            "type": "Property",
+            "value": "E-80"
+        },
+        "description": {
+            "type": "Property",
+            "value": "Autovía de Castilla"
+        },
+        "name": {
+            "type": "Property",
+            "value": "A-62"
+        },
+        "https://uri.fiware.org/ns/data-models#length": {
+            "type": "Property",
+            "value": 355
+        },
+        "https://uri.fiware.org/ns/data-models#refRoadSegment": {
+            "type": "Relationship",
+            "object": [
+                "urn:ngsi-ld:RoadSegment:Spain-RoadSegment-A62-0-355-forwards",
+                "urn:ngsi-ld:RoadSegment:Spain-RoadSegment-A62-0-355-backwards"
+            ]
+        },
+        "https://uri.fiware.org/ns/data-models#responsible": {
+            "type": "Property",
+            "value": "Ministerio de Fomento - Gobierno de España"
+        },
+        "https://uri.fiware.org/ns/data-models#roadClass": {
+            "type": "Property",
+            "value": "https://uri.fiware.org/ns/data-models#motorway"
+        }
+    };
+
+    const KEY_VALUES_ENTITY = {
+        "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+        "id": "urn:ngsi-ld:Road:Spain-Road-A62",
+        "type": "https://uri.fiware.org/ns/data-models#Road",
+        "https://schema.org/alternateName": "E-80",
+        "description": "Autovía de Castilla",
+        "name": "A-62",
+        "https://uri.fiware.org/ns/data-models#length": 355,
+        "https://uri.fiware.org/ns/data-models#refRoadSegment": [
+            "urn:ngsi-ld:RoadSegment:Spain-RoadSegment-A62-0-355-forwards",
+            "urn:ngsi-ld:RoadSegment:Spain-RoadSegment-A62-0-355-backwards"
+        ],
+        "https://uri.fiware.org/ns/data-models#responsible": "Ministerio de Fomento - Gobierno de España",
+        "https://uri.fiware.org/ns/data-models#roadClass": "https://uri.fiware.org/ns/data-models#motorway"
+    };
+
     describe("Connecton.ld", () => {
 
         let connection;
@@ -272,59 +325,6 @@ if ((typeof require === 'function') && typeof global != null) {
 
         describe('getEntity(options)', () => {
 
-            const LD_JSON_ENTITY = {
-                "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
-                "id": "urn:ngsi-ld:Road:Spain-Road-A62",
-                "type": "https://uri.fiware.org/ns/data-models#Road",
-                "https://schema.org/alternateName": {
-                    "type": "Property",
-                    "value": "E-80"
-                },
-                "description": {
-                    "type": "Property",
-                    "value": "Autovía de Castilla"
-                },
-                "name": {
-                    "type": "Property",
-                    "value": "A-62"
-                },
-                "https://uri.fiware.org/ns/data-models#length": {
-                    "type": "Property",
-                    "value": 355
-                },
-                "https://uri.fiware.org/ns/data-models#refRoadSegment": {
-                    "type": "Relationship",
-                    "object": [
-                        "urn:ngsi-ld:RoadSegment:Spain-RoadSegment-A62-0-355-forwards",
-                        "urn:ngsi-ld:RoadSegment:Spain-RoadSegment-A62-0-355-backwards"
-                    ]
-                },
-                "https://uri.fiware.org/ns/data-models#responsible": {
-                    "type": "Property",
-                    "value": "Ministerio de Fomento - Gobierno de España"
-                },
-                "https://uri.fiware.org/ns/data-models#roadClass": {
-                    "type": "Property",
-                    "value": "https://uri.fiware.org/ns/data-models#motorway"
-                }
-            };
-
-            const KEY_VALUES_ENTITY = {
-                "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
-                "id": "urn:ngsi-ld:Road:Spain-Road-A62",
-                "type": "https://uri.fiware.org/ns/data-models#Road",
-                "https://schema.org/alternateName": "E-80",
-                "description": "Autovía de Castilla",
-                "name": "A-62",
-                "https://uri.fiware.org/ns/data-models#length": 355,
-                "https://uri.fiware.org/ns/data-models#refRoadSegment": [
-                    "urn:ngsi-ld:RoadSegment:Spain-RoadSegment-A62-0-355-forwards",
-                    "urn:ngsi-ld:RoadSegment:Spain-RoadSegment-A62-0-355-backwards"
-                ],
-                "https://uri.fiware.org/ns/data-models#responsible": "Ministerio de Fomento - Gobierno de España",
-                "https://uri.fiware.org/ns/data-models#roadClass": "https://uri.fiware.org/ns/data-models#motorway"
-            };
-
             it("throws a TypeError exception when not passing the options parameter", () => {
                 expect(() => {
                     connection.ld.getEntity();
@@ -483,6 +483,223 @@ if ((typeof require === 'function') && typeof global != null) {
                 }, (e) => {
                     expect(e).toEqual(jasmine.any(NGSI.InvalidResponseError));
                 }).finally(done);
+            });
+
+        });
+
+        describe("queryEntities(options)", () => {
+
+            it("throws a TypeError exception when using the id and idPattern options at the same time", () => {
+                expect(() => {
+                    connection.ld.queryEntities({
+                        id: "urn:myentity",
+                        idPattern: "my.*"
+                    });
+                }).toThrowError(TypeError);
+            });
+
+            it("throws a TypeError exception when using the type and typePattern options at the same time", () => {
+                expect(() => {
+                    connection.ld.queryEntities({
+                        type: "myType",
+                        typePattern: "my.*"
+                    });
+                }).toThrowError(TypeError);
+            });
+
+            it("should assume idPattern: .* by default", (done) => {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/entities", {
+                    checkRequestContent: (url, options) => {
+                        expect(options.parameters.options).not.toBeDefined();
+                        expect(options.parameters.idPattern).toBe(".*");
+                    },
+                    headers: {
+                        'Content-Type': 'application/ld+json',
+                    },
+                    method: "GET",
+                    status: 200,
+                    responseText: '[]'
+                });
+
+                connection.ld.queryEntities().then(
+                    (result) => {
+                        expect(result).toEqual({
+                            format: 'application/ld+json',
+                            limit: 20,
+                            offset: 0,
+                            results: []
+                        });
+                    },
+                    (e) => {
+                        fail("Failure callback called");
+                    }
+                ).finally(done);
+            });
+
+            it("basic request (using the type option) with empty results", (done) => {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/entities", {
+                    checkRequestContent: (url, options) => {
+                        expect(options.parameters.options).not.toBeDefined();
+                        expect(options.parameters.idPattern).not.toBeDefined();
+                        expect(options.parameters.type).toBe("Room");
+                    },
+                    headers: {
+                        'Content-Type': 'application/ld+json',
+                    },
+                    method: "GET",
+                    status: 200,
+                    responseText: '[]'
+                });
+
+                connection.ld.queryEntities({type: "Room"}).then(
+                    (result) => {
+                        expect(result).toEqual({
+                            format: 'application/ld+json',
+                            limit: 20,
+                            offset: 0,
+                            results: []
+                        });
+                    },
+                    (e) => {
+                        fail("Failure callback called");
+                    }
+                ).finally(done);
+            });
+
+            it("basic request with empty results (using the keyValues option)", (done) => {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/entities", {
+                    checkRequestContent: (url, options) => {
+                        expect(options.parameters.options).toBe("keyValues");
+                    },
+                    headers: {
+                        'Content-Type': 'application/ld+json',
+                    },
+                    method: "GET",
+                    status: 200,
+                    responseText: '[]'
+                });
+
+                connection.ld.queryEntities({keyValues: true}).then(
+                    (result) => {
+                        expect(result).toEqual({
+                            format: 'application/ld+json',
+                            limit: 20,
+                            offset: 0,
+                            results: []
+                        });
+                    },
+                    (e) => {
+                        fail("Failure callback called");
+                    }
+                ).finally(done);
+            });
+
+            it("basic request with empty results (using the sysAttrs option)", (done) => {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/entities", {
+                    checkRequestContent: (url, options) => {
+                        expect(options.parameters.options).toBe("sysAttrs");
+                    },
+                    headers: {
+                        'Content-Type': 'application/ld+json',
+                    },
+                    method: "GET",
+                    status: 200,
+                    responseText: '[]'
+                });
+
+                connection.ld.queryEntities({sysAttrs: true}).then(
+                    (result) => {
+                        expect(result).toEqual({
+                            format: 'application/ld+json',
+                            limit: 20,
+                            offset: 0,
+                            results: []
+                        });
+                    },
+                    (e) => {
+                        fail("Failure callback called");
+                    }
+                ).finally(done);
+            });
+
+            it("basic request using the @context option", (done) => {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/entities", {
+                    headers: {
+                        'Content-Type': 'application/ld+json',
+                    },
+                    method: 'GET',
+                    status: 200,
+                    responseText: JSON.stringify([LD_JSON_ENTITY]),
+                    checkRequestContent: (url, options) => {
+                        expect(options.requestHeaders.Link).toBe('<https://json-ld.org/contexts/person.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"');
+                    }
+                });
+
+                connection.ld.queryEntities({
+                    "@context": "https://json-ld.org/contexts/person.jsonld"
+                }).then(
+                    (result) => {
+                        expect(result).toEqual({
+                            format: "application/ld+json",
+                            limit: 20,
+                            offset: 0,
+                            results: [LD_JSON_ENTITY]
+                        });
+                    }, (e) => {
+                        fail("Failure callback called");
+                    }
+                ).finally(done);
+            });
+
+            it("invalid json response", (done) => {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/entities", {
+                    headers: {
+                        'Content-Type': 'application/ld+json',
+                    },
+                    method: "GET",
+                    status: 200,
+                    responseText: 'invalid'
+                });
+
+                connection.ld.queryEntities().then(
+                    fail,
+                    (e) => {
+                        expect(e).toEqual(jasmine.any(NGSI.InvalidResponseError));
+                    }
+                ).finally(done);
+            });
+
+            it("bad request", (done) => {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/entities", {
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    method: "GET",
+                    status: 400,
+                    responseText: '{"type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData", "title": "Invalid characters in entity id", "detail": "no detail"}'
+                });
+
+                connection.ld.queryEntities({id: "21$("}).then(
+                    fail,
+                    (e) => {
+                        expect(e).toEqual(jasmine.any(NGSI.BadRequestError));
+                        expect(e.message).toBe("Invalid characters in entity id");
+                    }
+                ).finally(done);
+            });
+
+            it("unexpected error code", (done) => {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/entities", {
+                    method: "GET",
+                    status: 204
+                });
+
+                connection.ld.queryEntities({type: "Room"}).then(
+                    fail,
+                    (e) => {
+                        expect(e).toEqual(jasmine.any(NGSI.InvalidResponseError));
+                    }
+                ).finally(done);
             });
 
         });
