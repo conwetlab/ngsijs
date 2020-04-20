@@ -77,6 +77,13 @@ module.exports = function (grunt) {
 
         karma: {
             options: {
+                files: [
+                    {pattern: 'responses/*', included: false, served: true},
+                    'tests/helpers/*.js',
+                    'NGSI.js',
+                    'tests/browser/*Spec.js',
+                    'tests/common/*Spec.js'
+                ],
                 frameworks: ['jasmine'],
                 reporters: ['progress', 'coverage'],
                 browsers: ['Chrome', 'Firefox'],
@@ -88,19 +95,17 @@ module.exports = function (grunt) {
                     }
                 }
             },
+            librarydebug: {
+                options: {
+                    singleRun: false
+                }
+            },
             library: {
                 options: {
                     coverageReporter: {
                         type: 'html',
                         dir: 'build/coverage/library'
                     },
-                    files: [
-                        {pattern: 'responses/*', included: false, served: true},
-                        'tests/helpers/*.js',
-                        'NGSI.js',
-                        'tests/browser/*Spec.js',
-                        'tests/common/*Spec.js'
-                    ],
                     preprocessors: {
                         "NGSI.js": ['coverage'],
                     }
@@ -119,13 +124,6 @@ module.exports = function (grunt) {
                             {type: 'lcov', dir: 'build/coverage/library', subdir: 'lcov'},
                         ]
                     },
-                    files: [
-                        {pattern: 'responses/*', included: false, served: true},
-                        'tests/helpers/*.js',
-                        'NGSI.js',
-                        'tests/browser/*Spec.js',
-                        'tests/common/*Spec.js'
-                    ],
                     preprocessors: {
                         "NGSI.js": ['coverage'],
                     }
@@ -159,6 +157,10 @@ module.exports = function (grunt) {
         'copy',
         'uglify',
         'jsdoc'
+    ]);
+
+    grunt.registerTask('debug', [
+        'karma:librarydebug',
     ]);
 
     grunt.registerTask('ci', [
