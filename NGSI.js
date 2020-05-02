@@ -6479,6 +6479,75 @@
         });
     };
 
+    /**
+     * Removes an entity from the context broker server.
+     *
+     * > This method is aligned with NGSI-LD (CIM Specification v1.2.2)
+     *
+     * @since 1.4
+     *
+     * @name NGSI.Connection#ld.deleteEntity
+     * @method "ld.deleteEntity"
+     * @memberof NGSI.Connection
+     *
+     * @param {String|Object} options
+     *
+     * String with the entity id to remove or an object providing options:
+     *
+     * - `id` (`String`, required): Id of the entity to remove
+     * - `service` (`String`): Service/tenant to use in this operation
+     *
+     * @throws {NGSI.ConnectionError}
+     * @throws {NGSI.InvalidResponseError}
+     * @throws {NGSI.NotFoundError}
+     * @throws {NGSI.TooManyResultsError}
+     *
+     * @returns {Promise}
+     *
+     * @example <caption>Remove entity by Id</caption>
+     *
+     * connection.ld.deleteEntity("Spain-Road-A62").then(
+     *     (response) => {
+     *         // Entity deleted successfully
+     *     }, (error) => {
+     *         // Error deleting the entity
+     *     }
+     * );
+     *
+     */
+    NGSI.Connection.LD.prototype.deleteEntity = function deleteEntity(options) {
+        if (options == null) {
+            throw new TypeError("missing options parameter");
+        }
+
+        if (typeof options === "string") {
+            options = {
+                id: options
+            };
+        } else if (options.id == null) {
+            throw new TypeError("missing id option");
+        }
+
+        var connection = privates.get(this);
+        var url = new URL(interpolate(NGSI.endpoints.ld.ENTITY_ENTRY, {entityId: encodeURIComponent(options.id)}), connection.url);
+
+        return makeJSONRequest2.call(connection, url, {
+            method: "DELETE",
+            requestHeaders: {
+                "FIWARE-Service": options.service
+            }
+        }).then((response) => {
+            if (response.status === 400) {
+                return parse_bad_request_ld(response);
+            } else if (response.status === 404) {
+                return parse_not_found_response_ld(response);
+            } else if (response.status !== 204) {
+                return Promise.reject(new NGSI.InvalidResponseError('Unexpected error code: ' + response.status));
+            }
+            return Promise.resolve({});
+        });
+    };
+
     /* istanbul ignore else */
     if (typeof window !== 'undefined') {
         window.NGSI = NGSI;

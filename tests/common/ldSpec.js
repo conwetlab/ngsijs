@@ -323,6 +323,133 @@ if ((typeof require === 'function') && typeof global != null) {
 
         });
 
+        describe('deleteEntity(options)', () => {
+
+            it("throws a TypeError exception when not passing the options parameter", () => {
+                expect(() => {
+                    connection.ld.deleteEntity();
+                }).toThrowError(TypeError);
+            });
+
+            it("throws a TypeError exception when not passing the id option", () => {
+                expect(() => {
+                    connection.ld.deleteEntity({});
+                }).toThrowError(TypeError);
+            });
+
+            it("deletes entities only passing the id", (done) => {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/entities/urn%3Angsi-ld%3ARoad%3ASpain-Road-A62", {
+                    checkRequestContent: (url, options) => {
+                        expect(options.parameters).toBe(undefined);
+                    },
+                    method: "DELETE",
+                    status: 204
+                });
+
+                connection.ld.deleteEntity("urn:ngsi-ld:Road:Spain-Road-A62").then(
+                    (result) => {
+                        expect(result).toEqual({});
+                    },
+                    (e) => {
+                        fail("Failure callback called");
+                    }
+                ).finally(done);
+            });
+
+            it("deletes entities only passing the id as option", (done) => {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/entities/urn%3Angsi-ld%3ARoad%3ASpain-Road-A62", {
+                    checkRequestContent: (url, options) => {
+                        expect(options.parameters).toBe(undefined);
+                    },
+                    method: "DELETE",
+                    status: 204
+                });
+
+                connection.ld.deleteEntity({id: "urn:ngsi-ld:Road:Spain-Road-A62"}).then(
+                    (result) => {
+                        expect(result).toEqual({});
+                    },
+                    (e) => {
+                        fail("Failure callback called");
+                    }
+                ).finally(done);
+            });
+
+            it("entity not found", (done) => {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/entities/urn%3Angsi-ld%3ARoad%3ASpain-Road-A62", {
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    method: "DELETE",
+                    status: 404,
+                    responseText: '{"type": "https://uri.etsi.org/ngsi-ld/errors/ResourceNotFound", "title": "No context element found", "detail": "no detail"}'
+                });
+
+                connection.ld.deleteEntity("urn:ngsi-ld:Road:Spain-Road-A62").then(
+                    (value) => {
+                        fail("Success callback called");
+                    },
+                    (e) => {
+                        expect(e).toEqual(jasmine.any(NGSI.NotFoundError));
+                        expect(e.message).toBe("No context element found");
+                    }
+                ).finally(done);
+            });
+
+            it("bad request", (done) => {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/entities/21%24(", {
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    method: "DELETE",
+                    status: 400,
+                    responseText: '{"type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData", "title": "Invalid characters in entity id", "detail": "no detail"}'
+                });
+
+                connection.ld.deleteEntity({id: "21$("}).then(
+                    fail,
+                    (e) => {
+                        expect(e).toEqual(jasmine.any(NGSI.BadRequestError));
+                        expect(e.message).toBe("Invalid characters in entity id");
+                    }
+                ).finally(done);
+            });
+
+            it("invalid 404", (done) => {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/entities/urn%3Angsi-ld%3ARoad%3ASpain-Road-A62", {
+                    method: "DELETE",
+                    status: 404
+                });
+
+                connection.ld.deleteEntity({id: "urn:ngsi-ld:Road:Spain-Road-A62"}).then(
+                    (value) => {
+                        fail("Success callback called");
+                    },
+                    (e) => {
+                        expect(e).toEqual(jasmine.any(NGSI.InvalidResponseError));
+                    }
+                ).finally(done);
+            });
+
+            it("unexpected error code", (done) => {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/entities/urn%3Angsi-ld%3ARoad%3ASpain-Road-A62", {
+                    method: "DELETE",
+                    status: 200
+                });
+
+                connection.ld.deleteEntity("urn:ngsi-ld:Road:Spain-Road-A62").then(
+                    (value) => {
+                        fail("Success callback called");
+                    },
+                    (e) => {
+                        expect(e).toEqual(jasmine.any(NGSI.InvalidResponseError));
+                    }
+                ).finally(done);
+
+            });
+
+        });
+
         describe('getEntity(options)', () => {
 
             it("throws a TypeError exception when not passing the options parameter", () => {
