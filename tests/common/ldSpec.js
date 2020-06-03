@@ -831,6 +831,146 @@ if ((typeof require === 'function') && typeof global != null) {
 
         });
 
+        describe("listSubscriptions(options)", () => {
+
+            it("should limit subscriptions to 20 by default", (done) => {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/subscriptions", {
+                    checkRequestContent: (url, options) => {
+                        expect(options.parameters.options).not.toBeDefined();
+                    },
+                    headers: {
+                        'Content-Type': 'application/ld+json',
+                    },
+                    method: "GET",
+                    status: 200,
+                    responseText: '[]'
+                });
+
+                connection.ld.listSubscriptions().then(
+                    (result) => {
+                        expect(result).toEqual({
+                            format: 'application/ld+json',
+                            limit: 20,
+                            offset: 0,
+                            results: []
+                        });
+                    },
+                    (e) => {
+                        fail("Failure callback called");
+                    }
+                ).finally(done);
+            });
+
+            it("basic request with empty results (using the sysAttrs option)", (done) => {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/subscriptions", {
+                    checkRequestContent: (url, options) => {
+                        expect(options.parameters.options).toBe("sysAttrs");
+                    },
+                    headers: {
+                        'Content-Type': 'application/ld+json',
+                    },
+                    method: "GET",
+                    status: 200,
+                    responseText: '[]'
+                });
+
+                connection.ld.listSubscriptions({sysAttrs: true}).then(
+                    (result) => {
+                        expect(result).toEqual({
+                            format: 'application/ld+json',
+                            limit: 20,
+                            offset: 0,
+                            results: []
+                        });
+                    },
+                    (e) => {
+                        fail("Failure callback called");
+                    }
+                ).finally(done);
+            });
+
+            it("basic request using the @context option", (done) => {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/subscriptions", {
+                    headers: {
+                        'Content-Type': 'application/ld+json',
+                    },
+                    method: 'GET',
+                    status: 200,
+                    responseText: JSON.stringify([LD_JSON_ENTITY]),
+                    checkRequestContent: (url, options) => {
+                        expect(options.requestHeaders.Link).toBe('<https://json-ld.org/contexts/person.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"');
+                    }
+                });
+
+                connection.ld.listSubscriptions({
+                    "@context": "https://json-ld.org/contexts/person.jsonld"
+                }).then(
+                    (result) => {
+                        expect(result).toEqual({
+                            format: "application/ld+json",
+                            limit: 20,
+                            offset: 0,
+                            results: [LD_JSON_ENTITY]
+                        });
+                    }, (e) => {
+                        fail("Failure callback called");
+                    }
+                ).finally(done);
+            });
+
+            it("invalid json response", (done) => {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/subscriptions", {
+                    headers: {
+                        'Content-Type': 'application/ld+json',
+                    },
+                    method: "GET",
+                    status: 200,
+                    responseText: 'invalid'
+                });
+
+                connection.ld.listSubscriptions().then(
+                    fail,
+                    (e) => {
+                        expect(e).toEqual(jasmine.any(NGSI.InvalidResponseError));
+                    }
+                ).finally(done);
+            });
+
+            it("bad request", (done) => {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/subscriptions", {
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    method: "GET",
+                    status: 400,
+                    responseText: '{"type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData", "title": "Invalid characters in entity id", "detail": "no detail"}'
+                });
+
+                connection.ld.listSubscriptions({id: "21$("}).then(
+                    fail,
+                    (e) => {
+                        expect(e).toEqual(jasmine.any(NGSI.BadRequestError));
+                        expect(e.message).toBe("Invalid characters in entity id");
+                    }
+                ).finally(done);
+            });
+
+            it("unexpected error code", (done) => {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/subscriptions", {
+                    method: "GET",
+                    status: 204
+                });
+
+                connection.ld.listSubscriptions({type: "Room"}).then(
+                    fail,
+                    (e) => {
+                        expect(e).toEqual(jasmine.any(NGSI.InvalidResponseError));
+                    }
+                ).finally(done);
+            });
+
+        });
+
     });
 
 })();

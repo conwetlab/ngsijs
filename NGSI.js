@@ -277,6 +277,7 @@
         ld: {
             ENTITY_COLLECTION: 'ngsi-ld/v1/entities',
             ENTITY_ENTRY: 'ngsi-ld/v1/entities/%(entityId)s',
+            SUBSCRIPTION_COLLECTION: 'ngsi-ld/v1/subscriptions',
         }
 
     };
@@ -6545,6 +6546,100 @@
                 return Promise.reject(new NGSI.InvalidResponseError('Unexpected error code: ' + response.status));
             }
             return Promise.resolve({});
+        });
+    };
+
+    /**
+     * Retrieves the available subscriptions (using pagination).
+     *
+     * > This method is aligned with NGSI-LD (CIM Specification v1.2.2)
+     *
+     * @since 1.4
+     *
+     * @name NGSI.Connection#ld.listSubscriptions
+     * @method "ld.listSubscriptions"
+     * @memberof NGSI.Connection
+     *
+     * @param {Object} [options]
+     *
+     * Object with extra options:
+     *
+     * - `limit` (`Number`; default: `20`): This option allow you to specify
+     *   the maximum number of subscriptions you want to receive from the
+     *   server
+     * - `offset` (`Number`; default: `0`): Allows you to skip a given
+     *   number of elements at the beginning
+     * - `service` (`String`): Service/tenant to use in this operation
+     * - `sysAttrs` (`Boolean`): Request system-generated attributes (`createdAt`,
+     *   `modifiedAt`).
+     *
+     * @throws {NGSI.ConnectionError}
+     * @throws {NGSI.InvalidResponseError}
+     *
+     * @returns {Promise}
+     *
+     * @example <caption>Retrieve first 20 subscriptions from the Context Broker</caption>
+     *
+     * connection.ld.listSubscriptions().then(
+     *     (response) => {
+     *         // Subscriptions retrieved successfully
+     *         // response.results is an array with the retrieved subscriptions
+     *     }, (error) => {
+     *         // Error retrieving subscriptions
+     *     }
+     * );
+     *
+     */
+    NGSI.Connection.LD.prototype.listSubscriptions = function listSubscriptions(options) {
+        if (options == null) {
+            options = {};
+        }
+
+        var connection = privates.get(this);
+        var url = new URL(NGSI.endpoints.ld.SUBSCRIPTION_COLLECTION, connection.url);
+        var optionsparams = [];
+        var parameters = parse_pagination_options2(options, optionsparams);
+
+        if (options.sysAttrs === true) {
+            optionsparams.push("sysAttrs");
+        }
+        if (optionsparams.length !== 0) {
+            parameters.options = optionsparams.join(',');
+        }
+
+        const headers = {
+            "Accept": "application/ld+json, application/json",
+            "FIWARE-Service": options.service
+        };
+
+        if (typeof options["@context"] === "string") {
+            headers.Link = '<' + encodeURI(options["@context"]) + '>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"';
+        }
+
+        return makeJSONRequest2.call(connection, url, {
+            method: "GET",
+            parameters: parameters,
+            requestHeaders: headers,
+        }).then((response) => {
+            if (response.status === 400) {
+                return parse_bad_request_ld(response);
+            } else if (response.status !== 200) {
+                return Promise.reject(new NGSI.InvalidResponseError('Unexpected error code: ' + response.status));
+            }
+
+            let data;
+            try {
+                data = JSON.parse(response.responseText);
+            } catch (e) {
+                return Promise.reject(new NGSI.InvalidResponseError('Server returned invalid JSON content'));
+            }
+
+            return Promise.resolve({
+                format: response.getHeader('Content-Type'),
+                limit: options.limit,
+                offset: options.offset,
+                results: data
+            });
         });
     };
 
