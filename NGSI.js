@@ -6784,10 +6784,13 @@
                 throw new TypeError('invalid callback configuration');
             }
 
+            const callback = subscription.notification.endpoint.callback;
+            const format = subscription.notification.format || "normalized";
             const onNotify = (payload, headers) => {
                 const notification = JSON.parse(payload);
-                notification.attrsformat = headers['ngsiv2-attrsformat'];
-                subscription.notification.callback(notification);
+                notification.format = format;
+                notification.contentType = headers['content-type'];
+                callback(notification);
             };
 
             p = connection.ngsi_proxy.requestCallback(onNotify).then(

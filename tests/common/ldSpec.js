@@ -1011,26 +1011,33 @@ if ((typeof require === 'function') && typeof global != null) {
                 };
                 const notification_data = [
                     {
-                        "id": "Room1",
-                        "type": "Room",
-                        "temperature": {
-                            "value": 23,
-                            "type": "Number",
-                            "metadata": {}
+                        "id": "urn:ngsi-ld:Vehicle:Bus1",
+                        "type": "Vehicle",
+                        "speed": {
+                            "type": "Property",
+                            "value": 53,
                         },
-                        "humidity": {
-                            "value": 70,
-                            "type": "percentage",
-                            "metadata": {}
+                        "location": {
+                            "type": "Property",
+                            "value": {
+                                "type": "Point",
+                                "coordinates": [0, 1]
+                            }
                         }
                     },
                     {
-                        "id": "Room2",
-                        "type": "Room",
-                        "temperature": {
-                            "value": 24,
-                            "type": "Number",
-                            "metadata": {}
+                        "id": "urn:ngsi-ld:Vehicle:Bus1",
+                        "type": "Vehicle",
+                        "speed": {
+                            "type": "Property",
+                            "value": 73,
+                        },
+                        "location": {
+                            "type": "Property",
+                            "value": {
+                                "type": "Point",
+                                "coordinates": [1, 0]
+                            }
                         }
                     }
                 ];
@@ -1072,17 +1079,24 @@ if ((typeof require === 'function') && typeof global != null) {
                             .toHaveBeenCalledWith("1", "urn:ngsi-ld:Subscription:5ee0a80950053da73775b62c", "ld");
                         connection.ngsi_proxy.requestCallback.calls.argsFor(0)[0](
                             JSON.stringify({
-                                "subscriptionId": "urn:ngsi-ld:Subscription:5ee0a80950053da73775b62c",
-                                "data": notification_data
+                                id: "urn:ngsi-ld:Notification:1",
+                                type: "Notification",
+                                subscriptionId: "urn:ngsi-ld:Subscription:5ee0a80950053da73775b62c",
+                                notifiedAt: "2020-06-11T12:34:00+02:00",
+                                data: notification_data
                             }),
                             {
-                                "ngsild-attrsformat": "normalized"
+                                "content-type": "application/json"
                             }
                         );
                         expect(listener).toHaveBeenCalledWith({
-                            attrsformat: "normalized",
-                            data: notification_data,
-                            subscriptionId: "abcde98765"
+                            format: "normalized",
+                            contentType: "application/json",
+                            id: "urn:ngsi-ld:Notification:1",
+                            type: "Notification",
+                            subscriptionId: "urn:ngsi-ld:Subscription:5ee0a80950053da73775b62c",
+                            notifiedAt: "2020-06-11T12:34:00+02:00",
+                            data: notification_data
                         });
 
                         done();
