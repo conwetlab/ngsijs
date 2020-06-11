@@ -1272,6 +1272,109 @@ if ((typeof require === 'function') && typeof global != null) {
 
         });
 
+        describe('deleteSubscription(options)', () => {
+
+            it("throws a TypeError exception when not passing the options parameter", () => {
+                expect(() => {
+                    connection.ld.deleteSubscription();
+                }).toThrowError(TypeError);
+            });
+
+            it("basic request", (done) => {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/subscriptions/57f7787a5f817988e4eb3dda", {
+                    method: "DELETE",
+                    status: 204
+                });
+
+                connection.ld.deleteSubscription("57f7787a5f817988e4eb3dda").then(
+                    (result) => {
+                        expect(result).toEqual({});
+                    },
+                    (e) => {
+                        fail("Failure callback called");
+                    }
+                ).finally(done);
+            });
+
+            it("basic request (custom service)", (done) => {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/subscriptions/57f7787a5f817988e4eb3dda", {
+                    checkRequestContent: function (url, options) {
+                        expect(options.requestHeaders).toEqual(jasmine.objectContaining({
+                            'FIWARE-Service': 'customservice'
+                        }));
+                    },
+                    method: "DELETE",
+                    status: 204
+                });
+
+                connection.ld.deleteSubscription({
+                    id: "57f7787a5f817988e4eb3dda",
+                    service: "customservice"
+                }).then(
+                    (result) => {
+                        expect(result).toEqual({});
+                    },
+                    (e) => {
+                        fail("Failure callback called");
+                    }
+                ).finally(done);
+            });
+
+            it("entity not found", (done) => {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/subscriptions/57f7787a5f817988e4eb3dda", {
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    method: "DELETE",
+                    status: 404,
+                    responseText: '{"type": "https://uri.etsi.org/ngsi-ld/errors/ResourceNotFound", "title": "No context element found", "detail": "no detail"}'
+                });
+
+                connection.ld.deleteSubscription("57f7787a5f817988e4eb3dda").then(
+                    (value) => {
+                        fail("Success callback called");
+                    },
+                    (e) => {
+                        expect(e).toEqual(jasmine.any(NGSI.NotFoundError));
+                        expect(e.message).toBe("No context element found");
+                    }
+                ).finally(done);
+            });
+
+            it("invalid 404", (done) => {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/subscriptions/57f7787a5f817988e4eb3dda", {
+                    method: "DELETE",
+                    status: 404
+                });
+
+                connection.ld.deleteSubscription("57f7787a5f817988e4eb3dda").then(
+                    (value) => {
+                        fail("Success callback called");
+                    },
+                    (e) => {
+                        expect(e).toEqual(jasmine.any(NGSI.InvalidResponseError));
+                    }).finally(done);
+            });
+
+            it("unexpected error code", (done) => {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/subscriptions/57f7787a5f817988e4eb3dda", {
+                    method: "DELETE",
+                    status: 200
+                });
+
+                connection.ld.deleteSubscription("57f7787a5f817988e4eb3dda").then(
+                    (value) => {
+                        fail("Success callback called");
+                    },
+                    (e) => {
+                        expect(e).toEqual(jasmine.any(NGSI.InvalidResponseError));
+                    }
+                ).finally(done);
+
+            });
+
+        });
+
         describe("listSubscriptions(options)", () => {
 
             it("should limit subscriptions to 20 by default", (done) => {

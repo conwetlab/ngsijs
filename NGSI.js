@@ -278,6 +278,7 @@
             ENTITY_COLLECTION: 'ngsi-ld/v1/entities',
             ENTITY_ENTRY: 'ngsi-ld/v1/entities/%(entityId)s',
             SUBSCRIPTION_COLLECTION: 'ngsi-ld/v1/subscriptions',
+            SUBSCRIPTION_ENTRY: 'ngsi-ld/v1/subscriptions/%(subscriptionId)s',
         }
 
     };
@@ -1694,6 +1695,7 @@
     NGSI.BadRequestError = function BadRequestError(options) {
         this.name = 'BadRequest';
         this.message = options.message || '';
+        this.details = options.details || '';
         this.correlator = options.correlator || null;
     };
     NGSI.BadRequestError.prototype = new Error();
@@ -6845,6 +6847,79 @@
                 return Promise.reject(error);
             }
         );
+    };
+
+    /**
+     * Removes a subscription from the orion context broker server.
+     *
+     * > This method is aligned with NGSI-LD (CIM Specification v1.2.2)
+     *
+     * @since 1.4
+     *
+     * @name NGSI.Connection#ld.deleteSubscription
+     * @method "ld.deleteSubscription"
+     * @memberof NGSI.Connection
+     *
+     * @param {String|Object} options
+     *
+     * String with the id of the subscription to remove or an object with
+     * options:
+     *
+     * - `id` (`String`): Id of the subscription to remove
+     * - `service` (`String`): Service/tenant to use in this operation
+     *
+     * @throws {NGSI.BadRequestError}
+     * @throws {NGSI.ConnectionError}
+     * @throws {NGSI.InvalidResponseError}
+     * @throws {NGSI.NotFoundError}
+     *
+     * @returns {Promise}
+     *
+     * @example
+     *
+     * connection.ld.deleteSubscription("57f7787a5f817988e4eb3dda").then(
+     *     (response) => {
+     *         // Subscription deleted successfully
+     *     }, (error) => {
+     *         // Error deleting subscription
+     *     }
+     * );
+     */
+    NGSI.Connection.LD.prototype.deleteSubscription = function deleteSubscription(options) {
+        if (options == null) {
+            throw new TypeError("missing options parameter");
+        }
+
+        if (typeof options === "string") {
+            options = {
+                id: options
+            };
+        }
+
+        const connection = privates.get(this);
+        const url = new URL(
+            interpolate(
+                NGSI.endpoints.ld.SUBSCRIPTION_ENTRY,
+                {subscriptionId: encodeURIComponent(options.id)}
+            ),
+            connection.url
+        );
+
+        return makeJSONRequest2.call(connection, url, {
+            method: "DELETE",
+            requestHeaders: {
+                "FIWARE-Service": options.service
+            }
+        }).then((response) => {
+            if (response.status === 400) {
+                return parse_bad_request_ld(response);
+            } else if (response.status === 404) {
+                return parse_not_found_response_ld(response);
+            } else if (response.status !== 204) {
+                return Promise.reject(new NGSI.InvalidResponseError('Unexpected error code: ' + response.status));
+            }
+            return Promise.resolve({});
+        });
     };
 
     /* istanbul ignore else */
