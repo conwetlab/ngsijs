@@ -101,6 +101,24 @@ if ((typeof require === 'function') && typeof global != null) {
         "https://uri.fiware.org/ns/data-models#roadClass": "https://uri.fiware.org/ns/data-models#motorway"
     };
 
+    const assertFailure = function assertFailure(promise, handler) {
+        return promise.then(
+            (value) => {
+                fail("Success callback called");
+            },
+            handler
+        );
+    };
+
+    const assertSuccess = function assertSuccess(promise, handler) {
+        return promise.then(
+            handler,
+            (value) => {
+                fail("Failure callback called");
+            }
+        );
+    };
+
     describe("Connecton.ld", () => {
 
         let connection;
@@ -1542,6 +1560,146 @@ if ((typeof require === 'function') && typeof global != null) {
 
                 connection.ld.listSubscriptions({type: "Room"}).then(
                     fail,
+                    (e) => {
+                        expect(e).toEqual(jasmine.any(NGSI.InvalidResponseError));
+                    }
+                ).finally(done);
+            });
+
+        });
+
+        describe('updateSubscription(changes[, options])', () => {
+
+            it("throws a TypeError exception when not passing the changes parameter", () => {
+                expect(() => {
+                    connection.ld.updateSubscription();
+                }).toThrowError(TypeError);
+            });
+
+            it("allows basic usage", (done) => {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/subscriptions/urn%3Angsi-ld%3ASubscription%3AmySubscription", {
+                    method: 'PATCH',
+                    status: 204,
+                    checkRequestContent: (url, options) => {
+                        var data = JSON.parse(options.postBody);
+                        expect(data).toEqual({
+                            "expires": "2016-04-05T14:00:00.00Z"
+                        });
+                        expect(options.parameters == null).toBeTruthy();
+                    }
+                });
+
+                assertSuccess(
+                    connection.ld.updateSubscription({
+                        "id": "urn:ngsi-ld:Subscription:mySubscription",
+                        "expires": "2016-04-05T14:00:00.00Z"
+                    }),
+                    (result) => {
+                        expect(result).toEqual({});
+                    }
+                ).finally(done);
+            });
+
+            it("allows using the service option", (done) => {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/subscriptions/urn%3Angsi-ld%3ASubscription%3AmySubscription", {
+                    method: 'PATCH',
+                    status: 204,
+                    checkRequestContent: (url, options) => {
+                        var data = JSON.parse(options.postBody);
+                        expect(data).toEqual({
+                            "expires": "2016-04-05T14:00:00.00Z"
+                        });
+                        expect(options.parameters == null).toBeTruthy();
+                        expect(options.requestHeaders).toEqual(jasmine.objectContaining({
+                            'FIWARE-Service': "customservice"
+                        }));
+                    }
+                });
+
+                assertSuccess(
+                    connection.ld.updateSubscription({
+                        "id": "urn:ngsi-ld:Subscription:mySubscription",
+                        "expires": "2016-04-05T14:00:00.00Z"
+                    }, {
+                        "service": "customservice"
+                    }),
+                    (result) => {
+                        expect(result).toEqual({});
+                        done();
+                    }
+                ).finally(done);
+            });
+
+            it("bad request", (done) => {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/subscriptions/21%24(", {
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    method: "PATCH",
+                    status: 400,
+                    responseText: '{"type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData", "title": "Invalid characters in entity id", "detail": "no detail"}'
+                });
+
+                connection.ld.updateSubscription({id: "21$("}).then(
+                    fail,
+                    (e) => {
+                        expect(e).toEqual(jasmine.any(NGSI.BadRequestError));
+                        expect(e.message).toBe("Invalid characters in entity id");
+                        done();
+                    }
+                ).finally(done);
+            });
+
+            it("subscription not found", (done) => {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/subscriptions/urn%3Angsi-ld%3ASubscription%3AmySubscription", {
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    method: "PATCH",
+                    status: 404,
+                    responseText: '{"type": "https://uri.etsi.org/ngsi-ld/errors/ResourceNotFound", "title": "No context element found", "detail": "no detail"}'
+                });
+
+                assertFailure(
+                    connection.ld.updateSubscription({
+                        "id": "urn:ngsi-ld:Subscription:mySubscription",
+                        "expires": "2016-04-05T14:00:00.00Z"
+                    }),
+                    (e) => {
+                        expect(e).toEqual(jasmine.any(NGSI.NotFoundError));
+                        expect(e.message).toBe("No context element found");
+                    }
+                ).finally(done);
+            });
+
+            it("invalid 404", (done) => {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/subscriptions/urn%3Angsi-ld%3ASubscription%3AmySubscription", {
+                    method: "PATCH",
+                    status: 404
+                });
+
+                assertFailure(
+                    connection.ld.updateSubscription({
+                        "id": "urn:ngsi-ld:Subscription:mySubscription",
+                        "expires": "2016-04-05T14:00:00.00Z"
+                    }),
+                    (e) => {
+                        expect(e).toEqual(jasmine.any(NGSI.InvalidResponseError));
+                    }
+                ).finally(done);
+            });
+
+            it("handles unexpected error codes", (done) => {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/subscriptions/urn%3Angsi-ld%3ASubscription%3AmySubscription", {
+                    method: "PATCH",
+                    status: 201
+                });
+
+                assertFailure(
+                    connection.ld.updateSubscription({
+                        "id": "urn:ngsi-ld:Subscription:mySubscription",
+                        "expires": "2016-04-05T14:00:00.00Z"
+                    }),
                     (e) => {
                         expect(e).toEqual(jasmine.any(NGSI.InvalidResponseError));
                     }

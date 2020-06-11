@@ -6926,6 +6926,75 @@
         });
     };
 
+    /**
+     * Updates a subscription.
+     *
+     * > This method is aligned with NGSI-LD (CIM Specification v1.2.2)
+     *
+     * @since 1.4
+     *
+     * @name NGSI.Connection#ld.updateSubscription
+     * @method "ld.updateSubscription"
+     * @memberof NGSI.Connection
+     *
+     * @param {Object} changes
+     * @param {Object} [options]
+     *
+     * Object with extra options:
+     *
+     * - `service` (`String`): Service/tenant to use in this operation
+     *
+     * @throws {NGSI.BadRequestError}
+     * @throws {NGSI.ConnectionError}
+     * @throws {NGSI.InvalidResponseError}
+     * @throws {NGSI.NotFoundError}
+     *
+     * @returns {Promise}
+     *
+     * @example <caption>Update subscription expiration time</caption>
+     *
+     * connection.ld.updateSubscription({
+     *     "id": "abcdef",
+     *     "expires": "2016-04-05T14:00:00.00Z"
+     * }).then(
+     *     (response) => {
+     *         // Subscription updated successfully
+     *     }, (error) => {
+     *         // Error updating subscription
+     *     }
+     * );
+     *
+     */
+    NGSI.Connection.LD.prototype.updateSubscription = function updateSubscription(changes, options) {
+        if (options == null) {
+            options = {};
+        }
+
+        const connection = privates.get(this);
+        const url = new URL(interpolate(NGSI.endpoints.ld.SUBSCRIPTION_ENTRY, {subscriptionId: encodeURIComponent(changes.id)}), connection.url);
+
+        // Remove id from the payload
+        delete changes.id;
+
+        return makeJSONRequest2.call(connection, url, {
+            method: "PATCH",
+            contentType: "application/merge-patch+json",
+            postBody: changes,
+            requestHeaders: {
+                "FIWARE-Service": options.service
+            }
+        }).then((response) => {
+            if (response.status === 400) {
+                return parse_bad_request_ld(response);
+            } else if (response.status === 404) {
+                return parse_not_found_response_ld(response);
+            } else if (response.status !== 204) {
+                return Promise.reject(new NGSI.InvalidResponseError('Unexpected error code: ' + response.status));
+            }
+            return Promise.resolve({});
+        });
+    };
+
     /* istanbul ignore else */
     if (typeof window !== 'undefined') {
         window.NGSI = NGSI;
