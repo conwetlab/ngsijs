@@ -6575,6 +6575,7 @@
      * - `sysAttrs` (`Boolean`): Request system-generated attributes (`createdAt`,
      *   `modifiedAt`).
      *
+     * @throws {NGSI.BadRequestError}
      * @throws {NGSI.ConnectionError}
      * @throws {NGSI.InvalidResponseError}
      *

@@ -1334,6 +1334,27 @@ if ((typeof require === 'function') && typeof global != null) {
                 ).finally(done);
             });
 
+            it("bad request", (done) => {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/subscriptions/21%24(", {
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    method: "DELETE",
+                    status: 400,
+                    responseText: '{"type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData", "title": "Invalid subscriptionId", "detail": "no detail"}'
+                });
+
+                connection.ld.deleteSubscription("21$(").then(
+                    (value) => {
+                        fail("Success callback called");
+                    },
+                    (e) => {
+                        expect(e).toEqual(jasmine.any(NGSI.BadRequestError));
+                        expect(e.message).toBe("Invalid subscriptionId");
+                    }
+                ).finally(done);
+            });
+
             it("entity not found", (done) => {
                 ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/subscriptions/57f7787a5f817988e4eb3dda", {
                     headers: {
