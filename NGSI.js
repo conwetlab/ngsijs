@@ -6643,6 +6643,210 @@
         });
     };
 
+    /**
+     * Creates a new subscription.
+     *
+     * > This method is aligned with NGSI-LD (CIM Specification v1.2.2)
+     *
+     * @since 1.4
+     *
+     * @name NGSI.Connection#ld.createSubscription
+     * @method "ld.createSubscription"
+     * @memberof NGSI.Connection
+     *
+     * @param {Object}
+     *
+     * subscription values to be used for creating it
+     *
+     * @param {Object} [options]
+     *
+     * Object with extra options:
+     * - `service` (`String`): Service/tenant to use in this operation
+     *
+     * @throws {NGSI.AlreadyExistsError}
+     * @throws {NGSI.BadRequestError}
+     * @throws {NGSI.ConnectionError}
+     * @throws {NGSI.InvalidResponseError}
+     *
+     * @returns {Promise}
+     *
+     * @example <caption>Basic usage</caption>
+     *
+     * connection.ld.createSubscription({
+     *     "id": "urn:ngsi-ld:Subscription:mySubscription",
+     *     "type": "Subscription",
+     *     "entities": [
+     *         {
+     *             "type": "Vehicle"
+     *         }
+     *     ],
+     *     "notification": {
+     *         "format": "keyValues",
+     *         "endpoint": {
+     *             "uri": "http://my.endpoint.org/notify",
+     *             "accept": "application/ld+json"
+     *         }
+     *     },
+     *     "@context": [
+     *         "https://fiware.github.io/data-models/context.jsonld"
+     *     ]
+     * }).then(
+     *     (response) => {
+     *         // Subscription created successfully
+     *     }, (error) => {
+     *         // Error creating the subscription
+     *     }
+     * );
+     *
+     * @example <caption>Creating a subscription using a callback and a @context</caption>
+     *
+     * connection.ld.createSubscription({
+     *     "id": "urn:ngsi-ld:Subscription:mySubscription",
+     *     "type": "Subscription",
+     *     "entities": [
+     *         {
+     *             "type": "Vehicle"
+     *         }
+     *     ],
+     *     "watchedAttributes": ["speed"],
+     *     "q": "speed>50",
+     *     "geoQ": {
+     *         "georel": "near;maxDistance==2000",
+     *         "geometry": "Point",
+     *         "coordinates": [-1, 100]
+     *     },
+     *     "notification": {
+     *         "attributes": ["speed"],
+     *         "format": "keyValues",
+     *         "endpoint": {
+     *             "callback": (notification, headers, error) => {
+     *                 // notification.attrsformat provides information about the format used by notification.data
+     *                 // notification.data contains the modified entities
+     *                 // notification.subscriptionId provides the associated subscription id
+     *                 // etc...
+     *
+     *                 // In case of disconnection from the ngsi-proxy, this method
+     *                 // will be called with error = true (the notification and
+     *                 // the header parameters will contain a null value)
+     *             },
+     *             "accept": "application/json"
+     *         }
+     *     },
+     *     "@context": [
+     *         "https://fiware.github.io/data-models/context.jsonld",
+     *         "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+     *     ]
+     * }).then(
+     *     (response) => {
+     *         // Subscription created successfully
+     *     }, (error) => {
+     *         // Error creating the subscription
+     *     }
+     * );
+     *
+     */
+    NGSI.Connection.LD.prototype.createSubscription = function createSubscription(subscription, options) {
+        let p, proxy_callback;
+        const connection = privates.get(this);
+
+        if (options == null) {
+            options = {};
+        }
+
+        if (typeof subscription !== 'object') {
+            throw new TypeError('invalid subscription parameter');
+        }
+
+        if (subscription.type !== "Subscription") {
+            throw new TypeError("invalid subscription type, it should be 'Subscription' for NGSI-LD v1");
+        }
+
+        if (!Array.isArray(subscription.entities) && !Array.isArray(subscription.watchedAttributes)) {
+            throw new TypeError("at least one of 'entities' and 'watchedAttributes' must be provided");
+        }
+
+        if (subscription.notification == null) {
+            throw new TypeError("missing notification attribute");
+        } else if (typeof subscription.notification !== "object") {
+            throw new TypeError("invalid notification attribute");
+        }
+
+        if (subscription.notification.endpoint == null) {
+            throw new TypeError("missing notification.endpoint attribute");
+        } else if (typeof subscription.notification.endpoint !== "object") {
+            throw new TypeError("invalid notification.endpoint attribute");
+        }
+
+        if ('callback' in subscription.notification.endpoint) {
+            if (typeof subscription.notification.endpoint.callback !== "function") {
+                throw new TypeError('invalid callback configuration');
+            }
+
+            const onNotify = (payload, headers) => {
+                const notification = JSON.parse(payload);
+                notification.attrsformat = headers['ngsiv2-attrsformat'];
+                subscription.notification.callback(notification);
+            };
+
+            p = connection.ngsi_proxy.requestCallback(onNotify).then(
+                (response) => {
+                    proxy_callback = response;
+                    delete subscription.notification.endpoint.callback;
+                    subscription.notification.endpoint.uri = proxy_callback.url;
+                }
+            );
+        } else {
+            p = Promise.resolve();
+        }
+
+        const url = new URL(NGSI.endpoints.ld.SUBSCRIPTION_COLLECTION, connection.url);
+        return p.then(() => {
+            return makeJSONRequest2.call(connection, url, {
+                method: "POST",
+                contentType: "@context" in subscription ? "application/ld+json" : "application/json",
+                postBody: subscription,
+                requestHeaders: {
+                    "FIWARE-Service": options.service,
+                }
+            });
+        }).then(
+            (response) => {
+                if (response.status === 400) {
+                    return parse_bad_request_ld(response);
+                } else if (response.status === 409) {
+                    return Promise.reject(new NGSI.AlreadyExistsError({}));
+                } else if (response.status !== 201) {
+                    return Promise.reject(new NGSI.InvalidResponseError('Unexpected error code: ' + response.status));
+                }
+
+                const location_header = response.getHeader('Location');
+                try {
+                    const subscription_url = new URL(location_header, connection.url);
+                    subscription.id = subscription_url.pathname.split('/').pop();
+                } catch (e) {
+                    return Promise.reject(new NGSI.InvalidResponseError(
+                        'Unexpected location header: ' + location_header
+                    ));
+                }
+
+                if (proxy_callback) {
+                    connection.ngsi_proxy.associateSubscriptionId(proxy_callback.callback_id, subscription.id, "ld");
+                }
+
+                return Promise.resolve({
+                    subscription: subscription,
+                    location: location_header
+                });
+            },
+            (error) => {
+                if (proxy_callback) {
+                    connection.ngsi_proxy.closeCallback(proxy_callback.callback_id);
+                }
+                return Promise.reject(error);
+            }
+        );
+    };
+
     /* istanbul ignore else */
     if (typeof window !== 'undefined') {
         window.NGSI = NGSI;
