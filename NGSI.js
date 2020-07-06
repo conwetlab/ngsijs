@@ -6927,6 +6927,98 @@
     };
 
     /**
+     * Gets all the details of a subscription.
+     *
+     * > This method is aligned with NGSI-LD (CIM Specification v1.2.2)
+     *
+     * @since 1.4
+     *
+     * @name NGSI.Connection#ld.getSubscription
+     * @method "ld.getSubscription"
+     * @memberof NGSI.Connection
+     *
+     * @param {String|Object} options
+     *
+     * String with the id of the subscription to retrieve or an object with
+     * options:
+     *
+     * - `id` (`String`): Id of the subscription to retrieve
+     * - `service` (`String`): Service/tenant to use in this operation
+     *
+     * @throws {NGSI.BadRequestError}
+     * @throws {NGSI.ConnectionError}
+     * @throws {NGSI.InvalidResponseError}
+     * @throws {NGSI.NotFoundError}
+     *
+     * @returns {Promise}
+     *
+     * @example <caption>Basic usage</caption>
+     *
+     * connection.ld.getSubscription("urn:ngsi-ld:Subscription:abcdef").then(
+     *     (response) => {
+     *         // Subscription details retrieved successfully
+     *         // response.subscription subscription details
+     *     }, (error) => {
+     *         // Error retrieving subscription
+     *     }
+     * );
+     *
+     */
+    NGSI.Connection.LD.prototype.getSubscription = function getSubscription(options) {
+        if (options == null) {
+            throw new TypeError("missing options parameter");
+        }
+
+        if (typeof options === "string") {
+            options = {
+                id: options
+            };
+        } else if (options.id == null) {
+            throw new TypeError("missing id option");
+        }
+
+        const connection = privates.get(this);
+        const url = new URL(
+            interpolate(
+                NGSI.endpoints.ld.SUBSCRIPTION_ENTRY,
+                {subscriptionId: encodeURIComponent(options.id)}
+            ),
+            connection.url
+        );
+
+        const headers = {
+            "Accept": "application/ld+json, application/json",
+            "FIWARE-Service": options.service
+        };
+        if (typeof options["@context"] === "string") {
+            headers.Link = '<' + encodeURI(options["@context"]) + '>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"';
+        }
+
+        return makeJSONRequest2.call(connection, url, {
+            method: "GET",
+            requestHeaders: headers
+        }).then((response) => {
+            if (response.status === 400) {
+                return parse_bad_request_ld(response);
+            } else if (response.status === 404) {
+                return parse_not_found_response_ld(response);
+            } else if (response.status !== 200) {
+                return Promise.reject(new NGSI.InvalidResponseError('Unexpected error code: ' + response.status));
+            }
+            let data;
+            try {
+                data = JSON.parse(response.responseText);
+            } catch (e) {
+                throw new NGSI.InvalidResponseError('Server returned invalid JSON content');
+            }
+            return Promise.resolve({
+                format: response.getHeader('Content-Type'),
+                subscription: data
+            });
+        });
+    };
+
+    /**
      * Updates a subscription.
      *
      * > This method is aligned with NGSI-LD (CIM Specification v1.2.2)
