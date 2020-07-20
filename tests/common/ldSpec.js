@@ -277,7 +277,6 @@ if ((typeof require === 'function') && typeof global != null) {
                     (e) => {
                         expect(e).toEqual(jasmine.any(NGSI.InvalidRequestError));
                         expect(e.message).toBe("Request payload body is not a valid JSON document");
-                        done();
                     }
                 ).finally(done);
             });
@@ -297,7 +296,6 @@ if ((typeof require === 'function') && typeof global != null) {
                     (e) => {
                         expect(e).toEqual(jasmine.any(NGSI.BadRequestError));
                         expect(e.message).toBe("Invalid characters in entity id");
-                        done();
                     }
                 ).finally(done);
             });
@@ -353,6 +351,261 @@ if ((typeof require === 'function') && typeof global != null) {
 
                 connection.ld.createEntity(entity).then(
                     fail,
+                    (e) => {
+                        expect(e).toEqual(jasmine.any(NGSI.InvalidResponseError));
+                    }
+                ).finally(done);
+            });
+
+        });
+
+        describe('appendEntityAttributes(changes[, options])', () => {
+
+            it("throws a TypeError exception when not passing the changes parameter", () => {
+                expect(() => {
+                    connection.ld.appendEntityAttributes();
+                }).toThrowError(TypeError);
+            });
+
+            it("throws a TypeError exception when not providing an id", () => {
+                expect(() => {
+                    connection.ld.appendEntityAttributes({
+                        "myattribute": {
+                            "type": "Property",
+                            "value": 5
+                        }
+                    });
+                }).toThrowError(TypeError);
+            });
+
+            it("allows basic usage passing entity id directly on the changes parameter", (done) => {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/entities/urn%3Angsi-ld%3ARoad%3ASpain-Road-A62/attrs", {
+                    method: 'POST',
+                    status: 204,
+                    checkRequestContent: (url, options) => {
+                        expect("options" in options.parameters).toBe(false);
+                    }
+                });
+
+                assertSuccess(
+                    connection.ld.appendEntityAttributes({
+                        "id": "urn:ngsi-ld:Road:Spain-Road-A62",
+                        "temperature": {
+                            "value": 21.7
+                        }
+                    }),
+                    (result) => {
+                        expect(result).toEqual({
+                            "updated": ["temperature"],
+                            "notUpdated": []
+                        });
+                    }
+                ).finally(done);
+            });
+
+            it("allows basic usage passing entity id on the options parameter", (done) => {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/entities/urn%3Angsi-ld%3ARoad%3ASpain-Road-A62/attrs", {
+                    method: 'POST',
+                    status: 204,
+                    checkRequestContent: (url, options) => {
+                        expect("options" in options.parameters).toBe(false);
+                    }
+                });
+
+                assertSuccess(
+                    connection.ld.appendEntityAttributes({
+                        "temperature": {
+                            "value": 21.7
+                        }
+                    }, {
+                        "id": "urn:ngsi-ld:Road:Spain-Road-A62",
+                    }),
+                    (result) => {
+                        expect(result).toEqual({
+                            "updated": ["temperature"],
+                            "notUpdated": []
+                        });
+                    }
+                ).finally(done);
+            });
+
+            it("allows strictly append attributes using the strict option", (done) => {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/entities/urn%3Angsi-ld%3ARoad%3ASpain-Road-A62/attrs", {
+                    method: 'POST',
+                    status: 204,
+                    checkRequestContent: (url, options) => {
+                        expect(options.parameters.options).toBe("noOverwrite");
+                        const data = JSON.parse(options.postBody);
+                        expect(data).toEqual({
+                            "temperature": 21.7
+                        });
+                    }
+                });
+
+                assertSuccess(
+                    connection.ld.appendEntityAttributes({
+                        "id": "urn:ngsi-ld:Road:Spain-Road-A62",
+                        "temperature": 21.7
+                    }, {
+                        noOverwrite: true
+                    }),
+                    (result) => {
+                        expect(result).toEqual({
+                            "updated": ["temperature"],
+                            "notUpdated": []
+                        });
+                    }
+                ).finally(done);
+            });
+
+            it("supports multi-status responses", (done) => {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/entities/urn%3Angsi-ld%3ARoad%3ASpain-Road-A62/attrs", {
+                    method: 'POST',
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    status: 207,
+                    responseText: '{"updated": ["temperature"], "notUpdated": [{"attributeName": "attribute2", "reason": "already existing attribute"}]}'
+                });
+
+                assertSuccess(
+                    connection.ld.appendEntityAttributes({
+                        "id": "urn:ngsi-ld:Road:Spain-Road-A62",
+                        "temperature": {
+                            "value": 21.7
+                        },
+                        "attribute2": {
+                            "value": {}
+                        }
+                    }, {
+                        noOverwrite: true
+                    }),
+                    (result) => {
+                        expect(result.updated).toEqual(["temperature"]);
+                        expect(result.notUpdated).toEqual([{"attributeName": "attribute2", "reason": "already existing attribute"}]);
+                    }
+                ).finally(done);
+            });
+
+            it("handles invalid multi-status responses", (done) => {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/entities/urn%3Angsi-ld%3ARoad%3ASpain-Road-A62/attrs", {
+                    method: 'POST',
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    status: 207,
+                    responseText: 'invalid'
+                });
+
+                assertFailure(
+                    connection.ld.appendEntityAttributes({
+                        "id": "urn:ngsi-ld:Road:Spain-Road-A62",
+                        "temperature": {
+                            "value": 21.7
+                        },
+                        "attribute2": {
+                            "value": {}
+                        }
+                    }, {
+                        noOverwrite: true
+                    }),
+                    (e) => {
+                        expect(e).toEqual(jasmine.any(NGSI.InvalidResponseError));
+                    }
+                ).finally(done);
+            });
+
+            it("entity not found", (done) => {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/entities/urn%3Angsi-ld%3ARoad%3ASpain-Road-A62/attrs", {
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    method: "POST",
+                    status: 404,
+                    responseText: '{"type": "https://uri.etsi.org/ngsi-ld/errors/ResourceNotFound", "title": "No context element found", "detail": "no detail"}'
+                });
+
+                assertFailure(
+                    connection.ld.appendEntityAttributes({
+                        "id": "urn:ngsi-ld:Road:Spain-Road-A62",
+                        "temperature": 21.7
+                    }),
+                    (e) => {
+                        expect(e).toEqual(jasmine.any(NGSI.NotFoundError));
+                        expect(e.message).toBe("No context element found");
+                    }
+                ).finally(done);
+            });
+
+            it("invalid 404", (done) => {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/entities/urn%3Angsi-ld%3ARoad%3ASpain-Road-A62/attrs", {
+                    method: "POST",
+                    status: 404
+                });
+
+                assertFailure(
+                    connection.ld.appendEntityAttributes({
+                        "id": "urn:ngsi-ld:Road:Spain-Road-A62",
+                        "temperature": 21.7
+                    }),
+                    (e) => {
+                        expect(e).toEqual(jasmine.any(NGSI.InvalidResponseError));
+                    }
+                ).finally(done);
+            });
+
+            it("bad request", (done) => {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/entities/urn%3Angsi-ld%3ARoad%3ASpain-Road-A62/attrs", {
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    method: "POST",
+                    status: 400,
+                    responseText: '{"type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData", "title": "Invalid characters in attribute value", "detail": "no detail"}'
+                });
+
+                assertFailure(
+                    connection.ld.appendEntityAttributes({
+                        "id": "urn:ngsi-ld:Road:Spain-Road-A62",
+                        "temperature": "("
+                    }),
+                    (e) => {
+                        expect(e).toEqual(jasmine.any(NGSI.BadRequestError));
+                        expect(e.message).toBe("Invalid characters in attribute value");
+                    }
+                ).finally(done);
+            });
+
+            it("invalid 400", (done) => {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/entities/urn%3Angsi-ld%3ARoad%3ASpain-Road-A62/attrs", {
+                    method: "POST",
+                    status: 400
+                });
+
+                assertFailure(
+                    connection.ld.appendEntityAttributes({
+                        "id": "urn:ngsi-ld:Road:Spain-Road-A62",
+                        "temperature": 21.7
+                    }),
+                    (e) => {
+                        expect(e).toEqual(jasmine.any(NGSI.InvalidResponseError));
+                    }
+                ).finally(done);
+            });
+
+            it("handles unexpected error codes", (done) => {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/entities/urn%3Angsi-ld%3ARoad%3ASpain-Road-A62/attrs", {
+                    method: "POST",
+                    status: 201
+                });
+
+                assertFailure(
+                    connection.ld.appendEntityAttributes({
+                        "id": "urn:ngsi-ld:Road:Spain-Road-A62",
+                        "temperature": {
+                            "value": 21.7
+                        }
+                    }),
                     (e) => {
                         expect(e).toEqual(jasmine.any(NGSI.InvalidResponseError));
                     }
@@ -1116,8 +1369,6 @@ if ((typeof require === 'function') && typeof global != null) {
                             notifiedAt: "2020-06-11T12:34:00+02:00",
                             data: notification_data
                         });
-
-                        done();
                     },
                     (e) => {
                         fail("Failure callback called");
@@ -1777,7 +2028,6 @@ if ((typeof require === 'function') && typeof global != null) {
                     }),
                     (result) => {
                         expect(result).toEqual({});
-                        done();
                     }
                 ).finally(done);
             });
@@ -1797,7 +2047,6 @@ if ((typeof require === 'function') && typeof global != null) {
                     (e) => {
                         expect(e).toEqual(jasmine.any(NGSI.BadRequestError));
                         expect(e.message).toBe("Invalid characters in entity id");
-                        done();
                     }
                 ).finally(done);
             });
