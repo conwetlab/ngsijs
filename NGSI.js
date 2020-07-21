@@ -7204,6 +7204,113 @@
         });
     };
 
+    /**
+     * Updates the attributes of an entity.
+     *
+     * > This method is aligned with NGSI-LD (CIM Specification v1.2.2)
+     *
+     * @since 1.4
+     *
+     * @name NGSI.Connection#ld.updateEntityAttributes
+     * @method "ld.updateEntityAttributes"
+     * @memberof NGSI.Connection
+     *
+     * @param {Object} changes
+     *
+     * New values for the attributes. Must contain the `id` of the entity to
+     * update if not provided using the options parameter.
+     *
+     * @param {Object} [options]
+     *
+     * Object with extra options:
+     *
+     * - `id` (`String`, required): Id of the entity to update
+     * - `service` (`String`): Service/tenant to use in this operation
+     *
+     * @throws {NGSI.BadRequestError}
+     * @throws {NGSI.ConnectionError}
+     * @throws {NGSI.InvalidResponseError}
+     * @throws {NGSI.NotFoundError}
+     *
+     * @returns {Promise}
+     *
+     * @example <caption>Append or update the temperature attribute</caption>
+     *
+     * connection.ld.updateEntityAttributes({
+     *     "id": "urn:ngsi-ld:Vehicle:A4567",
+     *     "name": {
+     *         "type": "Property",
+     *         "value": "Bus 1"
+     *     },
+     *     "@context": [
+     *         "https://fiware.github.io/data-models/context.jsonld"
+     *     ]
+     * }).then(
+     *     (response) => {
+     *         // Request ended correctly
+     *         // response.updated will contain the list of updated attributes
+     *         // while response.notUpdated will contain the list with the
+     *         // attributes that were not updated
+     *     }, (error) => {
+     *         // Error updating the attributes of the entity
+     *     }
+     * );
+     *
+     */
+    NGSI.Connection.LD.prototype.updateEntityAttributes = function updateEntityAttributes(changes, options) {
+        if (changes == null || typeof changes !== "object") {
+            throw new TypeError('changes parameter should be an object');
+        }
+
+        if (options == null) {
+            options = {};
+        }
+
+        const id = options.id != null ? options.id : changes.id;
+        if (id == null) {
+            throw new TypeError('missing entity id');
+        } else if (changes.id != null) {
+            // Remove id from the payload
+            delete changes.id;
+        }
+
+        const connection = privates.get(this);
+        const url = new URL(
+            interpolate(
+                NGSI.endpoints.ld.ENTITY_ATTRS_COLLECTION,
+                {entityId: encodeURIComponent(id)}
+            ),
+            connection.url
+        );
+
+        return makeJSONRequest2.call(connection, url, {
+            method: "PATCH",
+            postBody: changes,
+            requestHeaders: {
+                "FIWARE-Service": options.service
+            }
+        }).then((response) => {
+            let data;
+            if (response.status === 400) {
+                return parse_bad_request_ld(response);
+            } else if (response.status === 207) {
+                try {
+                    data = JSON.parse(response.responseText);
+                } catch (e) {
+                    throw new NGSI.InvalidResponseError('Server returned invalid JSON content');
+                }
+            } else if (response.status === 404) {
+                return parse_not_found_response_ld(response);
+            } else if (response.status !== 204) {
+                return Promise.reject(new NGSI.InvalidResponseError('Unexpected error code: ' + response.status));
+            }
+            return Promise.resolve({
+                updated: data ? data.updated : Object.keys(changes),
+                notUpdated: data ? data.notUpdated : []
+            });
+        });
+    };
+
     /* istanbul ignore else */
     if (typeof window !== 'undefined') {
         window.NGSI = NGSI;
