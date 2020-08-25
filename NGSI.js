@@ -7206,6 +7206,107 @@
     };
 
     /**
+     * Updates one attribute of an entity.
+     *
+     * > This method is aligned with NGSI-LD (CIM Specification v1.2.2)
+     *
+     * @since 1.4
+     *
+     * @name NGSI.Connection#ld.updateEntityAttribute
+     * @method "ld.updateEntityAttribute"
+     * @memberof NGSI.Connection
+     *
+     * @param {Object} changes
+     *
+     * Changes to apply to the attribute.
+     *
+     * @param {Object} [options]
+     *
+     * Object with extra options:
+     *
+     * - `@context` (`String`): URI pointing to the JSON-LD document which
+     *   contains the `@context` to be used to expand the terms when updating
+     *   entity details.
+     * - `id` (`String`, required): Id of the entity to update
+     * - `service` (`String`): Service/tenant to use in this operation
+     *
+     * @throws {NGSI.BadRequestError}
+     * @throws {NGSI.ConnectionError}
+     * @throws {NGSI.InvalidResponseError}
+     * @throws {NGSI.NotFoundError}
+     *
+     * @returns {Promise}
+     *
+     * @example <caption>Append or update the temperature attribute</caption>
+     *
+     * connection.ld.updateEntityAttribute({
+     *     "type": "Property",
+     *     "value": "Bus 1"
+     * }, {
+     *     id: "urn:ngsi-ld:Vehicle:A4567",
+     *     attribute: "name",
+     *     "@context": [
+     *         "https://fiware.github.io/data-models/context.jsonld"
+     *     ]
+     * }).then(
+     *     (response) => {
+     *         // Attribute updated correctly
+     *     }, (error) => {
+     *         // Error updating the attribute of the entity
+     *     }
+     * );
+     *
+     */
+    NGSI.Connection.LD.prototype.updateEntityAttribute = function updateEntityAttribute(changes, options) {
+        if (changes == null || typeof changes !== "object") {
+            throw new TypeError('changes parameter should be an object');
+        }
+
+        if (options == null) {
+            options = {};
+        }
+
+        const id = options.id;
+        if (id == null) {
+            throw new TypeError('missing entity id');
+        }
+
+        const connection = privates.get(this);
+        const url = new URL(
+            interpolate(
+                NGSI.endpoints.ld.ENTITY_ATTR_ENTRY,
+                {
+                    entityId: encodeURIComponent(options.id),
+                    attribute: encodeURIComponent(options.attribute)
+                }
+            ),
+            connection.url
+        );
+
+        const headers = {
+            "FIWARE-Service": options.service
+        };
+        if (typeof options["@context"] === "string") {
+            headers.Link = '<' + encodeURI(options["@context"]) + '>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"';
+        }
+
+        return makeJSONRequest2.call(connection, url, {
+            method: "PATCH",
+            postBody: changes,
+            requestHeaders: headers
+        }).then((response) => {
+            if (response.status === 400) {
+                return parse_bad_request_ld(response);
+            } else if (response.status === 404) {
+                return parse_not_found_response_ld(response);
+            } else if (response.status !== 204) {
+                return Promise.reject(new NGSI.InvalidResponseError('Unexpected error code: ' + response.status));
+            }
+            return Promise.resolve({});
+        });
+    };
+
+    /**
      * Updates the attributes of an entity.
      *
      * > This method is aligned with NGSI-LD (CIM Specification v1.2.2)

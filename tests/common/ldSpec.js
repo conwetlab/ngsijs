@@ -1971,6 +1971,186 @@ if ((typeof require === 'function') && typeof global != null) {
 
         });
 
+        describe('updateEntityAttribute(changes[, options])', () => {
+
+            it("throws a TypeError exception when not passing the changes parameter", () => {
+                expect(() => {
+                    connection.ld.updateEntityAttribute();
+                }).toThrowError(TypeError);
+            });
+
+            it("throws a TypeError exception when not passing the options parameter", () => {
+                expect(() => {
+                    connection.ld.updateEntityAttribute({
+                        type: "Property",
+                        value: 5
+                    });
+                }).toThrowError(TypeError);
+            });
+
+            it("throws a TypeError exception when not providing an id", () => {
+                expect(() => {
+                    connection.ld.updateEntityAttribute({
+                        type: "Property",
+                        value: 5
+                    }, {
+                        attribute: "https://uri.fiware.org/ns/data-models#speed"
+                    });
+                }).toThrowError(TypeError);
+            });
+
+            it("allows basic usage passing entity id and attribute on the options parameter", (done) => {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/entities/urn%3Angsi-ld%3AVehicle%3ABus1/attrs/https%3A%2F%2Furi.fiware.org%2Fns%2Fdata-models%23speed", {
+                    method: 'PATCH',
+                    status: 204,
+                    checkRequestContent: (url, options) => {
+                        expect(options.parameters).toBe(undefined);
+                    }
+                });
+
+                assertSuccess(
+                    connection.ld.updateEntityAttribute({
+                        value: 21.7
+                    }, {
+                        id: "urn:ngsi-ld:Vehicle:Bus1",
+                        attribute: "https://uri.fiware.org/ns/data-models#speed"
+                    }),
+                    (result) => {
+                        expect(result).toEqual({});
+                    }
+                ).finally(done);
+            });
+
+            it("allows updating attributes from entities using @context resolution", (done) => {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/entities/urn%3Angsi-ld%3AVehicle%3ABus1/attrs/speed", {
+                    checkRequestContent: (url, options) => {
+                        expect(options.requestHeaders.Link).toBe('<https://fiware.github.io/data-models/context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"');
+                    },
+                    method: "PATCH",
+                    status: 204
+                });
+
+                assertSuccess(
+                    connection.ld.updateEntityAttribute({
+                        value: 21.7
+                    }, {
+                        id: "urn:ngsi-ld:Vehicle:Bus1",
+                        attribute: "speed",
+                        "@context": "https://fiware.github.io/data-models/context.jsonld"
+                    }),
+                    (result) => {
+                        expect(result).toEqual({});
+                    }
+                ).finally(done);
+            });
+
+            it("entity not found", (done) => {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/entities/urn%3Angsi-ld%3AVehicle%3ABus1/attrs/https%3A%2F%2Furi.fiware.org%2Fns%2Fdata-models%23speed", {
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    method: "PATCH",
+                    status: 404,
+                    responseText: '{"type": "https://uri.etsi.org/ngsi-ld/errors/ResourceNotFound", "title": "No context element found", "detail": "no detail"}'
+                });
+
+                assertFailure(
+                    connection.ld.updateEntityAttribute({
+                        "value": 21.7
+                    }, {
+                        id: "urn:ngsi-ld:Vehicle:Bus1",
+                        attribute: "https://uri.fiware.org/ns/data-models#speed"
+                    }),
+                    (e) => {
+                        expect(e).toEqual(jasmine.any(NGSI.NotFoundError));
+                        expect(e.message).toBe("No context element found");
+                    }
+                ).finally(done);
+            });
+
+            it("invalid 404", (done) => {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/entities/urn%3Angsi-ld%3AVehicle%3ABus1/attrs/https%3A%2F%2Furi.fiware.org%2Fns%2Fdata-models%23speed", {
+                    method: "PATCH",
+                    status: 404
+                });
+
+                assertFailure(
+                    connection.ld.updateEntityAttribute({
+                        value: 21.7
+                    }, {
+                        id: "urn:ngsi-ld:Vehicle:Bus1",
+                        attribute: "https://uri.fiware.org/ns/data-models#speed"
+                    }),
+                    (e) => {
+                        expect(e).toEqual(jasmine.any(NGSI.InvalidResponseError));
+                    }
+                ).finally(done);
+            });
+
+            it("bad request", (done) => {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/entities/21%24(/attrs/https%3A%2F%2Furi.fiware.org%2Fns%2Fdata-models%23speed", {
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    method: "PATCH",
+                    status: 400,
+                    responseText: '{"type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData", "title": "Invalid characters in entity id", "detail": "no detail"}'
+                });
+
+                assertFailure(
+                    connection.ld.updateEntityAttribute({
+                        value: 21.7
+                    }, {
+                        id: "21$(",
+                        attribute: "https://uri.fiware.org/ns/data-models#speed"
+                    }),
+                    (e) => {
+                        expect(e).toEqual(jasmine.any(NGSI.BadRequestError));
+                        expect(e.message).toBe("Invalid characters in entity id");
+                    }
+                ).finally(done);
+            });
+
+            it("invalid 400", (done) => {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/entities/urn%3Angsi-ld%3AVehicle%3ABus1/attrs/https%3A%2F%2Furi.fiware.org%2Fns%2Fdata-models%23speed", {
+                    method: "PATCH",
+                    status: 400
+                });
+
+                assertFailure(
+                    connection.ld.updateEntityAttribute({
+                        value: 21.7
+                    }, {
+                        id: "urn:ngsi-ld:Vehicle:Bus1",
+                        attribute: "https://uri.fiware.org/ns/data-models#speed"
+                    }),
+                    (e) => {
+                        expect(e).toEqual(jasmine.any(NGSI.InvalidResponseError));
+                    }
+                ).finally(done);
+            });
+
+            it("handles unexpected error codes", (done) => {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/entities/urn%3Angsi-ld%3AVehicle%3ABus1/attrs/https%3A%2F%2Furi.fiware.org%2Fns%2Fdata-models%23speed", {
+                    method: "PATCH",
+                    status: 201
+                });
+
+                assertFailure(
+                    connection.ld.updateEntityAttribute({
+                        value: 21.7
+                    }, {
+                        id: "urn:ngsi-ld:Vehicle:Bus1",
+                        attribute: "https://uri.fiware.org/ns/data-models#speed"
+                    }),
+                    (e) => {
+                        expect(e).toEqual(jasmine.any(NGSI.InvalidResponseError));
+                    }
+                ).finally(done);
+            });
+
+        });
+
         describe('updateEntityAttributes(changes[, options])', () => {
 
             it("throws a TypeError exception when not passing the changes parameter", () => {
@@ -2397,6 +2577,7 @@ if ((typeof require === 'function') && typeof global != null) {
                     }
                 ).finally(done);
             });
+
             it("entity not found", (done) => {
                 ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/entities/Bcn_Welt/attrs/temperature", {
                     headers: {
