@@ -390,13 +390,13 @@ if ((typeof require === 'function') && typeof global != null) {
                 assertSuccess(
                     connection.ld.appendEntityAttributes({
                         "id": "urn:ngsi-ld:Road:Spain-Road-A62",
-                        "temperature": {
+                        "https://uri.fiware.org/ns/data-models#temperature": {
                             "value": 21.7
                         }
                     }),
                     (result) => {
                         expect(result).toEqual({
-                            "updated": ["temperature"],
+                            "updated": ["https://uri.fiware.org/ns/data-models#temperature"],
                             "notUpdated": []
                         });
                     }
@@ -414,11 +414,38 @@ if ((typeof require === 'function') && typeof global != null) {
 
                 assertSuccess(
                     connection.ld.appendEntityAttributes({
+                        "https://uri.fiware.org/ns/data-models#temperature": {
+                            "value": 21.7
+                        }
+                    }, {
+                        "id": "urn:ngsi-ld:Road:Spain-Road-A62",
+                    }),
+                    (result) => {
+                        expect(result).toEqual({
+                            "updated": ["https://uri.fiware.org/ns/data-models#temperature"],
+                            "notUpdated": []
+                        });
+                    }
+                ).finally(done);
+            });
+
+            it("allows basic usage using the @context option", (done) => {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/entities/urn%3Angsi-ld%3ARoad%3ASpain-Road-A62/attrs", {
+                    method: 'POST',
+                    status: 204,
+                    checkRequestContent: (url, options) => {
+                        expect("options" in options.parameters).toBe(false);
+                    }
+                });
+
+                assertSuccess(
+                    connection.ld.appendEntityAttributes({
                         "temperature": {
                             "value": 21.7
                         }
                     }, {
                         "id": "urn:ngsi-ld:Road:Spain-Road-A62",
+                        "@context": "https://json-ld.org/contexts/person.jsonld"
                     }),
                     (result) => {
                         expect(result).toEqual({
@@ -2381,12 +2408,20 @@ if ((typeof require === 'function') && typeof global != null) {
                 }).toThrowError(TypeError);
             });
 
+            it("throws a TypeError exception when not passing any subcription id", () => {
+                expect(() => {
+                    connection.ld.updateSubscription({
+                        "expires": "2016-04-05T14:00:00.00Z"
+                    });
+                }).toThrowError(TypeError);
+            });
+
             it("allows basic usage", (done) => {
                 ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/subscriptions/urn%3Angsi-ld%3ASubscription%3AmySubscription", {
                     method: 'PATCH',
                     status: 204,
                     checkRequestContent: (url, options) => {
-                        var data = JSON.parse(options.postBody);
+                        const data = JSON.parse(options.postBody);
                         expect(data).toEqual({
                             "expires": "2016-04-05T14:00:00.00Z"
                         });
@@ -2398,6 +2433,60 @@ if ((typeof require === 'function') && typeof global != null) {
                     connection.ld.updateSubscription({
                         "id": "urn:ngsi-ld:Subscription:mySubscription",
                         "expires": "2016-04-05T14:00:00.00Z"
+                    }),
+                    (result) => {
+                        expect(result).toEqual({});
+                    }
+                ).finally(done);
+            });
+
+            it("allows basic usage passing subcription id as option", (done) => {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/subscriptions/urn%3Angsi-ld%3ASubscription%3AmySubscription", {
+                    method: 'PATCH',
+                    status: 204,
+                    checkRequestContent: (url, options) => {
+                        const data = JSON.parse(options.postBody);
+                        expect(data).toEqual({
+                            "expires": "2016-04-05T14:00:00.00Z"
+                        });
+                        expect(options.parameters == null).toBeTruthy();
+                    }
+                });
+
+                assertSuccess(
+                    connection.ld.updateSubscription({
+                        "expires": "2016-04-05T14:00:00.00Z"
+                    }, {
+                        "id": "urn:ngsi-ld:Subscription:mySubscription"
+                    }),
+                    (result) => {
+                        expect(result).toEqual({});
+                    }
+                ).finally(done);
+            });
+
+            it("allows using the @context option", (done) => {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/subscriptions/urn%3Angsi-ld%3ASubscription%3AmySubscription", {
+                    method: 'PATCH',
+                    status: 204,
+                    checkRequestContent: (url, options) => {
+                        var data = JSON.parse(options.postBody);
+                        expect(data).toEqual({
+                            "expires": "2016-04-05T14:00:00.00Z"
+                        });
+                        expect(options.parameters == null).toBeTruthy();
+                        expect(options.requestHeaders).toEqual(jasmine.objectContaining({
+                            'Link': '<https://fiware.github.io/data-models/context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
+                        }));
+                    }
+                });
+
+                assertSuccess(
+                    connection.ld.updateSubscription({
+                        "id": "urn:ngsi-ld:Subscription:mySubscription",
+                        "expires": "2016-04-05T14:00:00.00Z"
+                    }, {
+                        "@context": "https://fiware.github.io/data-models/context.jsonld"
                     }),
                     (result) => {
                         expect(result).toEqual({});

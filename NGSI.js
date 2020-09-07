@@ -6569,6 +6569,9 @@
      *
      * Object with extra options:
      *
+     * - `@context` (`String`): URI pointing to the JSON-LD document which
+     *   contains the `@context` to be used to expand the terms when retrieving
+     *   subscription details.
      * - `limit` (`Number`; default: `20`): This option allow you to specify
      *   the maximum number of subscriptions you want to receive from the
      *   server
@@ -6601,10 +6604,10 @@
             options = {};
         }
 
-        var connection = privates.get(this);
-        var url = new URL(NGSI.endpoints.ld.SUBSCRIPTION_COLLECTION, connection.url);
-        var optionsparams = [];
-        var parameters = parse_pagination_options2(options, optionsparams);
+        const connection = privates.get(this);
+        const url = new URL(NGSI.endpoints.ld.SUBSCRIPTION_COLLECTION, connection.url);
+        const optionsparams = [];
+        const parameters = parse_pagination_options2(options, optionsparams);
 
         if (options.sysAttrs === true) {
             optionsparams.push("sysAttrs");
@@ -6945,6 +6948,9 @@
      * String with the id of the subscription to retrieve or an object with
      * options:
      *
+     * - `@context` (`String`): URI pointing to the JSON-LD document which
+     *   contains the `@context` to be used to expand the terms when retrieving
+     *   subscription details.
      * - `id` (`String`): Id of the subscription to retrieve
      * - `service` (`String`): Service/tenant to use in this operation
      *
@@ -7037,6 +7043,9 @@
      *
      * Object with extra options:
      *
+     * - `@context` (`String`): URI pointing to the JSON-LD document which
+     *   contains the `@context` to be used to expand the terms when updating
+     *   subscription details.
      * - `service` (`String`): Service/tenant to use in this operation
      *
      * @throws {NGSI.BadRequestError}
@@ -7065,19 +7074,30 @@
             options = {};
         }
 
-        const connection = privates.get(this);
-        const url = new URL(interpolate(NGSI.endpoints.ld.SUBSCRIPTION_ENTRY, {subscriptionId: encodeURIComponent(changes.id)}), connection.url);
+        const id = options.id != null ? options.id : changes.id;
+        if (id == null) {
+            throw new TypeError('missing subscription id');
+        } else if (changes.id != null) {
+            // Remove id from the payload
+            delete changes.id;
+        }
 
-        // Remove id from the payload
-        delete changes.id;
+        const connection = privates.get(this);
+        const url = new URL(interpolate(NGSI.endpoints.ld.SUBSCRIPTION_ENTRY, {subscriptionId: encodeURIComponent(id)}), connection.url);
+
+        const headers = {
+            "Accept": "application/ld+json, application/json",
+            "FIWARE-Service": options.service
+        };
+        if (typeof options["@context"] === "string") {
+            headers.Link = '<' + encodeURI(options["@context"]) + '>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"';
+        }
 
         return makeJSONRequest2.call(connection, url, {
             method: "PATCH",
             contentType: "application/merge-patch+json",
             postBody: changes,
-            requestHeaders: {
-                "FIWARE-Service": options.service
-            }
+            requestHeaders: headers
         }).then((response) => {
             if (response.status === 400) {
                 return parse_bad_request_ld(response);
@@ -7110,6 +7130,9 @@
      *
      * Object with extra options:
      *
+     * - `@context` (`String`): URI pointing to the JSON-LD document which
+     *   contains the `@context` to be used to expand the terms when updating
+     *   entity details.
      * - `id` (`String`, required): Id of the entity to update
      * - `service` (`String`): Service/tenant to use in this operation
      * - `noOverwrite` (`Boolean`): `true` if no attribute overwrite shall be
@@ -7176,13 +7199,19 @@
             connection.url
         );
 
+        const headers = {
+            "FIWARE-Service": options.service
+        };
+        if (typeof options["@context"] === "string") {
+            headers.Link = '<' + encodeURI(options["@context"]) + '>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"';
+        }
+
         return makeJSONRequest2.call(connection, url, {
             method: "POST",
             parameters: parameters,
+            contentType: "application/merge-patch+json",
             postBody: changes,
-            requestHeaders: {
-                "FIWARE-Service": options.service
-            }
+            requestHeaders: headers
         }).then((response) => {
             let data;
             if (response.status === 400) {
@@ -7326,6 +7355,9 @@
      *
      * Object with extra options:
      *
+     * - `@context` (`String`): URI pointing to the JSON-LD document which
+     *   contains the `@context` to be used to expand the terms when updating
+     *   entity details.
      * - `id` (`String`, required): Id of the entity to update
      * - `service` (`String`): Service/tenant to use in this operation
      *
@@ -7448,7 +7480,7 @@
      *
      * @example <caption>Deletes the name attribute</caption>
      *
-     * connection.ld.deleteEntityAttributes({
+     * connection.ld.deleteEntityAttribute({
      *     "id": "urn:ngsi-ld:Vehicle:A4567",
      *     "attribute": "name"
      *     "@context": "https://fiware.github.io/data-models/context.jsonld"
