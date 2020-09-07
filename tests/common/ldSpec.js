@@ -981,6 +981,73 @@ if ((typeof require === 'function') && typeof global != null) {
                 ).finally(done);
             });
 
+            it("should handle the count option", (done) => {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/entities", {
+                    checkRequestContent: (url, options) => {
+                        expect(options.parameters.options).not.toBeDefined();
+                        expect(options.parameters.count).toBe(true);
+                        expect(options.parameters.idPattern).toBe("urn:ngsi-ld:Vehicle:.*");
+                    },
+                    headers: {
+                        'Content-Type': 'application/ld+json',
+                        'NGSILD-Results-Count': '5',
+                    },
+                    method: "GET",
+                    status: 200,
+                    responseText: '[]'
+                });
+
+                assertSuccess(
+                    connection.ld.queryEntities({
+                        limit: 0,
+                        count: true,
+                        idPattern: "urn:ngsi-ld:Vehicle:.*"
+                    }),
+                    (result) => {
+                        expect(result).toEqual({
+                            count: 5,
+                            format: 'application/ld+json',
+                            limit: 0,
+                            offset: 0,
+                            results: []
+                        });
+                    }
+                ).finally(done);
+            });
+
+            it("should handle the count option when server does not implement it", (done) => {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/entities", {
+                    checkRequestContent: (url, options) => {
+                        expect(options.parameters.options).not.toBeDefined();
+                        expect(options.parameters.count).toBe(true);
+                        expect(options.parameters.idPattern).toBe("urn:ngsi-ld:Vehicle:.*");
+                    },
+                    headers: {
+                        'Content-Type': 'application/ld+json',
+                    },
+                    method: "GET",
+                    status: 200,
+                    responseText: '[]'
+                });
+
+                assertSuccess(
+                    connection.ld.queryEntities({
+                        limit: 0,
+                        count: true,
+                        idPattern: "urn:ngsi-ld:Vehicle:.*"
+                    }),
+                    (result) => {
+                        expect(result).toEqual({
+                            count: null,
+                            format: 'application/ld+json',
+                            limit: 0,
+                            offset: 0,
+                            results: []
+                        });
+                    }
+                ).finally(done);
+            });
+
             it("basic request (using the type option) with empty results", (done) => {
                 ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/entities", {
                     checkRequestContent: (url, options) => {
@@ -1941,6 +2008,69 @@ if ((typeof require === 'function') && typeof global != null) {
                         });
                     }, (e) => {
                         fail("Failure callback called");
+                    }
+                ).finally(done);
+            });
+
+            it("should handle the count option", (done) => {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/subscriptions", {
+                    headers: {
+                        'Content-Type': 'application/ld+json',
+                        'NGSILD-Results-Count': '5',
+                    },
+                    method: 'GET',
+                    status: 200,
+                    responseText: '[]',
+                    checkRequestContent: (url, options) => {
+                        expect(options.parameters.count).toBe(true);
+                    },
+                });
+
+                assertSuccess(
+                    connection.ld.listSubscriptions({
+                        limit: 0,
+                        count: true,
+                        offset: 0
+                    }),
+                    (result) => {
+                        expect(result).toEqual({
+                            count: 5,
+                            format: "application/ld+json",
+                            limit: 0,
+                            offset: 0,
+                            results: []
+                        });
+                    }
+                ).finally(done);
+            });
+
+            it("should handle the count option when server does not implement it", (done) => {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/subscriptions", {
+                    headers: {
+                        'Content-Type': 'application/ld+json'
+                    },
+                    method: 'GET',
+                    status: 200,
+                    responseText: '[]',
+                    checkRequestContent: (url, options) => {
+                        expect(options.parameters.count).toBe(true);
+                    },
+                });
+
+                assertSuccess(
+                    connection.ld.listSubscriptions({
+                        limit: 0,
+                        count: true,
+                        offset: 0
+                    }),
+                    (result) => {
+                        expect(result).toEqual({
+                            count: null,
+                            format: "application/ld+json",
+                            limit: 0,
+                            offset: 0,
+                            results: []
+                        });
                     }
                 ).finally(done);
             });

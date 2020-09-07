@@ -1156,11 +1156,11 @@
         return parameters;
     };
 
-    const parse_pagination_options2 = function parse_pagination_options2(options, optionsparams) {
-        var parameters = {};
+    const parse_pagination_options2 = function parse_pagination_options2(options, optionsparams, ld) {
+        const parameters = {};
 
         if (options.limit != null) {
-            if (typeof options.limit !== 'number' || !Number.isInteger(options.limit) || options.limit < 1) {
+            if (typeof options.limit !== 'number' || !Number.isInteger(options.limit) || options.limit < (ld ? 0 : 1)) {
                 throw new TypeError('invalid value for the limit option');
             }
             parameters.limit = options.limit;
@@ -1181,7 +1181,11 @@
             if (typeof options.count !== 'boolean') {
                 throw new TypeError('invalid value for the count option');
             }
-            optionsparams.push('count');
+            if (ld) {
+                parameters.count = options.count;
+            } else {
+                optionsparams.push('count');
+            }
         }
 
         return parameters;
@@ -3033,7 +3037,7 @@
         var connection = privates.get(this);
         var url = new URL(NGSI.endpoints.v2.ENTITY_COLLECTION, connection.url);
         var optionsparams = [];
-        var parameters = parse_pagination_options2(options, optionsparams);
+        var parameters = parse_pagination_options2(options, optionsparams, false);
 
         if (options.keyValues === true) {
             optionsparams.push("keyValues");
@@ -4647,7 +4651,7 @@
         var connection = privates.get(this);
         var url = new URL(NGSI.endpoints.v2.TYPE_COLLECTION, connection.url);
         var optionsparams = [];
-        var parameters = parse_pagination_options2(options, optionsparams);
+        var parameters = parse_pagination_options2(options, optionsparams, false);
         if (options.values === true) {
             optionsparams.push("values");
         }
@@ -4832,7 +4836,7 @@
         var connection = privates.get(this);
         var url = new URL(NGSI.endpoints.v2.SUBSCRIPTION_COLLECTION, connection.url);
         var optionsparams = [];
-        var parameters = parse_pagination_options2(options, optionsparams);
+        var parameters = parse_pagination_options2(options, optionsparams, false);
 
         if (optionsparams.length !== 0) {
             parameters.options = optionsparams.join(',');
@@ -5390,7 +5394,7 @@
         var connection = privates.get(this);
         var url = new URL(NGSI.endpoints.v2.REGISTRATION_COLLECTION, connection.url);
         var optionsparams = [];
-        var parameters = parse_pagination_options2(options, optionsparams);
+        var parameters = parse_pagination_options2(options, optionsparams, false);
 
         if (optionsparams.length !== 0) {
             parameters.options = optionsparams.join(',');
@@ -5987,7 +5991,7 @@
         var connection = privates.get(this);
         var url = new URL(NGSI.endpoints.v2.BATCH_QUERY_OP, connection.url);
         var optionsparams = [];
-        var parameters = parse_pagination_options2(options, optionsparams);
+        var parameters = parse_pagination_options2(options, optionsparams, false);
 
         if (options.keyValues === true) {
             optionsparams.push("keyValues");
@@ -6148,7 +6152,7 @@
         const connection = privates.get(this);
         const url = new URL(NGSI.endpoints.ld.ENTITY_COLLECTION, connection.url);
         const optionsparams = [];
-        const parameters = parse_pagination_options2(options, optionsparams);
+        const parameters = parse_pagination_options2(options, optionsparams, true);
 
         if (options.keyValues === true) {
             optionsparams.push("keyValues");
@@ -6191,18 +6195,23 @@
                 return Promise.reject(new NGSI.InvalidResponseError('Unexpected error code: ' + response.status));
             }
 
+            let data;
             try {
-                var data = JSON.parse(response.responseText);
+                data = JSON.parse(response.responseText);
             } catch (e) {
                 return Promise.reject(new NGSI.InvalidResponseError('Server returned invalid JSON content'));
             }
 
             const result = {
                 format: response.getHeader('Content-Type'),
-                results: data,
                 limit: options.limit,
-                offset: options.offset
+                offset: options.offset,
+                results: data
             };
+            if (options.count === true) {
+                const count = response.getHeader("NGSILD-Results-Count");
+                result.count = count != null ? parseInt(count, 10) : null;
+            }
 
             return Promise.resolve(result);
         });
@@ -6607,7 +6616,7 @@
         const connection = privates.get(this);
         const url = new URL(NGSI.endpoints.ld.SUBSCRIPTION_COLLECTION, connection.url);
         const optionsparams = [];
-        const parameters = parse_pagination_options2(options, optionsparams);
+        const parameters = parse_pagination_options2(options, optionsparams, true);
 
         if (options.sysAttrs === true) {
             optionsparams.push("sysAttrs");
@@ -6628,7 +6637,7 @@
         return makeJSONRequest2.call(connection, url, {
             method: "GET",
             parameters: parameters,
-            requestHeaders: headers,
+            requestHeaders: headers
         }).then((response) => {
             if (response.status === 400) {
                 return parse_bad_request_ld(response);
@@ -6643,12 +6652,18 @@
                 return Promise.reject(new NGSI.InvalidResponseError('Server returned invalid JSON content'));
             }
 
-            return Promise.resolve({
+            const result = {
                 format: response.getHeader('Content-Type'),
                 limit: options.limit,
                 offset: options.offset,
                 results: data
-            });
+            };
+            if (options.count === true) {
+                const count = response.getHeader("NGSILD-Results-Count");
+                result.count = count != null ? parseInt(count, 10) : null;
+            }
+
+            return Promise.resolve(result);
         });
     };
 
