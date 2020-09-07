@@ -6048,7 +6048,7 @@
     /**
      * Retrieves the available entities using pagination.
      *
-     * > This method is aligned with NGSI-LD (CIM Specification v1.2.2)
+     * > This method is aligned with NGSI-LD (CIM 009 v1.3.1 Specification)
      *
      * @since 1.4
      *
@@ -6088,9 +6088,9 @@
      *   See "Geographical Queries" section in NGSIv2 specification for details.
      * - `geoproperty` (`String`): The name of the Property that contains the
      *   geospatial data that will be used to resolve the geoquery.
-     * - `service` (`String`): Service/tenant to use in this operation
      * - `sysAttrs` (`Boolean`): Request system-generated attributes (`createdAt`,
      *   `modifiedAt`).
+     * - `tenant` (`String`): Tenant to use in this operation
      * - `type` (`String`): A comma-separated list of entity types to retrieve.
      *   Incompatible with the `typePattern` option.
      * - `typePattern` (`String`): A correctly formated regular expression.
@@ -6173,7 +6173,7 @@
 
         const headers = {
             "Accept": "application/ld+json, application/json",
-            "FIWARE-Service": options.service
+            "NGSILD-Tenant": options.tenant
         };
 
         if (typeof options["@context"] === "string") {
@@ -6211,7 +6211,7 @@
     /**
      * Creates a new entity.
      *
-     * > This method is aligned with NGSI-LD (CIM Specification v1.2.2)
+     * > This method is aligned with NGSI-LD (CIM 009 v1.3.1 Specification)
      *
      * @since 1.4
      *
@@ -6228,7 +6228,7 @@
      *
      * Object with extra options:
      *
-     * - `service` (`String`): Service/tenant to use in this operation
+     * - `tenant` (`String`): Tenant to use in this operation
      *
      *
      * @throws {NGSI.AlreadyExistsError}
@@ -6286,7 +6286,7 @@
      *     }
      * );
      *
-     * @example <caption>Using the service option</caption>
+     * @example <caption>Using the tenant option</caption>
      *
      * connection.ld.createEntity({
      *     "id": "urn:ngsi-ld:Road:Spain-Road-A62",
@@ -6326,7 +6326,7 @@
      *        "https://schema.lab.fiware.org/ld/context",
      *        "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
      *     ]
-     * }, {service: "mytenant"}).then(
+     * }, {tenant: "mytenant"}).then(
      *     (response) => {
      *         // Entity created successfully
      *     }, (error) => {
@@ -6355,7 +6355,7 @@
             postBody: entity,
             contentType: "@context" in entity ? "application/ld+json" : "application/json",
             requestHeaders: {
-                "FIWARE-Service": options.service
+                "NGSILD-Tenant": options.tenant
             }
         }).then(function (response) {
             if (response.status === 400) {
@@ -6375,7 +6375,7 @@
     /**
      * Gets all the details of an entity.
      *
-     * > This method is aligned with NGSI-LD (CIM Specification v1.2.2)
+     * > This method is aligned with NGSI-LD (CIM 009 v1.3.1 Specification)
      *
      * @since 1.4
      *
@@ -6397,7 +6397,7 @@
      *   entity details.
      * - `keyValues` (`Boolean`; default: `false`): Use flat attributes
      * - `id` (`String`, required): Id of the entity to query
-     * - `service` (`String`): Service/tenant to use in this operation
+     * - `tenant` (`String`): Tenant to use in this operation
      *
      * @throws {NGSI.ConnectionError}
      * @throws {NGSI.InvalidResponseError}
@@ -6456,7 +6456,7 @@
 
         const headers = {
             "Accept": "application/ld+json, application/json",
-            "FIWARE-Service": options.service
+            "NGSILD-Tenant": options.tenant
         };
         if (typeof options["@context"] === "string") {
             headers.Link = '<' + encodeURI(options["@context"]) + '>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"';
@@ -6488,7 +6488,7 @@
     /**
      * Removes an entity from the context broker server.
      *
-     * > This method is aligned with NGSI-LD (CIM Specification v1.2.2)
+     * > This method is aligned with NGSI-LD (CIM 009 v1.3.1 Specification)
      *
      * @since 1.4
      *
@@ -6501,7 +6501,7 @@
      * String with the entity id to remove or an object providing options:
      *
      * - `id` (`String`, required): Id of the entity to remove
-     * - `service` (`String`): Service/tenant to use in this operation
+     * - `tenant` (`String`): Tenant to use in this operation
      *
      * @throws {NGSI.ConnectionError}
      * @throws {NGSI.InvalidResponseError}
@@ -6540,7 +6540,7 @@
         return makeJSONRequest2.call(connection, url, {
             method: "DELETE",
             requestHeaders: {
-                "FIWARE-Service": options.service
+                "NGSILD-Tenant": options.tenant
             }
         }).then((response) => {
             if (response.status === 400) {
@@ -6557,7 +6557,7 @@
     /**
      * Retrieves the available subscriptions (using pagination).
      *
-     * > This method is aligned with NGSI-LD (CIM Specification v1.2.2)
+     * > This method is aligned with NGSI-LD (CIM 009 v1.3.1 Specification)
      *
      * @since 1.4
      *
@@ -6577,7 +6577,7 @@
      *   server
      * - `offset` (`Number`; default: `0`): Allows you to skip a given
      *   number of elements at the beginning
-     * - `service` (`String`): Service/tenant to use in this operation
+     * - `tenant` (`String`): Tenant to use in this operation
      * - `sysAttrs` (`Boolean`): Request system-generated attributes (`createdAt`,
      *   `modifiedAt`).
      *
@@ -6618,7 +6618,7 @@
 
         const headers = {
             "Accept": "application/ld+json, application/json",
-            "FIWARE-Service": options.service
+            "NGSILD-Tenant": options.tenant
         };
 
         if (typeof options["@context"] === "string") {
@@ -6655,7 +6655,7 @@
     /**
      * Creates a new subscription.
      *
-     * > This method is aligned with NGSI-LD (CIM Specification v1.2.2)
+     * > This method is aligned with NGSI-LD (CIM 009 v1.3.1 Specification)
      *
      * @since 1.4
      *
@@ -6670,7 +6670,7 @@
      * @param {Object} [options]
      *
      * Object with extra options:
-     * - `service` (`String`): Service/tenant to use in this operation
+     * - `tenant` (`String`): Tenant to use in this operation
      *
      * @throws {NGSI.AlreadyExistsError}
      * @throws {NGSI.BadRequestError}
@@ -6818,7 +6818,7 @@
                 contentType: "@context" in subscription ? "application/ld+json" : "application/json",
                 postBody: subscription,
                 requestHeaders: {
-                    "FIWARE-Service": options.service,
+                    "NGSILD-Tenant": options.tenant,
                 }
             });
         }).then(
@@ -6862,7 +6862,7 @@
     /**
      * Removes a subscription from the orion context broker server.
      *
-     * > This method is aligned with NGSI-LD (CIM Specification v1.2.2)
+     * > This method is aligned with NGSI-LD (CIM 009 v1.3.1 Specification)
      *
      * @since 1.4
      *
@@ -6876,7 +6876,7 @@
      * options:
      *
      * - `id` (`String`): Id of the subscription to remove
-     * - `service` (`String`): Service/tenant to use in this operation
+     * - `tenant` (`String`): Tenant to use in this operation
      *
      * @throws {NGSI.BadRequestError}
      * @throws {NGSI.ConnectionError}
@@ -6918,7 +6918,7 @@
         return makeJSONRequest2.call(connection, url, {
             method: "DELETE",
             requestHeaders: {
-                "FIWARE-Service": options.service
+                "NGSILD-Tenant": options.tenant
             }
         }).then((response) => {
             if (response.status === 400) {
@@ -6935,7 +6935,7 @@
     /**
      * Gets all the details of a subscription.
      *
-     * > This method is aligned with NGSI-LD (CIM Specification v1.2.2)
+     * > This method is aligned with NGSI-LD (CIM 009 v1.3.1 Specification)
      *
      * @since 1.4
      *
@@ -6952,7 +6952,7 @@
      *   contains the `@context` to be used to expand the terms when retrieving
      *   subscription details.
      * - `id` (`String`): Id of the subscription to retrieve
-     * - `service` (`String`): Service/tenant to use in this operation
+     * - `tenant` (`String`): Tenant to use in this operation
      *
      * @throws {NGSI.BadRequestError}
      * @throws {NGSI.ConnectionError}
@@ -6997,7 +6997,7 @@
 
         const headers = {
             "Accept": "application/ld+json, application/json",
-            "FIWARE-Service": options.service
+            "NGSILD-Tenant": options.tenant
         };
         if (typeof options["@context"] === "string") {
             headers.Link = '<' + encodeURI(options["@context"]) + '>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"';
@@ -7030,7 +7030,7 @@
     /**
      * Updates a subscription.
      *
-     * > This method is aligned with NGSI-LD (CIM Specification v1.2.2)
+     * > This method is aligned with NGSI-LD (CIM 009 v1.3.1 Specification)
      *
      * @since 1.4
      *
@@ -7046,7 +7046,7 @@
      * - `@context` (`String`): URI pointing to the JSON-LD document which
      *   contains the `@context` to be used to expand the terms when updating
      *   subscription details.
-     * - `service` (`String`): Service/tenant to use in this operation
+     * - `tenant` (`String`): Tenant to use in this operation
      *
      * @throws {NGSI.BadRequestError}
      * @throws {NGSI.ConnectionError}
@@ -7087,7 +7087,7 @@
 
         const headers = {
             "Accept": "application/ld+json, application/json",
-            "FIWARE-Service": options.service
+            "NGSILD-Tenant": options.tenant
         };
         if (typeof options["@context"] === "string") {
             headers.Link = '<' + encodeURI(options["@context"]) + '>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"';
@@ -7113,7 +7113,7 @@
     /**
      * Updates or appends attributes to an entity.
      *
-     * > This method is aligned with NGSI-LD (CIM Specification v1.2.2)
+     * > This method is aligned with NGSI-LD (CIM 009 v1.3.1 Specification)
      *
      * @since 1.4
      *
@@ -7134,9 +7134,9 @@
      *   contains the `@context` to be used to expand the terms when updating
      *   entity details.
      * - `id` (`String`, required): Id of the entity to update
-     * - `service` (`String`): Service/tenant to use in this operation
      * - `noOverwrite` (`Boolean`): `true` if no attribute overwrite shall be
      *   performed.
+     * - `tenant` (`String`): Tenant to use in this operation
      *
      * @throws {NGSI.BadRequestError}
      * @throws {NGSI.ConnectionError}
@@ -7200,7 +7200,7 @@
         );
 
         const headers = {
-            "FIWARE-Service": options.service
+            "NGSILD-Tenant": options.tenant
         };
         if (typeof options["@context"] === "string") {
             headers.Link = '<' + encodeURI(options["@context"]) + '>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"';
@@ -7237,7 +7237,7 @@
     /**
      * Updates one attribute of an entity.
      *
-     * > This method is aligned with NGSI-LD (CIM Specification v1.2.2)
+     * > This method is aligned with NGSI-LD (CIM 009 v1.3.1 Specification)
      *
      * @since 1.4
      *
@@ -7257,7 +7257,7 @@
      *   contains the `@context` to be used to expand the terms when updating
      *   entity details.
      * - `id` (`String`, required): Id of the entity to update
-     * - `service` (`String`): Service/tenant to use in this operation
+     * - `tenant` (`String`): Tenant to use in this operation
      *
      * @throws {NGSI.BadRequestError}
      * @throws {NGSI.ConnectionError}
@@ -7313,7 +7313,7 @@
         );
 
         const headers = {
-            "FIWARE-Service": options.service
+            "NGSILD-Tenant": options.tenant
         };
         if (typeof options["@context"] === "string") {
             headers.Link = '<' + encodeURI(options["@context"]) + '>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"';
@@ -7338,7 +7338,7 @@
     /**
      * Updates the attributes of an entity.
      *
-     * > This method is aligned with NGSI-LD (CIM Specification v1.2.2)
+     * > This method is aligned with NGSI-LD (CIM 009 v1.3.1 Specification)
      *
      * @since 1.4
      *
@@ -7359,7 +7359,7 @@
      *   contains the `@context` to be used to expand the terms when updating
      *   entity details.
      * - `id` (`String`, required): Id of the entity to update
-     * - `service` (`String`): Service/tenant to use in this operation
+     * - `tenant` (`String`): Tenant to use in this operation
      *
      * @throws {NGSI.BadRequestError}
      * @throws {NGSI.ConnectionError}
@@ -7421,7 +7421,7 @@
             method: "PATCH",
             postBody: changes,
             requestHeaders: {
-                "FIWARE-Service": options.service
+                "NGSILD-Tenant": options.tenant
             }
         }).then((response) => {
             let data;
@@ -7448,7 +7448,7 @@
     /**
      * Delete an attribute from a given entity.
      *
-     * > This method is aligned with NGSI-LD (CIM Specification v1.2.2)
+     * > This method is aligned with NGSI-LD (CIM 009 v1.3.1 Specification)
      *
      * @since 1.4
      *
@@ -7469,7 +7469,7 @@
      * - `@context` (`String`): URI pointing to the JSON-LD document which
      *   contains the `@context` to be used to expand attribute name.the terms associated with
      *   the changes.
-     * - `service` (`String`): Service/tenant to use in this operation
+     * - `tenant` (`String`): Tenant to use in this operation
      *
      * @throws {NGSI.BadRequestError}
      * @throws {NGSI.ConnectionError}
@@ -7522,7 +7522,7 @@
         };
 
         const headers = {
-            "FIWARE-Service": options.service
+            "NGSILD-Tenant": options.tenant
         };
         if (typeof options["@context"] === "string") {
             headers.Link = '<' + encodeURI(options["@context"]) + '>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"';

@@ -236,7 +236,7 @@ if ((typeof require === 'function') && typeof global != null) {
                 ).finally(done);
             });
 
-            it("basic request (using the service option)", (done) => {
+            it("basic request (using the tenant option)", (done) => {
                 ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/entities", {
                     method: "POST",
                     status: 201,
@@ -245,12 +245,12 @@ if ((typeof require === 'function') && typeof global != null) {
                     },
                     checkRequestContent: (url, options) => {
                         expect(options.requestHeaders).toEqual(jasmine.objectContaining({
-                            'FIWARE-Service': 'mytenant'
+                            'NGSILD-Tenant': 'mytenant'
                         }));
                     }
                 });
 
-                connection.ld.createEntity(entity, {service: "mytenant"}).then(
+                connection.ld.createEntity(entity, {tenant: "mytenant"}).then(
                     (result) => {
                         expect(result).toEqual({
                             entity: entity,
@@ -1254,7 +1254,7 @@ if ((typeof require === 'function') && typeof global != null) {
                 ).finally(done);
             });
 
-            it("basic request providing a custom service", (done) => {
+            it("basic request providing a custom tenant", (done) => {
                 ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/subscriptions", {
                     method: "POST",
                     status: 201,
@@ -1265,12 +1265,12 @@ if ((typeof require === 'function') && typeof global != null) {
                         const data = JSON.parse(options.postBody);
                         expect(data).toEqual(LD_JSON_SUBSCRIPTION);
                         expect(options.requestHeaders).toEqual(jasmine.objectContaining({
-                            'FIWARE-Service': 'customservice'
+                            'NGSILD-Tenant': 'customservice'
                         }));
                     }
                 });
 
-                connection.ld.createSubscription(LD_JSON_SUBSCRIPTION, {service: "customservice"}).then(
+                connection.ld.createSubscription(LD_JSON_SUBSCRIPTION, {tenant: "customservice"}).then(
                     (result) => {
                         expect(result).toEqual({
                             subscription: LD_JSON_SUBSCRIPTION,
@@ -1604,11 +1604,11 @@ if ((typeof require === 'function') && typeof global != null) {
                 ).finally(done);
             });
 
-            it("basic request (custom service)", (done) => {
+            it("basic request (custom tenant)", (done) => {
                 ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/subscriptions/urn%3Angsi-ld%3ASubscription%3AmySubscription", {
                     checkRequestContent: (url, options) => {
                         expect(options.requestHeaders).toEqual(jasmine.objectContaining({
-                            'FIWARE-Service': 'customservice'
+                            'NGSILD-Tenant': 'customservice'
                         }));
                     },
                     method: "DELETE",
@@ -1618,7 +1618,7 @@ if ((typeof require === 'function') && typeof global != null) {
                 assertSuccess(
                     connection.ld.deleteSubscription({
                         id: "urn:ngsi-ld:Subscription:mySubscription",
-                        service: "customservice"
+                        tenant: "customservice"
                     }),
                     (result) => {
                         expect(result).toEqual({});
@@ -2494,7 +2494,7 @@ if ((typeof require === 'function') && typeof global != null) {
                 ).finally(done);
             });
 
-            it("allows using the service option", (done) => {
+            it("allows using the tenant option", (done) => {
                 ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/subscriptions/urn%3Angsi-ld%3ASubscription%3AmySubscription", {
                     method: 'PATCH',
                     status: 204,
@@ -2505,7 +2505,7 @@ if ((typeof require === 'function') && typeof global != null) {
                         });
                         expect(options.parameters == null).toBeTruthy();
                         expect(options.requestHeaders).toEqual(jasmine.objectContaining({
-                            'FIWARE-Service': "customservice"
+                            'NGSILD-Tenant': "customservice"
                         }));
                     }
                 });
@@ -2515,7 +2515,7 @@ if ((typeof require === 'function') && typeof global != null) {
                         "id": "urn:ngsi-ld:Subscription:mySubscription",
                         "expires": "2016-04-05T14:00:00.00Z"
                     }, {
-                        "service": "customservice"
+                        "tenant": "customservice"
                     }),
                     (result) => {
                         expect(result).toEqual({});
