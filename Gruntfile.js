@@ -151,9 +151,13 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-karma');
     grunt.loadNpmTasks("grunt-jsdoc");
 
-    grunt.registerTask('default', [
+    grunt.registerTask('test', [
         'eslint',
         'karma:library',
+    ]);
+
+    grunt.registerTask('default', [
+        'test',
         'copy',
         'terser',
         'jsdoc'
