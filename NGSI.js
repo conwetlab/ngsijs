@@ -281,6 +281,7 @@
             ENTITY_ATTRS_COLLECTION: 'ngsi-ld/v1/entities/%(entityId)s/attrs',
             SUBSCRIPTION_COLLECTION: 'ngsi-ld/v1/subscriptions',
             SUBSCRIPTION_ENTRY: 'ngsi-ld/v1/subscriptions/%(subscriptionId)s',
+            TYPE_COLLECTION: 'ngsi-ld/v1/types',
         }
 
     };
@@ -1156,8 +1157,9 @@
         return parameters;
     };
 
-    const parse_pagination_options2 = function parse_pagination_options2(options, optionsparams, ld) {
+    const parse_pagination_options2 = function parse_pagination_options2(options, optionsparams) {
         const parameters = {};
+        const ld = optionsparams == null;
 
         if (options.limit != null) {
             if (typeof options.limit !== 'number' || !Number.isInteger(options.limit) || options.limit < (ld ? 0 : 1)) {
@@ -3037,7 +3039,7 @@
         var connection = privates.get(this);
         var url = new URL(NGSI.endpoints.v2.ENTITY_COLLECTION, connection.url);
         var optionsparams = [];
-        var parameters = parse_pagination_options2(options, optionsparams, false);
+        var parameters = parse_pagination_options2(options, optionsparams);
 
         if (options.keyValues === true) {
             optionsparams.push("keyValues");
@@ -5394,7 +5396,7 @@
         var connection = privates.get(this);
         var url = new URL(NGSI.endpoints.v2.REGISTRATION_COLLECTION, connection.url);
         var optionsparams = [];
-        var parameters = parse_pagination_options2(options, optionsparams, false);
+        var parameters = parse_pagination_options2(options, optionsparams);
 
         if (optionsparams.length !== 0) {
             parameters.options = optionsparams.join(',');
@@ -5991,7 +5993,7 @@
         var connection = privates.get(this);
         var url = new URL(NGSI.endpoints.v2.BATCH_QUERY_OP, connection.url);
         var optionsparams = [];
-        var parameters = parse_pagination_options2(options, optionsparams, false);
+        var parameters = parse_pagination_options2(options, optionsparams);
 
         if (options.keyValues === true) {
             optionsparams.push("keyValues");
@@ -6072,6 +6074,8 @@
      *   contains the `@context` to be used to expand the terms when retrieving
      *   entity details.
      * - `coordinates` (`String`): Coordinates serialized as a string.
+     * - `count` (`Boolean`; default: `false`): Request total result count
+     *   details
      * - `csf` (`String`): Context Source filter.
      * - `id` (`String`): A comma-separated list of entity ids to retrieve.
      *   Incompatible with the `idPattern` option.
@@ -6151,9 +6155,9 @@
 
         const connection = privates.get(this);
         const url = new URL(NGSI.endpoints.ld.ENTITY_COLLECTION, connection.url);
-        const optionsparams = [];
-        const parameters = parse_pagination_options2(options, optionsparams, true);
+        const parameters = parse_pagination_options2(options, null);
 
+        const optionsparams = [];
         if (options.keyValues === true) {
             optionsparams.push("keyValues");
         }
@@ -6581,6 +6585,8 @@
      * - `@context` (`String`): URI pointing to the JSON-LD document which
      *   contains the `@context` to be used to expand the terms when retrieving
      *   subscription details.
+     * - `count` (`Boolean`; default: `false`): Request total result count
+     *   details
      * - `limit` (`Number`; default: `20`): This option allow you to specify
      *   the maximum number of subscriptions you want to receive from the
      *   server
@@ -6615,9 +6621,9 @@
 
         const connection = privates.get(this);
         const url = new URL(NGSI.endpoints.ld.SUBSCRIPTION_COLLECTION, connection.url);
-        const optionsparams = [];
-        const parameters = parse_pagination_options2(options, optionsparams, true);
+        const parameters = parse_pagination_options2(options, null);
 
+        const optionsparams = [];
         if (options.sysAttrs === true) {
             optionsparams.push("sysAttrs");
         }
@@ -7556,6 +7562,106 @@
                 return Promise.reject(new NGSI.InvalidResponseError('Unexpected error code: ' + response.status));
             }
             return Promise.resolve({});
+        });
+    };
+
+    /**
+     * Retrieves the available entity types (using pagination).
+     *
+     * > This method is aligned with NGSI-LD (CIM 009 v1.3.1 Specification)
+     *
+     * @since 1.4
+     *
+     * @name NGSI.Connection#ld.listTypes
+     * @method "ld.listTypes"
+     * @memberof NGSI.Connection
+     *
+     * @param {Object} [options]
+     *
+     * Object with extra options:
+     *
+     * - `@context` (`String`): URI pointing to the JSON-LD document which
+     *   contains the `@context` to be used to expand the terms when retrieving
+     *   subscription details.
+     * - `count` (`Boolean`; default: `false`): Request total result count
+     *   details
+     * - `limit` (`Number`; default: `20`): This option allow you to specify
+     *   the maximum number of subscriptions you want to receive from the
+     *   server
+     * - `offset` (`Number`; default: `0`): Allows you to skip a given
+     *   number of elements at the beginning
+     * - `tenant` (`String`): Tenant to use in this operation
+     * - `details` (`Boolean`): If `true`, then detailed entity type information
+     *   represented as an array with elements of the Entity Type data structure
+     *   will be returned by the server
+     *
+     * @throws {NGSI.BadRequestError}
+     * @throws {NGSI.ConnectionError}
+     * @throws {NGSI.InvalidResponseError}
+     *
+     * @returns {Promise}
+     *
+     * @example <caption>Retrieve first 20 types from the Context Broker</caption>
+     *
+     * connection.ld.listTypes().then(
+     *     (response) => {
+     *         // Types retrieved successfully
+     *         // response.results is an array with the retrieved subscriptions
+     *     }, (error) => {
+     *         // Error retrieving subscriptions
+     *     }
+     * );
+     *
+     */
+    NGSI.Connection.LD.prototype.listTypes = function listTypes(options) {
+        if (options == null) {
+            options = {};
+        }
+
+        const connection = privates.get(this);
+        const url = new URL(NGSI.endpoints.ld.TYPE_COLLECTION, connection.url);
+        const parameters = parse_pagination_options2(options, null);
+        parameters.details = options.details;
+
+        const headers = {
+            "Accept": "application/ld+json, application/json",
+            "NGSILD-Tenant": options.tenant
+        };
+
+        if (typeof options["@context"] === "string") {
+            headers.Link = '<' + encodeURI(options["@context"]) + '>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"';
+        }
+
+        return makeJSONRequest2.call(connection, url, {
+            method: "GET",
+            parameters: parameters,
+            requestHeaders: headers
+        }).then((response) => {
+            if (response.status === 400) {
+                return parse_bad_request_ld(response);
+            } else if (response.status !== 200) {
+                return Promise.reject(new NGSI.InvalidResponseError('Unexpected error code: ' + response.status));
+            }
+
+            let data;
+            try {
+                data = JSON.parse(response.responseText);
+            } catch (e) {
+                return Promise.reject(new NGSI.InvalidResponseError('Server returned invalid JSON content'));
+            }
+
+            const result = {
+                format: response.getHeader('Content-Type'),
+                limit: options.limit,
+                offset: options.offset,
+                results: data
+            };
+            if (options.count === true) {
+                const count = response.getHeader("NGSILD-Results-Count");
+                result.count = count != null ? parseInt(count, 10) : null;
+            }
+
+            return Promise.resolve(result);
         });
     };
 
