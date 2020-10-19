@@ -2891,6 +2891,209 @@ if ((typeof require === 'function') && typeof global != null) {
 
         });
 
+        describe("listTypes(options)", () => {
+
+            it("should limit types to 20 by default", (done) => {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/types", {
+                    checkRequestContent: (url, options) => {
+                        expect(options.parameters.options).not.toBeDefined();
+                    },
+                    headers: {
+                        'Content-Type': 'application/ld+json',
+                    },
+                    method: "GET",
+                    status: 200,
+                    responseText: '[]'
+                });
+
+                connection.ld.listTypes().then(
+                    (result) => {
+                        expect(result).toEqual({
+                            format: 'application/ld+json',
+                            limit: 20,
+                            offset: 0,
+                            results: []
+                        });
+                    },
+                    (e) => {
+                        fail("Failure callback called");
+                    }
+                ).finally(done);
+            });
+
+            it("basic request with empty results (using the details option)", (done) => {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/types", {
+                    checkRequestContent: (url, options) => {
+                        expect(options.parameters.details).toBe(true);
+                    },
+                    headers: {
+                        'Content-Type': 'application/ld+json',
+                    },
+                    method: "GET",
+                    status: 200,
+                    responseText: '[]'
+                });
+
+                connection.ld.listTypes({details: true}).then(
+                    (result) => {
+                        expect(result).toEqual({
+                            format: 'application/ld+json',
+                            limit: 20,
+                            offset: 0,
+                            results: []
+                        });
+                    },
+                    (e) => {
+                        fail("Failure callback called");
+                    }
+                ).finally(done);
+            });
+
+            it("basic request using the @context option", (done) => {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/types", {
+                    headers: {
+                        'Content-Type': 'application/ld+json',
+                    },
+                    method: 'GET',
+                    status: 200,
+                    responseText: JSON.stringify([LD_JSON_ENTITY]),
+                    checkRequestContent: (url, options) => {
+                        expect(options.requestHeaders.Link).toBe('<https://json-ld.org/contexts/person.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"');
+                    }
+                });
+
+                connection.ld.listTypes({
+                    "@context": "https://json-ld.org/contexts/person.jsonld"
+                }).then(
+                    (result) => {
+                        expect(result).toEqual({
+                            format: "application/ld+json",
+                            limit: 20,
+                            offset: 0,
+                            results: [LD_JSON_ENTITY]
+                        });
+                    }, (e) => {
+                        fail("Failure callback called");
+                    }
+                ).finally(done);
+            });
+
+            it("should handle the count option", (done) => {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/types", {
+                    headers: {
+                        'Content-Type': 'application/ld+json',
+                        'NGSILD-Results-Count': '5',
+                    },
+                    method: 'GET',
+                    status: 200,
+                    responseText: '[]',
+                    checkRequestContent: (url, options) => {
+                        expect(options.parameters.count).toBe(true);
+                    },
+                });
+
+                assertSuccess(
+                    connection.ld.listTypes({
+                        limit: 0,
+                        count: true,
+                        offset: 0
+                    }),
+                    (result) => {
+                        expect(result).toEqual({
+                            count: 5,
+                            format: "application/ld+json",
+                            limit: 0,
+                            offset: 0,
+                            results: []
+                        });
+                    }
+                ).finally(done);
+            });
+
+            it("should handle the count option when server does not implement it", (done) => {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/types", {
+                    headers: {
+                        'Content-Type': 'application/ld+json'
+                    },
+                    method: 'GET',
+                    status: 200,
+                    responseText: '[]',
+                    checkRequestContent: (url, options) => {
+                        expect(options.parameters.count).toBe(true);
+                    },
+                });
+
+                assertSuccess(
+                    connection.ld.listTypes({
+                        limit: 0,
+                        count: true,
+                        offset: 0
+                    }),
+                    (result) => {
+                        expect(result).toEqual({
+                            count: null,
+                            format: "application/ld+json",
+                            limit: 0,
+                            offset: 0,
+                            results: []
+                        });
+                    }
+                ).finally(done);
+            });
+
+            it("invalid json response", (done) => {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/types", {
+                    headers: {
+                        'Content-Type': 'application/ld+json',
+                    },
+                    method: "GET",
+                    status: 200,
+                    responseText: 'invalid'
+                });
+
+                connection.ld.listTypes().then(
+                    fail,
+                    (e) => {
+                        expect(e).toEqual(jasmine.any(NGSI.InvalidResponseError));
+                    }
+                ).finally(done);
+            });
+
+            it("bad request", (done) => {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/types", {
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    method: "GET",
+                    status: 400,
+                    responseText: '{"type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData", "title": "Invalid characters in entity id", "detail": "no detail"}'
+                });
+
+                connection.ld.listTypes({id: "21$("}).then(
+                    fail,
+                    (e) => {
+                        expect(e).toEqual(jasmine.any(NGSI.BadRequestError));
+                        expect(e.message).toBe("Invalid characters in entity id");
+                    }
+                ).finally(done);
+            });
+
+            it("unexpected error code", (done) => {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/types", {
+                    method: "GET",
+                    status: 204
+                });
+
+                connection.ld.listTypes({type: "Room"}).then(
+                    fail,
+                    (e) => {
+                        expect(e).toEqual(jasmine.any(NGSI.InvalidResponseError));
+                    }
+                ).finally(done);
+            });
+
+        });
+
     });
 
 })();
