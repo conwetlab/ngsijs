@@ -2,7 +2,10 @@ ngsi-proxy/node_modules
 nodejs/lib/NGSI.js
 nodejs/*.log
 node_modules
+coverage
 build
 dist
 .grunt
 *.DS_Store
+*~
+*.swp

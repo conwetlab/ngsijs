@@ -3094,6 +3094,124 @@ if ((typeof require === 'function') && typeof global != null) {
 
         });
 
+        describe("getType(options)", () => {
+
+            it("requires the option parameter", () => {
+                expect(() => {
+                    connection.ld.getType();
+                }).toThrowError(TypeError);
+            });
+
+            it("requires the type option", () => {
+                expect(() => {
+                    connection.ld.getType({});
+                }).toThrowError(TypeError);
+            });
+
+            it("should return type details", (done) => {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/types/https%3A%2F%2Furi.fiware.org%2Fns%2Fdata-models%23Vehicle", {
+                    headers: {
+                        "Content-Type": "application/ld+json",
+                    },
+                    method: "GET",
+                    status: 200,
+                    responseText: "{}"
+                });
+
+                assertSuccess(
+                    connection.ld.getType("https://uri.fiware.org/ns/data-models#Vehicle"),
+                    (result) => {
+                        expect(result).toEqual({
+                            format: "application/ld+json",
+                            type: {}
+                        });
+                    }
+                ).finally(done);
+            });
+
+            it("should return type details using the @context option", (done) => {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/types/Vehicle", {
+                    checkRequestContent: (url, options) => {
+                        expect(options.requestHeaders.Link).toBe('<https://fiware.github.io/data-models/context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"');
+                    },
+                    headers: {
+                        "Content-Type": "application/ld+json",
+                    },
+                    method: "GET",
+                    status: 200,
+                    responseText: "{}"
+                });
+
+                assertSuccess(
+                    connection.ld.getType({
+                        type: "Vehicle",
+                        "@context": "https://fiware.github.io/data-models/context.jsonld"
+                    }),
+                    (result) => {
+                        expect(result).toEqual({
+                            format: "application/ld+json",
+                            type: {}
+                        });
+                    }
+                ).finally(done);
+            });
+
+            it("invalid json response", (done) => {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/types/Vehicle", {
+                    headers: {
+                        'Content-Type': 'application/ld+json',
+                    },
+                    method: "GET",
+                    status: 200,
+                    responseText: 'invalid'
+                });
+
+                assertFailure(
+                    connection.ld.getType({
+                        type: "Vehicle",
+                        "@context": "https://fiware.github.io/data-models/context.jsonld"
+                    }),
+                    (e) => {
+                        expect(e).toEqual(jasmine.any(NGSI.InvalidResponseError));
+                    }
+                ).finally(done);
+            });
+
+            it("bad request", (done) => {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/types/21%24(", {
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    method: "GET",
+                    status: 400,
+                    responseText: '{"type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData", "title": "Invalid characters in entity id", "detail": "no detail"}'
+                });
+
+                connection.ld.getType("21$(").then(
+                    fail,
+                    (e) => {
+                        expect(e).toEqual(jasmine.any(NGSI.BadRequestError));
+                        expect(e.message).toBe("Invalid characters in entity id");
+                    }
+                ).finally(done);
+            });
+
+            it("unexpected error code", (done) => {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/types/Room", {
+                    method: "GET",
+                    status: 204
+                });
+
+                connection.ld.getType({type: "Room"}).then(
+                    fail,
+                    (e) => {
+                        expect(e).toEqual(jasmine.any(NGSI.InvalidResponseError));
+                    }
+                ).finally(done);
+            });
+
+        });
+
     });
 
 })();

@@ -282,6 +282,7 @@
             SUBSCRIPTION_COLLECTION: 'ngsi-ld/v1/subscriptions',
             SUBSCRIPTION_ENTRY: 'ngsi-ld/v1/subscriptions/%(subscriptionId)s',
             TYPE_COLLECTION: 'ngsi-ld/v1/types',
+            TYPE_ENTRY: 'ngsi-ld/v1/types/%(typeId)s'
         }
 
     };
@@ -4653,7 +4654,7 @@
         var connection = privates.get(this);
         var url = new URL(NGSI.endpoints.v2.TYPE_COLLECTION, connection.url);
         var optionsparams = [];
-        var parameters = parse_pagination_options2(options, optionsparams, false);
+        var parameters = parse_pagination_options2(options, optionsparams);
         if (options.values === true) {
             optionsparams.push("values");
         }
@@ -4838,7 +4839,7 @@
         var connection = privates.get(this);
         var url = new URL(NGSI.endpoints.v2.SUBSCRIPTION_COLLECTION, connection.url);
         var optionsparams = [];
-        var parameters = parse_pagination_options2(options, optionsparams, false);
+        var parameters = parse_pagination_options2(options, optionsparams);
 
         if (optionsparams.length !== 0) {
             parameters.options = optionsparams.join(',');
@@ -7662,6 +7663,106 @@
             }
 
             return Promise.resolve(result);
+        });
+    };
+
+    /**
+     * Retrieves entity type information.
+     *
+     * > This method is aligned with NGSI-LD (CIM 009 v1.3.1 Specification)
+     *
+     * @since 1.4
+     *
+     * @name NGSI.Connection#ld.getType
+     * @method "ld.getTypes"
+     * @memberof NGSI.Connection
+     *
+     * @param {String|Object} options String with the name of the type to query
+     * or an object with extra options:
+     *
+     * - `@context` (`String`): URI pointing to the JSON-LD document which
+     *   contains the `@context` to be used to expand the terms when retrieving
+     *   subscription details.
+     * - `tenant` (`String`): Tenant to use in this operation
+     * - `type` (`String`): Name of the type to query
+     *
+     * @throws {NGSI.BadRequestError}
+     * @throws {NGSI.ConnectionError}
+     * @throws {NGSI.InvalidResponseError}
+     *
+     * @returns {Promise}
+     *
+     * @example <caption>Retrieve type information using FQN</caption>
+     *
+     * connection.ld.getType("https://uri.fiware.org/ns/data-models#Vehicle").then(
+     *     (information) => {
+     *         // Types retrieved successfully
+     *         // response.type type details
+     *     }, (error) => {
+     *         // Error retrieving type information
+     *     }
+     * );
+     *
+     * @example <caption>Retrieve type information using short name</caption>
+     *
+     * const await details = connection.ld.getType({
+     *     type: "Vehicle",
+     *     "@context": "https://fiware.github.io/data-models/context.jsonld"
+     * }).type;
+     *
+     */
+    NGSI.Connection.LD.prototype.getType = function getType(options) {
+        if (typeof options === "string") {
+            options = {type: options};
+        } else if (options == null) {
+            throw new TypeError("missing options parameter");
+        }
+
+        if (options.type == null) {
+            throw new TypeError("missing type option");
+        }
+
+        const connection = privates.get(this);
+        const url = new URL(
+            interpolate(
+                NGSI.endpoints.ld.TYPE_ENTRY,
+                {
+                    typeId: encodeURIComponent(options.type)
+                }
+            ),
+            connection.url
+        );
+
+        const headers = {
+            "Accept": "application/ld+json, application/json",
+            "NGSILD-Tenant": options.tenant
+        };
+
+        if (typeof options["@context"] === "string") {
+            headers.Link = '<' + encodeURI(options["@context"]) + '>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"';
+        }
+
+        return makeJSONRequest2.call(connection, url, {
+            method: "GET",
+            requestHeaders: headers
+        }).then((response) => {
+            if (response.status === 400) {
+                return parse_bad_request_ld(response);
+            } else if (response.status === 404) {
+                return parse_not_found_response_ld(response);
+            } else if (response.status !== 200) {
+                return Promise.reject(new NGSI.InvalidResponseError('Unexpected error code: ' + response.status));
+            }
+            let data;
+            try {
+                data = JSON.parse(response.responseText);
+            } catch (e) {
+                throw new NGSI.InvalidResponseError('Server returned invalid JSON content');
+            }
+            return Promise.resolve({
+                format: response.getHeader('Content-Type'),
+                type: data
+            });
         });
     };
 
