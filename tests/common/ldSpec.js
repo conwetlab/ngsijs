@@ -973,15 +973,6 @@ if ((typeof require === 'function') && typeof global != null) {
                 }).toThrowError(TypeError);
             });
 
-            it("throws a TypeError exception when using the type and typePattern options at the same time", () => {
-                expect(() => {
-                    connection.ld.queryEntities({
-                        type: "myType",
-                        typePattern: "my.*"
-                    });
-                }).toThrowError(TypeError);
-            });
-
             it("should assume idPattern: .* by default", (done) => {
                 ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/entities", {
                     checkRequestContent: (url, options) => {
@@ -3203,6 +3194,25 @@ if ((typeof require === 'function') && typeof global != null) {
                     }),
                     (e) => {
                         expect(e).toEqual(jasmine.any(NGSI.InvalidResponseError));
+                    }
+                ).finally(done);
+            });
+
+            it("not found", (done) => {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/types/21%24(", {
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    method: "GET",
+                    status: 404,
+                    responseText: '{"type": "https://uri.etsi.org/ngsi-ld/errors/ResourceNotFound", "title": "Type not found", "detail": ""}'
+                });
+
+                connection.ld.getType("21$(").then(
+                    fail,
+                    (e) => {
+                        expect(e).toEqual(jasmine.any(NGSI.NotFoundError));
+                        expect(e.message).toBe("Type not found");
                     }
                 ).finally(done);
             });

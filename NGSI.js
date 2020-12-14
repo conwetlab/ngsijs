@@ -6068,10 +6068,11 @@
      *
      * Object with extra options:
      *
-     * - `attrs` (`String`): Comma-separated list of attribute names whose data
-     *   are to be included in the response. The attributes are retrieved in the
-     *   order specified by this parameter. If this parameter is not included,
-     *   the attributes are retrieved in arbitrary order.
+     * - `attrs` (`String`|`Array`): String array or comma-separated list of
+     *   attribute names whose data are to be included in the response. The
+     *   attributes are retrieved in the order specified by this parameter. If
+     *   this parameter is not included, the attributes are retrieved in
+     *   arbitrary order.
      * - `@context` (`String`): URI pointing to the JSON-LD document which
      *   contains the `@context` to be used to expand the terms when retrieving
      *   entity details.
@@ -6084,6 +6085,7 @@
      * - `idPattern` (`String`): A correctly formated regular expression.
      *   Retrieve entities whose ID matches the regular expression. Incompatible
      *   with the `id` option
+     * - `keyValues` (`Boolean`; default: `false`): Use flat attributes
      * - `limit` (`Number`; default: `20`): This option allow you to specify
      *   the maximum number of entities you want to receive from the server
      * - `offset` (`Number`; default: `0`): Allows you to skip a given number of
@@ -6102,11 +6104,8 @@
      *   `modifiedAt`).
      * - `tenant` (`String`): Tenant to use in this operation
      * - `type` (`String`): A comma-separated list of entity types to retrieve.
-     *   Incompatible with the `typePattern` option.
-     * - `typePattern` (`String`): A correctly formated regular expression.
-     *   Retrieve entities whose type matches the regular expression.
-     *   Incompatible with the `type` option.
      *
+     * @throws {NGSI.BadRequestError}
      * @throws {NGSI.ConnectionError}
      * @throws {NGSI.InvalidResponseError}
      *
@@ -6147,11 +6146,7 @@
             throw new TypeError('id and idPattern options cannot be used at the same time');
         }
 
-        if (options.type != null && options.typePattern != null) {
-            throw new TypeError('type and typePattern options cannot be used at the same time');
-        }
-
-        if (options.id == null && options.idPattern == null && options.type == null && options.typePattern == null) {
+        if (options.id == null && options.idPattern == null && options.type == null) {
             options.idPattern = ".*";
         }
 
@@ -6170,13 +6165,13 @@
             parameters.options = optionsparams.join(',');
         }
 
-        parameters.attrs = options.attrs;
+        parameters.attrs = Array.isArray(options.attrs) ? options.attrs.join(',') : options.attrs;
         parameters.csf = options.csf;
         parameters.id = options.id;
         parameters.idPattern = options.idPattern;
         parameters.q = options.q;
         parameters.type = options.type;
-        parameters.typePattern = options.typePattern;
+        parameters.geoproperty = options.geoproperty;
         parameters.georel = options.georel;
         parameters.geometry = options.geometry;
         parameters.coordinates = options.coordinates;
@@ -6560,7 +6555,7 @@
         }).then((response) => {
             if (response.status === 400) {
                 return parse_bad_request_ld(response);
-            } else if (response.status === 404) {
+            } else if (response.status === 404) {
                 return parse_not_found_response_ld(response);
             } else if (response.status !== 204) {
                 return Promise.reject(new NGSI.InvalidResponseError('Unexpected error code: ' + response.status));
@@ -7715,7 +7710,7 @@
     NGSI.Connection.LD.prototype.getType = function getType(options) {
         if (typeof options === "string") {
             options = {type: options};
-        } else if (options == null) {
+        } else if (options == null) {
             throw new TypeError("missing options parameter");
         }
 
