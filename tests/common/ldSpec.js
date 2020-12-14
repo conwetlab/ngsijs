@@ -85,6 +85,36 @@ if ((typeof require === 'function') && typeof global != null) {
         }
     };
 
+    const LD_JSON_TEMPORAL_ENTITY = {
+        "id": "urn:ngsi-ld:Vehicle:B9211",
+        "type": "Vehicle",
+        "brandName": [
+            {
+                "type": "Property",
+                "value": "Volvo",
+            }
+        ],
+        "speed": [
+            {
+                "type": "Property",
+                "value": 120,
+                "observedAt": "2018-08-01T12:03:00Z"
+            }, {
+                "type": "Property",
+                "value": 80,
+                "observedAt": "2018-08-01T12:05:00Z"
+            }, {
+                "type": "Property",
+                "value": 100,
+                "observedAt": "2018-08-01T12:07:00Z"
+            }
+        ],
+        "@context": [
+            "http://example.org/ngsi-ld/latest/vehicle.jsonld",
+            "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.3.jsonld"
+        ]
+    };
+
     const KEY_VALUES_ENTITY = {
         "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
         "id": "urn:ngsi-ld:Road:Spain-Road-A62",
@@ -3204,6 +3234,327 @@ if ((typeof require === 'function') && typeof global != null) {
 
                 connection.ld.getType({type: "Room"}).then(
                     fail,
+                    (e) => {
+                        expect(e).toEqual(jasmine.any(NGSI.InvalidResponseError));
+                    }
+                ).finally(done);
+            });
+
+        });
+
+        describe("queryTemporalEntities(options)", () => {
+
+            it("throws a TypeError exception when not passing the minimal options", () => {
+                expect(() => {
+                    connection.ld.queryTemporalEntities();
+                }).toThrowError(TypeError);
+            });
+
+            it("throws a TypeError exception when passing an empty attrs list", () => {
+                expect(() => {
+                    connection.ld.queryTemporalEntities({attrs: []});
+                }).toThrowError(TypeError);
+            });
+
+            it("throws a TypeError exception if timerel is between and endTimeAt is missing", () => {
+                expect(() => {
+                    connection.ld.queryTemporalEntities({
+                        attrs: ["https://uri.fiware.org/ns/data-models#speed"],
+                        timerel: "between"
+                    });
+                }).toThrowError(TypeError);
+            });
+
+            it("throws a TypeError exception when using the id and idPattern options at the same time", () => {
+                expect(() => {
+                    connection.ld.queryTemporalEntities({
+                        id: "urn:myentity",
+                        idPattern: "my.*"
+                    });
+                }).toThrowError(TypeError);
+            });
+
+            it("should handle the count option", (done) => {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/temporal/entities", {
+                    checkRequestContent: (url, options) => {
+                        expect(options.parameters.options).not.toBeDefined();
+                        expect(options.parameters.count).toBe(true);
+                        expect(options.parameters.idPattern).toBe("urn:ngsi-ld:Vehicle:.*");
+                        expect(options.parameters.type).toBe("https://uri.fiware.org/ns/data-models#Vehicle");
+                    },
+                    headers: {
+                        'Content-Type': 'application/ld+json',
+                        'NGSILD-Results-Count': '5',
+                    },
+                    method: "GET",
+                    status: 200,
+                    responseText: '[]'
+                });
+
+                assertSuccess(
+                    connection.ld.queryTemporalEntities({
+                        limit: 0,
+                        count: true,
+                        idPattern: "urn:ngsi-ld:Vehicle:.*",
+                        type: "https://uri.fiware.org/ns/data-models#Vehicle"
+                    }),
+                    (result) => {
+                        expect(result).toEqual({
+                            count: 5,
+                            format: 'application/ld+json',
+                            limit: 0,
+                            offset: 0,
+                            results: []
+                        });
+                    }
+                ).finally(done);
+            });
+
+            it("should handle the count option when server does not implement it", (done) => {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/temporal/entities", {
+                    checkRequestContent: (url, options) => {
+                        expect(options.parameters.options).not.toBeDefined();
+                        expect(options.parameters.count).toBe(true);
+                    },
+                    headers: {
+                        'Content-Type': 'application/ld+json',
+                    },
+                    method: "GET",
+                    status: 200,
+                    responseText: '[]'
+                });
+
+                assertSuccess(
+                    connection.ld.queryTemporalEntities({
+                        limit: 0,
+                        count: true,
+                        idPattern: "urn:ngsi-ld:Vehicle:.*",
+                        type: "https://uri.fiware.org/ns/data-models#Vehicle"
+                    }),
+                    (result) => {
+                        expect(result).toEqual({
+                            count: null,
+                            format: 'application/ld+json',
+                            limit: 0,
+                            offset: 0,
+                            results: []
+                        });
+                    }
+                ).finally(done);
+            });
+
+            it("basic request (using the type option) with empty results", (done) => {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/temporal/entities", {
+                    checkRequestContent: (url, options) => {
+                        expect(options.parameters.options).not.toBeDefined();
+                        expect(options.parameters.idPattern).not.toBeDefined();
+                        expect(options.parameters.type).toBe("Room");
+                    },
+                    headers: {
+                        'Content-Type': 'application/ld+json',
+                    },
+                    method: "GET",
+                    status: 200,
+                    responseText: '[]'
+                });
+
+                connection.ld.queryTemporalEntities({type: "Room"}).then(
+                    (result) => {
+                        expect(result).toEqual({
+                            format: 'application/ld+json',
+                            limit: 20,
+                            offset: 0,
+                            results: []
+                        });
+                    },
+                    (e) => {
+                        fail("Failure callback called");
+                    }
+                ).finally(done);
+            });
+
+            it("basic request with empty results (using the temporalValues option)", (done) => {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/temporal/entities", {
+                    checkRequestContent: (url, options) => {
+                        expect(options.parameters.options).toBe("temporalValues");
+                    },
+                    headers: {
+                        'Content-Type': 'application/ld+json',
+                    },
+                    method: "GET",
+                    status: 200,
+                    responseText: '[]'
+                });
+
+                assertSuccess(
+                    connection.ld.queryTemporalEntities({
+                        attrs: ["speed"],
+                        temporalValues: true,
+                        "@context": "https://schema.lab.fiware.org/ld/context"
+
+                    }),
+                    (result) => {
+                        expect(result).toEqual({
+                            format: 'application/ld+json',
+                            limit: 20,
+                            offset: 0,
+                            results: []
+                        });
+                    }
+                ).finally(done);
+            });
+
+            it("basic request with empty results (using timerel between)", (done) => {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/temporal/entities", {
+                    checkRequestContent: (url, options) => {
+                        expect(options.parameters.timeAt).toBe("2020-12-01T00:00:00.000Z");
+                        expect(options.parameters.endTimeAt).toBe("2020-12-14T00:00:00.000Z");
+                    },
+                    headers: {
+                        'Content-Type': 'application/ld+json',
+                    },
+                    method: "GET",
+                    status: 200,
+                    responseText: '[]'
+                });
+
+                assertSuccess(
+                    connection.ld.queryTemporalEntities({
+                        attrs: ["speed"],
+                        timerel: "between",
+                        timeAt: "2020-12-01T00:00:00.000Z",
+                        endTimeAt: "2020-12-14T00:00:00.000Z",
+                        "@context": "https://schema.lab.fiware.org/ld/context"
+
+                    }),
+                    (result) => {
+                        expect(result).toEqual({
+                            format: 'application/ld+json',
+                            limit: 20,
+                            offset: 0,
+                            results: []
+                        });
+                    }
+                ).finally(done);
+            });
+
+            it("basic request with empty results (using timerel between using Dates)", (done) => {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/temporal/entities", {
+                    checkRequestContent: (url, options) => {
+                        expect(options.parameters.timeAt).toBe("2020-12-01T00:00:00.000Z");
+                        expect(options.parameters.endTimeAt).toBe("2020-12-14T00:00:00.000Z");
+                    },
+                    headers: {
+                        'Content-Type': 'application/ld+json',
+                    },
+                    method: "GET",
+                    status: 200,
+                    responseText: '[]'
+                });
+
+                assertSuccess(
+                    connection.ld.queryTemporalEntities({
+                        attrs: ["speed"],
+                        timerel: "between",
+                        timeAt: new Date("2020-12-01"),
+                        endTimeAt: new Date("2020-12-14"),
+                        "@context": "https://schema.lab.fiware.org/ld/context"
+
+                    }),
+                    (result) => {
+                        expect(result).toEqual({
+                            format: 'application/ld+json',
+                            limit: 20,
+                            offset: 0,
+                            results: []
+                        });
+                    }
+                ).finally(done);
+            });
+
+            it("basic request using the @context option", (done) => {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/temporal/entities", {
+                    headers: {
+                        'Content-Type': 'application/ld+json',
+                    },
+                    method: 'GET',
+                    status: 200,
+                    responseText: JSON.stringify([LD_JSON_TEMPORAL_ENTITY]),
+                    checkRequestContent: (url, options) => {
+                        expect(options.requestHeaders.Link).toBe('<https://schema.lab.fiware.org/ld/context>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"');
+                    }
+                });
+
+                assertSuccess(
+                    connection.ld.queryTemporalEntities({
+                        type: "Vehicle",
+                        "@context": "https://schema.lab.fiware.org/ld/context"
+                    }),
+                    (result) => {
+                        expect(result).toEqual({
+                            format: "application/ld+json",
+                            limit: 20,
+                            offset: 0,
+                            results: [LD_JSON_TEMPORAL_ENTITY]
+                        });
+                    }
+                ).finally(done);
+            });
+
+            it("invalid json response", (done) => {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/temporal/entities", {
+                    headers: {
+                        'Content-Type': 'application/ld+json',
+                    },
+                    method: "GET",
+                    status: 200,
+                    responseText: 'invalid'
+                });
+
+                assertFailure(
+                    connection.ld.queryTemporalEntities({
+                        type: "Vehicle",
+                        "@context": "https://schema.lab.fiware.org/ld/context"
+                    }),
+                    (e) => {
+                        expect(e).toEqual(jasmine.any(NGSI.InvalidResponseError));
+                    }
+                ).finally(done);
+            });
+
+            it("bad request", (done) => {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/temporal/entities", {
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    method: "GET",
+                    status: 400,
+                    responseText: '{"type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData", "title": "Invalid characters in entity type", "detail": "no detail"}'
+                });
+
+                assertFailure(
+                    connection.ld.queryTemporalEntities({
+                        type: "21$(",
+                        "@context": "https://schema.lab.fiware.org/ld/context"
+                    }),
+                    (e) => {
+                        expect(e).toEqual(jasmine.any(NGSI.BadRequestError));
+                        expect(e.message).toBe("Invalid characters in entity type");
+                    }
+                ).finally(done);
+            });
+
+            it("unexpected error code", (done) => {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/temporal/entities", {
+                    method: "GET",
+                    status: 204
+                });
+
+                assertFailure(
+                    connection.ld.queryTemporalEntities({
+                        type: "Vehicle",
+                        "@context": "https://schema.lab.fiware.org/ld/context"
+                    }),
                     (e) => {
                         expect(e).toEqual(jasmine.any(NGSI.InvalidResponseError));
                     }
