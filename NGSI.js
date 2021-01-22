@@ -282,6 +282,7 @@
             SUBSCRIPTION_COLLECTION: 'ngsi-ld/v1/subscriptions',
             SUBSCRIPTION_ENTRY: 'ngsi-ld/v1/subscriptions/%(subscriptionId)s',
             TEMPORAL_ENTITY_COLLECTION: 'ngsi-ld/v1/temporal/entities',
+            TEMPORAL_ENTITY_ENTRY: 'ngsi-ld/v1/temporal/entities/%(entityId)s',
             TYPE_COLLECTION: 'ngsi-ld/v1/types',
             TYPE_ENTRY: 'ngsi-ld/v1/types/%(typeId)s'
         }
@@ -8146,8 +8147,78 @@
             }
             return Promise.resolve({
                 entity: entity,
+                created: response.status === 201,
                 location: response.getHeader("Location")
             });
+        });
+    };
+
+    /**
+     * Removes a temporal entity from the context broker server.
+     *
+     * > This method is aligned with NGSI-LD (CIM 009 v1.3.1 Specification)
+     *
+     * @since 1.4
+     *
+     * @name NGSI.Connection#ld.deleteTemporalEntity
+     * @method "ld.deleteTemporalEntity"
+     * @memberof NGSI.Connection
+     *
+     * @param {String|Object} options
+     *
+     * String with the entity id to remove or an object providing options:
+     *
+     * - `id` (`String`, required): Id of the entity to remove
+     * - `tenant` (`String`): Tenant to use in this operation
+     *
+     * @throws {NGSI.ConnectionError}
+     * @throws {NGSI.InvalidResponseError}
+     * @throws {NGSI.NotFoundError}
+     * @throws {NGSI.TooManyResultsError}
+     *
+     * @returns {Promise}
+     *
+     * @example <caption>Remove entity by Id</caption>
+     *
+     * connection.ld.deleteTemporalEntity("urn:ngsi-ld:RoadSegment:Spain-Road-A62").then(
+     *     (response) => {
+     *         // Temporal entity deleted successfully
+     *     }, (error) => {
+     *         // Error deleting the temporal entity
+     *     }
+     * );
+     *
+     */
+    NGSI.Connection.LD.prototype.deleteTemporalEntity = function deleteTemporalEntity(options) {
+        if (options == null) {
+            throw new TypeError("missing options parameter");
+        }
+
+        if (typeof options === "string") {
+            options = {
+                id: options
+            };
+        } else if (options.id == null) {
+            throw new TypeError("missing id option");
+        }
+
+        const connection = privates.get(this);
+        const url = new URL(interpolate(NGSI.endpoints.ld.TEMPORAL_ENTITY_ENTRY, {entityId: encodeURIComponent(options.id)}), connection.url);
+
+        return makeJSONRequest2.call(connection, url, {
+            method: "DELETE",
+            requestHeaders: {
+                "NGSILD-Tenant": options.tenant
+            }
+        }).then((response) => {
+            if (response.status === 400) {
+                return parse_bad_request_ld(response);
+            } else if (response.status === 404) {
+                return parse_not_found_response_ld(response);
+            } else if (response.status !== 204) {
+                return Promise.reject(new NGSI.InvalidResponseError("Unexpected error code: " + response.status));
+            }
+            return Promise.resolve({});
         });
     };
 
