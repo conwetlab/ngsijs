@@ -3416,6 +3416,7 @@ if ((typeof require === 'function') && typeof global != null) {
             });
 
             it("basic request with empty results (using timerel between)", (done) => {
+
                 ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/temporal/entities", {
                     checkRequestContent: (url, options) => {
                         expect(options.parameters.timeAt).toBe("2020-12-01T00:00:00.000Z");

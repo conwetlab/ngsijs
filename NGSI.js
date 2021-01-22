@@ -1641,76 +1641,99 @@
 
     /* NGSI Connection Error */
 
+    NGSI.Error = class NGSIError extends Error {
+
+        constructor(name, message) {
+            super(message);
+
+            this.name = name;
+            this.message = message || "";
+
+            // Maintains proper stack trace for where our error was thrown (only available on V8)
+            if (Error.captureStackTrace) {
+                Error.captureStackTrace(this, this.constructor);
+            }
+        }
+
+    };
+
     /**
      * Error raised if there are problems connecting to the context broker
      * server. Browsers doesn't provide details about the connection problem due
      * security concerns, so this exception doesn't provide those details.
      *
      * @class
-     * @extends Error
+     * @extends NGSI.Error
      * @name NGSI.ConnectionError
      * @summary Exception raised for connection problems.
      */
-    NGSI.ConnectionError = function ConnectionError(message) {
-        this.name = 'ConnectionError';
-        this.message = message || 'Connection Error';
-    };
-    NGSI.ConnectionError.prototype = new Error();
-    NGSI.ConnectionError.prototype.constructor = NGSI.ConnectionError;
+    NGSI.ConnectionError = class ConnectionError extends NGSI.Error {
+
+        constructor(message) {
+            super("ConnectionError", message || "Connection Error");
+        };
+
+    }
 
     /**
      * Error raised if the context broker server detected some problems with the
      * data provided in the request.
      *
      * @class
-     * @extends Error
+     * @extends NGSI.Error
      * @name NGSI.InvalidRequestError
      * @summary Exception raised when the context broker server reject the
      * request.
      */
-    NGSI.InvalidRequestError = function InvalidRequestError(code, message, details) {
-        this.name = 'InvalidRequest';
-        this.code = code;
-        this.message = message || '';
-        this.details = details || '';
+    NGSI.InvalidRequestError = class InvalidRequestError extends NGSI.Error {
+
+        constructor(code, message, details) {
+            super("InvalidRequest", message);
+
+            this.code = code;
+            this.details = details || "";
+        }
+
     };
-    NGSI.InvalidRequestError.prototype = new Error();
-    NGSI.InvalidRequestError.prototype.constructor = NGSI.InvalidRequestError;
 
     /**
      * Exception raised when creating an entity that already exists.
      * Error code used by the context broker server: 422 Unprocessable
      *
      * @class
-     * @extends Error
+     * @extends NGSI.Error
      * @name NGSI.AlreadyExistsError
      * @summary Exception raised when creating an entity that already exists.
      */
-    NGSI.AlreadyExistsError = function AlreadyExistsError(options) {
-        this.name = 'AlreadyExists';
-        this.message = options.message || '';
-        this.correlator = options.correlator || null;
+    NGSI.AlreadyExistsError = class AlreadyExistsError extends NGSI.Error {
+
+        constructor(options) {
+            super("AlreadyExists", options.message);
+
+            this.correlator = options.correlator || null;
+        }
+
     };
-    NGSI.AlreadyExistsError.prototype = new Error();
-    NGSI.AlreadyExistsError.prototype.constructor = NGSI.AlreadyExistsError;
 
     /**
      * Exception raised when the provided data has errors.
      * Error code used by the context broker server: 400 Bad Request
      *
      * @class
-     * @extends Error
+     * @extends NGSI.Error
      * @name NGSI.BadRequestError
      * @summary Exception raised when creating an entity that already exists.
      */
-    NGSI.BadRequestError = function BadRequestError(options) {
-        this.name = 'BadRequest';
-        this.message = options.message || '';
-        this.details = options.details || '';
-        this.correlator = options.correlator || null;
+    NGSI.BadRequestError = class BadRequestError extends NGSI.Error {
+
+        constructor(options) {
+            super("BadRequest", options.message);
+
+            this.details = options.details || "";
+            this.correlator = options.correlator || null;
+        }
+
     };
-    NGSI.BadRequestError.prototype = new Error();
-    NGSI.BadRequestError.prototype.constructor = NGSI.BadRequestError;
 
     /**
      * Exception raised when the server returns an unexpected response. This
@@ -1727,60 +1750,78 @@
      * ContentLengthRequired.
      *
      * @class
-     * @extends Error
+     * @extends NGSI.Error
      * @name NGSI.InvalidResponseError
      * @summary Exception raised when detecting invalid responses from the
      * server.
      */
-    NGSI.InvalidResponseError = function InvalidResponseError(message, correlator) {
-        this.name = 'InvalidResponse';
-        this.message = message || '';
-        this.correlator = correlator;
+    NGSI.InvalidResponseError = class InvalidResponseError extends NGSI.Error {
+
+        constructor(message, correlator) {
+            super("InvalidResponse", message);
+
+            this.correlator = correlator;
+        }
+
     };
-    NGSI.InvalidResponseError.prototype = new Error();
-    NGSI.InvalidResponseError.prototype.constructor = NGSI.InvalidResponseError;
 
     /**
      * Exception raised when requesting a missing resource (entity, attribute,
      * type, subscription, ...)
      *
      * @class
-     * @extends Error
+     * @extends NGSI.Error
      * @name NGSI.NotFoundError
      * @summary Exception raised when requesting a missing resource
      */
-    NGSI.NotFoundError = function NotFoundError(options) {
-        this.name = 'NotFound';
-        this.message = options.message || '';
-        this.details = options.details || '';
-        this.correlator = options.correlator || null;
+    NGSI.NotFoundError = class NotFoundError extends NGSI.Error {
+
+        constructor(options) {
+            super("NotFound", options.message);
+
+            this.details = options.details || "";
+            this.correlator = options.correlator || null;
+        }
+
     };
-    NGSI.NotFoundError.prototype = new Error();
-    NGSI.NotFoundError.prototype.constructor = NGSI.NotFoundError;
 
     /**
      * Exception raised when making ambiguous query returning more than One
      * entity.
      *
      * @class
-     * @extends Error
+     * @extends NGSI.Error
      * @name NGSI.TooManyResultsError
      * @summary Exception raised when making an ambiguous query
      */
-    NGSI.TooManyResultsError = function TooManyResultsError(options) {
-        this.name = 'TooManyResults';
-        this.message = options.message || '';
-        this.correlator = options.correlator || null;
-    };
-    NGSI.TooManyResultsError.prototype = new Error();
-    NGSI.TooManyResultsError.prototype.constructor = NGSI.TooManyResultsError;
+    NGSI.TooManyResultsError = class TooManyResultsError extends NGSI.Error {
 
-    NGSI.ProxyConnectionError = function ProxyConnectionError(cause) {
-        this.name = 'ProxyConnectionError';
-        this.cause = cause;
+        constructor(options) {
+            super("TooManyResults", options.message);
+            this.correlator = options.correlator || null;
+        }
+
     };
-    NGSI.ProxyConnectionError.prototype = new Error();
-    NGSI.ProxyConnectionError.prototype.constructor = NGSI.ProxyConnectionError;
+
+    /**
+     * Error raised if there are problems connecting to the context broker proxy
+     * server. Browsers doesn't provide details about the connection problem due
+     * security concerns, so this exception doesn't provide those details.
+     *
+     * @class
+     * @extends NGSI.Error
+     * @name NGSI.ConnectionError
+     * @summary Exception raised for connection problems.
+     */
+    NGSI.ProxyConnectionError = class ProxyConnectionError extends NGSI.Error {
+
+        constructor(cause) {
+            super("ProxyConnectionError", cause);
+
+            this.cause = cause;
+        }
+
+    };
 
     /**
      * Creates a new NGSI Connection.
@@ -6080,8 +6121,8 @@
      * - `count` (`Boolean`; default: `false`): Request total result count
      *   details
      * - `csf` (`String`): Context Source filter.
-     * - `id` (`String`): A comma-separated list of entity ids to retrieve.
-     *   Incompatible with the `idPattern` option.
+     * - `id` (`String`|`Array`): String array or a comma-separated list of
+     *   entity ids to retrieve. Incompatible with the `idPattern` option.
      * - `idPattern` (`String`): A correctly formated regular expression.
      *   Retrieve entities whose ID matches the regular expression. Incompatible
      *   with the `id` option
