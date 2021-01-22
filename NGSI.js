@@ -1,6 +1,6 @@
 /*
  *     Copyright (c) 2013-2017 CoNWeT Lab., Universidad Politécnica de Madrid
- *     Copyright (c) 2018-2020 Future Internet Consulting and Development Solutions S.L.
+ *     Copyright (c) 2018-2021 Future Internet Consulting and Development Solutions S.L.
  *
  *     This file is part of ngsijs.
  *
@@ -7953,6 +7953,160 @@
             }
 
             return Promise.resolve(result);
+        });
+    };
+
+    /**
+     * Creates a new temporal entity.
+     *
+     * > This method is aligned with NGSI-LD (CIM 009 v1.3.1 Specification)
+     *
+     * @since 1.4
+     *
+     * @name NGSI.Connection#ld.createTemporalEntity
+     * @method "ld.createTemporalEntity"
+     * @memberof NGSI.Connection
+     *
+     * @param {Object}
+     *
+     * entity values to be used for creating the new entity. Requires at least
+     * the `id` value for the new entity.
+     *
+     * @param {Object} [options]
+     *
+     * Object with extra options:
+     *
+     * - `tenant` (`String`): Tenant to use in this operation
+     *
+     *
+     * @throws {NGSI.AlreadyExistsError}
+     * @throws {NGSI.BadRequestError}
+     * @throws {NGSI.ConnectionError}
+     * @throws {NGSI.InvalidResponseError}
+     *
+     * @returns {Promise}
+     *
+     * @example <caption>Basic usage</caption>
+     *
+     * connection.ld.createTemporalEntity({
+     *     "id": "urn:ngsi-ld:Road:Spain-Road-A62",
+     *     "type": "Road",
+     *     "name": {
+     *          "type": "Property",
+     *          "value": "A-62"
+     *     },
+     *     "alternateName": {
+     *          "type": "Property",
+     *          "value": "E-80"
+     *     },
+     *     "description": {
+     *          "type": "Property",
+     *          "value": "Autovía de Castilla"
+     *     },
+     *     "roadClass": {
+     *          "type": "Property",
+     *          "value": "motorway"
+     *     },
+     *     "length": {
+     *          "type": "Property",
+     *          "value": 355
+     *     },
+     *     "refRoadSegment": {
+     *         "type": "Relationship",
+     *         "object": [
+     *             "urn:ngsi-ld:RoadSegment:Spain-RoadSegment-A62-0-355-forwards",
+     *             "urn:ngsi-ld:RoadSegment:Spain-RoadSegment-A62-0-355-backwards"
+     *         ]
+     *     },
+     *     "responsible": {
+     *          "type": "Property",
+     *          "value": "Ministerio de Fomento - Gobierno de España"
+     *     },
+     *     "@context": [
+     *        "https://schema.lab.fiware.org/ld/context",
+     *        "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+     *     ]
+     * }).then(
+     *     (response) => {
+     *         // Entity created successfully
+     *     }, (error) => {
+     *         // Error creating the entity
+     *     }
+     * );
+     *
+     * @example <caption>Using the tenant option</caption>
+     *
+     * connection.ld.createTemporalEntity({
+     *     "id": "urn:ngsi-ld:Vehicle:B9211",
+     *     "type": "Vehicle",
+     *     "brandName": [
+     *         {
+     *             "type": "Property",
+     *             "value": "Volvo"
+     *         }
+     *     ],
+     *     "speed": [
+     *         {
+     *             "type": "Property",
+     *             "value": 120,
+     *             "observedAt": "2018-08-01T12:03:00Z"
+     *         }, {
+     *             "type": "Property",
+     *             "value": 80,
+     *             "observedAt": "2018-08-01T12:05:00Z"
+     *         }, {
+     *             "type": "Property",
+     *             "value": 100,
+     *             "observedAt": "2018-08-01T12:07:00Z"
+     *         }
+     *     ],
+     *     "@context": [
+     *        "https://schema.lab.fiware.org/ld/context",
+     *        "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+     *     ]
+     * }, {tenant: "mytenant"}).then(
+     *     (response) => {
+     *         // Entity created successfully
+     *     }, (error) => {
+     *         // Error creating the entity
+     *     }
+     * );
+     *
+     */
+    NGSI.Connection.LD.prototype.createTemporalEntity = function createTemporalEntity(entity, options) {
+        if (options == null) {
+            options = {};
+        }
+
+        if (entity.id == null) {
+            throw new TypeError("missing entity id");
+        }
+
+        if (entity.type == null) {
+            throw new TypeError("missing entity type");
+        }
+
+        const connection = privates.get(this);
+        const url = new URL(NGSI.endpoints.ld.TEMPORAL_ENTITY_COLLECTION, connection.url);
+        return makeJSONRequest2.call(connection, url, {
+            method: "POST",
+            postBody: entity,
+            contentType: "@context" in entity ? "application/ld+json" : "application/json",
+            requestHeaders: {
+                "NGSILD-Tenant": options.tenant
+            }
+        }).then((response) => {
+            if (response.status === 400) {
+                return parse_bad_request_ld(response);
+            } else if (response.status === 409) {
+                return Promise.reject(new NGSI.AlreadyExistsError({}));
+            } else if (response.status !== 201) {
+                return Promise.reject(new NGSI.InvalidResponseError("Unexpected error code: " + response.status));
+            }
+            return Promise.resolve({
+                entity: entity,
+                location: response.getHeader("Location")
+            });
         });
     };
 

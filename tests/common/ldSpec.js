@@ -1,5 +1,5 @@
 /*
- *     Copyright (c) 2020 Future Internet Consulting and Development Solutions S.L.
+ *     Copyright (c) 2020-2021 Future Internet Consulting and Development Solutions S.L.
  *
  *     This file is part of ngsijs.
  *
@@ -91,7 +91,7 @@ if ((typeof require === 'function') && typeof global != null) {
         "brandName": [
             {
                 "type": "Property",
-                "value": "Volvo",
+                "value": "Volvo"
             }
         ],
         "speed": [
@@ -114,6 +114,7 @@ if ((typeof require === 'function') && typeof global != null) {
             "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.3.jsonld"
         ]
     };
+    Object.freeze(LD_JSON_TEMPORAL_ENTITY);
 
     const KEY_VALUES_ENTITY = {
         "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
@@ -3565,6 +3566,237 @@ if ((typeof require === 'function') && typeof global != null) {
                         type: "Vehicle",
                         "@context": "https://schema.lab.fiware.org/ld/context"
                     }),
+                    (e) => {
+                        expect(e).toEqual(jasmine.any(NGSI.InvalidResponseError));
+                    }
+                ).finally(done);
+            });
+
+        });
+
+        describe("createTemporalEntity(entity[, options])", () => {
+
+            const entity = {
+                "id": "urn:ngsi-ld:Vehicle:vehicle:WasteManagement:1",
+                "type": "Vehicle",
+                "category": [{
+                    "type": "Property",
+                    "value": ["municipalServices"]
+                }],
+                "vehicleType": [{
+                    "type": "Property",
+                    "value": "lorry"
+                }],
+                "name": [{
+                    "type": "Property",
+                    "value": "C Recogida 1"
+                }],
+                "vehiclePlateIdentifier": [{
+                    "type": "Property",
+                    "value": "3456ABC"
+                }],
+                "refVehicleModel": [{
+                    "type": "Relationship",
+                    "object": "urn:ngsi-ld:VehicleModel:vehiclemodel:econic"
+                }],
+                "location": [{
+                    "type": "GeoProperty",
+                    "value": {
+                        "type": "Point",
+                        "coordinates": [-3.164485591715449, 40.62785133667262]
+                    },
+                    "observedAt": "2018-09-27T12:00:00Z"
+                }],
+                "areaServed": [{
+                    "type": "Property",
+                    "value": "Centro"
+                }],
+                "serviceStatus": [{
+                    "type": "Property",
+                    "value": "onRoute"
+                }],
+                "cargoWeight": [{
+                    "type": "Property",
+                    "value": 314
+                }],
+                "speed": [
+                    {
+                        "type": "Property",
+                        "value": 120,
+                        "observedAt": "2018-08-01T12:03:00Z"
+                    }, {
+                        "type": "Property",
+                        "value": 80,
+                        "observedAt": "2018-08-01T12:05:00Z"
+                    }, {
+                        "type": "Property",
+                        "value": 100,
+                        "observedAt": "2018-08-01T12:07:00Z"
+                    }
+                ],
+                "serviceProvided": [{
+                    "type": "Property",
+                    "value": ["gargabeCollection", "wasteContainerCleaning"]
+                }],
+                "@context": [
+                    "https://schema.lab.fiware.org/ld/context",
+                    "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+                ]
+            };
+
+            it("throws a TypeError exception when not passing the id option", () => {
+                expect(() => {
+                    connection.ld.createTemporalEntity({type: "Vehicle"});
+                }).toThrowError(TypeError);
+            });
+
+            it("throws a TypeError exception when not passing the type option", () => {
+                expect(() => {
+                    connection.ld.createTemporalEntity({id: "urn:A"});
+                }).toThrowError(TypeError);
+            });
+
+            it("basic request", (done) => {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/temporal/entities", {
+                    method: "POST",
+                    status: 201,
+                    headers: {
+                        'Location': '/ngsi-ld/v1/temporal/entities/a?type=b'
+                    },
+                    checkRequestContent: (url, options) => {
+                        let data = JSON.parse(options.postBody);
+                        expect(data).toEqual(entity);
+                    }
+                });
+
+                connection.ld.createTemporalEntity(entity).then(
+                    (result) => {
+                        expect(result).toEqual({
+                            entity: entity,
+                            created: true,
+                            location: "/ngsi-ld/v1/temporal/entities/a?type=b"
+                        });
+                    },
+                    fail
+                ).finally(done);
+            });
+
+            it("basic request (using the tenant option)", (done) => {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/temporal/entities", {
+                    method: "POST",
+                    status: 201,
+                    headers: {
+                        'Location': '/ngsi-ld/v1/temporal/entities/a?type=b'
+                    },
+                    checkRequestContent: (url, options) => {
+                        expect(options.requestHeaders).toEqual(jasmine.objectContaining({
+                            'NGSILD-Tenant': 'mytenant'
+                        }));
+                    }
+                });
+
+                connection.ld.createTemporalEntity(entity, {tenant: "mytenant"}).then(
+                    (result) => {
+                        expect(result).toEqual({
+                            entity: entity,
+                            created: true,
+                            location: "/ngsi-ld/v1/temporal/entities/a?type=b"
+                        });
+                    },
+                    fail
+                ).finally(done);
+            });
+
+            it("invalid request", (done) => {
+                // Invalid Request error should not be possible when using the library, but code can always have bugs.
+                ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/temporal/entities", {
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    method: "POST",
+                    status: 400,
+                    responseText: '{"type": "https://uri.etsi.org/ngsi-ld/errors/InvalidRequest", "title": "Request payload body is not a valid JSON document", "detail": "no detail"}'
+                });
+
+                connection.ld.createTemporalEntity({id: "car1", type: "Car"}).then(
+                    fail,
+                    (e) => {
+                        expect(e).toEqual(jasmine.any(NGSI.InvalidRequestError));
+                        expect(e.message).toBe("Request payload body is not a valid JSON document");
+                    }
+                ).finally(done);
+            });
+
+            it("bad request", (done) => {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/temporal/entities", {
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    method: "POST",
+                    status: 400,
+                    responseText: '{"type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData", "title": "Invalid characters in entity id", "detail": "no detail"}'
+                });
+
+                connection.ld.createTemporalEntity({id: "21$(", type: "Car"}).then(
+                    fail,
+                    (e) => {
+                        expect(e).toEqual(jasmine.any(NGSI.BadRequestError));
+                        expect(e.message).toBe("Invalid characters in entity id");
+                    }
+                ).finally(done);
+            });
+
+            it("invalid 400", (done) => {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/temporal/entities", {
+                    method: "POST",
+                    status: 400
+                });
+
+                connection.ld.createTemporalEntity(entity).then(
+                    fail,
+                    (e) => {
+                        expect(e).toEqual(jasmine.any(NGSI.InvalidResponseError));
+                    }
+                ).finally(done);
+            });
+
+            it("manage already exists errors", (done) => {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/temporal/entities", {
+                    method: "POST",
+                    status: 409,
+                    responseText: '{"type": "https://uri.etsi.org/ngsi-ld/errors/AlreadyExists", "title": "The referred element already exists", "detail": "no detail"}'
+                });
+
+                connection.ld.createTemporalEntity(entity).then(
+                    fail,
+                    (e) => {
+                        expect(e).toEqual(jasmine.any(NGSI.AlreadyExistsError));
+                    }
+                ).finally(done);
+            });
+
+            it("unexpected error code", (done) => {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/temporal/entities", {
+                    method: "POST",
+                    status: 204
+                });
+
+                connection.ld.createTemporalEntity(entity).then(
+                    fail,
+                    (e) => {
+                        expect(e).toEqual(jasmine.any(NGSI.InvalidResponseError));
+                    }
+                ).finally(done);
+            });
+
+            it("unexpected error code (204)", (done) => {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/temporal/entities", {
+                    method: "POST",
+                    status: 204
+                });
+
+                connection.ld.createTemporalEntity(entity).then(
+                    fail,
                     (e) => {
                         expect(e).toEqual(jasmine.any(NGSI.InvalidResponseError));
                     }
