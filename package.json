@@ -8,6 +8,9 @@
     "type": "git",
     "url": "https://github.com/conwetlab/ngsijs"
   },
+  "scripts": {
+    "test": "./node_modules/istanbul/lib/cli.js cover -- ./node_modules/jasmine/bin/jasmine.js --config=jasmine.json"
+  },
   "keywords": [
     "context broker",
     "fiware",
@@ -33,7 +36,6 @@
     "grunt-bump": "^0.8.0",
     "grunt-contrib-clean": "^1.1.0",
     "grunt-contrib-copy": "^1.0.0",
-    "grunt-coveralls": "^2.0.0",
     "grunt-jsdoc": "^2.4.0",
     "grunt-karma": "^3.0.2",
     "grunt-terser": "^1.0.0",
@@ -42,7 +44,7 @@
     "jasmine": "^3.5.0",
     "jasmine-core": "^2.5.2",
     "karma": "^5.0.2",
-    "karma-chrome-launcher": "^1.0.1",
+    "karma-chrome-launcher": "^3.1.0",
     "karma-coverage": "^2.0.2",
     "karma-firefox-launcher": "^1.2.0",
     "karma-jasmine": "^1.0.2",

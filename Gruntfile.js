@@ -1,5 +1,6 @@
 /*
  *   Copyright 2014-2017 CoNWeT Lab., Universidad Politecnica de Madrid
+ *   Copyright (c) 2021 Future Internet Consulting and Development Solutions S.L.
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -35,15 +36,6 @@ module.exports = function (grunt) {
                 files: [
                     {src: 'NGSI.js', dest: 'dist/'}
                 ]
-            }
-        },
-
-        coveralls: {
-            librarynode: {
-                src: 'build/coverage/library-node/lcov.info'
-            },
-            library: {
-                src: 'build/coverage/library/lcov/lcov.info'
             }
         },
 
@@ -85,15 +77,9 @@ module.exports = function (grunt) {
                     'tests/common/*Spec.js'
                 ],
                 frameworks: ['jasmine'],
-                reporters: ['progress', 'coverage'],
-                browsers: ['Chrome', 'Firefox'],
-                singleRun: true,
-                customLaunchers: {
-                    ChromeNoSandbox: {
-                        base: "Chrome",
-                        flags: ['--no-sandbox']
-                    }
-                }
+                reporters: ["progress", "coverage"],
+                browsers: ["ChromeHeadless", "FirefoxHeadless"],
+                singleRun: true
             },
             librarydebug: {
                 options: {
@@ -116,8 +102,7 @@ module.exports = function (grunt) {
                     junitReporter: {
                         "outputDir": 'build/test-reports/library'
                     },
-                    reporters: ['junit', 'coverage'],
-                    browsers: ['ChromeNoSandbox', 'Firefox'],
+                    reporters: ["junit", "coverage", "progress"],
                     coverageReporter: {
                         reporters: [
                             {type: 'cobertura', dir: 'build/coverage/library', subdir: 'xml'},
@@ -147,7 +132,6 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks("grunt-bump");
     grunt.loadNpmTasks("grunt-contrib-copy");
     grunt.loadNpmTasks("grunt-terser");
-    grunt.loadNpmTasks("grunt-coveralls");
     grunt.loadNpmTasks('grunt-karma');
     grunt.loadNpmTasks("grunt-jsdoc");
 
@@ -170,7 +154,6 @@ module.exports = function (grunt) {
     grunt.registerTask('ci', [
         'eslint',
         'karma:libraryci',
-        'coveralls:library',
         'copy',
         'terser',
         'jsdoc'
