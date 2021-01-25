@@ -8,6 +8,9 @@
     "type": "git",
     "url": "https://github.com/conwetlab/ngsijs"
   },
+  "scripts": {
+    "test": "./node_modules/istanbul/lib/cli.js cover -- ./node_modules/jasmine/bin/jasmine.js --config=jasmine.json"
+  },
   "keywords": [
     "context broker",
     "fiware",
