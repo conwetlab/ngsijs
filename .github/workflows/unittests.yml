@@ -53,7 +53,7 @@ jobs:
         with:
           github-token: ${{ secrets.github_token }}
           flag-name: browsers
-          path-to-lcov: build/coverage/library/lcov.info
+          path-to-lcov: build/coverage/library/lcov/lcov.info
           parallel: true
 
 
