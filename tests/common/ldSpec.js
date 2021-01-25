@@ -363,21 +363,7 @@ if ((typeof require === 'function') && typeof global != null) {
             it("unexpected error code", (done) => {
                 ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/entities", {
                     method: "POST",
-                    status: 204
-                });
-
-                connection.ld.createEntity(entity).then(
-                    fail,
-                    (e) => {
-                        expect(e).toEqual(jasmine.any(NGSI.InvalidResponseError));
-                    }
-                ).finally(done);
-            });
-
-            it("unexpected error code (204)", (done) => {
-                ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/entities", {
-                    method: "POST",
-                    status: 204
+                    status: 200
                 });
 
                 connection.ld.createEntity(entity).then(
@@ -3658,7 +3644,7 @@ if ((typeof require === 'function') && typeof global != null) {
                 }).toThrowError(TypeError);
             });
 
-            it("basic request", (done) => {
+            it("basic request (creation)", (done) => {
                 ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/temporal/entities", {
                     method: "POST",
                     status: 201,
@@ -3677,6 +3663,28 @@ if ((typeof require === 'function') && typeof global != null) {
                             entity: entity,
                             created: true,
                             location: "/ngsi-ld/v1/temporal/entities/a?type=b"
+                        });
+                    },
+                    fail
+                ).finally(done);
+            });
+
+            it("basic request (update)", (done) => {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/temporal/entities", {
+                    method: "POST",
+                    status: 204,
+                    checkRequestContent: (url, options) => {
+                        let data = JSON.parse(options.postBody);
+                        expect(data).toEqual(entity);
+                    }
+                });
+
+                connection.ld.createTemporalEntity(entity).then(
+                    (result) => {
+                        expect(result).toEqual({
+                            entity: entity,
+                            created: false,
+                            location: null
                         });
                     },
                     fail
@@ -3780,21 +3788,7 @@ if ((typeof require === 'function') && typeof global != null) {
             it("unexpected error code", (done) => {
                 ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/temporal/entities", {
                     method: "POST",
-                    status: 204
-                });
-
-                connection.ld.createTemporalEntity(entity).then(
-                    fail,
-                    (e) => {
-                        expect(e).toEqual(jasmine.any(NGSI.InvalidResponseError));
-                    }
-                ).finally(done);
-            });
-
-            it("unexpected error code (204)", (done) => {
-                ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/temporal/entities", {
-                    method: "POST",
-                    status: 204
+                    status: 200
                 });
 
                 connection.ld.createTemporalEntity(entity).then(

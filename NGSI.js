@@ -8142,7 +8142,7 @@
                 return parse_bad_request_ld(response);
             } else if (response.status === 409) {
                 return Promise.reject(new NGSI.AlreadyExistsError({}));
-            } else if (response.status !== 201) {
+            } else if ([201, 204].indexOf(response.status) === -1) {
                 return Promise.reject(new NGSI.InvalidResponseError("Unexpected error code: " + response.status));
             }
             return Promise.resolve({
