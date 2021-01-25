@@ -38,15 +38,6 @@ module.exports = function (grunt) {
             }
         },
 
-        coveralls: {
-            librarynode: {
-                src: 'build/coverage/library-node/lcov.info'
-            },
-            library: {
-                src: 'build/coverage/library/lcov/lcov.info'
-            }
-        },
-
         eslint: {
             library: {
                 src: 'NGSI.js'
@@ -149,7 +140,6 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks("grunt-bump");
     grunt.loadNpmTasks("grunt-contrib-copy");
     grunt.loadNpmTasks("grunt-contrib-uglify");
-    grunt.loadNpmTasks("grunt-coveralls");
     grunt.loadNpmTasks('grunt-karma');
     grunt.loadNpmTasks("grunt-jsdoc");
 
@@ -164,7 +154,6 @@ module.exports = function (grunt) {
     grunt.registerTask('ci', [
         'eslint',
         'karma:libraryci',
-        'coveralls:library',
         'copy',
         'uglify',
         'jsdoc'
