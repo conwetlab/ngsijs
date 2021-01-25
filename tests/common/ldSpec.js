@@ -3289,6 +3289,7 @@ if ((typeof require === 'function') && typeof global != null) {
                 ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/temporal/entities", {
                     checkRequestContent: (url, options) => {
                         expect(options.parameters.options).not.toBeDefined();
+                        expect(options.parameters.endTimeAt).toBe(undefined);
                         expect(options.parameters.count).toBe(true);
                         expect(options.parameters.idPattern).toBe("urn:ngsi-ld:Vehicle:.*");
                         expect(options.parameters.type).toBe("https://uri.fiware.org/ns/data-models#Vehicle");

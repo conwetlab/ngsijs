@@ -6586,8 +6586,8 @@
             throw new TypeError("missing id option");
         }
 
-        var connection = privates.get(this);
-        var url = new URL(interpolate(NGSI.endpoints.ld.ENTITY_ENTRY, {entityId: encodeURIComponent(options.id)}), connection.url);
+        const connection = privates.get(this);
+        const url = new URL(interpolate(NGSI.endpoints.ld.ENTITY_ENTRY, {entityId: encodeURIComponent(options.id)}), connection.url);
 
         return makeJSONRequest2.call(connection, url, {
             method: "DELETE",
@@ -7941,7 +7941,7 @@
         parameters.attrs = Array.isArray(options.attrs) ? options.attrs.join(',') : options.attrs;
         parameters.endTimeAt = options.endTimeAt != null ? (
             typeof(options.endTimeAt.toISOString) === "function" ? options.endTimeAt.toISOString() : options.endTimeAt
-        ) : null;
+        ) : undefined;
         parameters.csf = options.csf;
         parameters.id = options.id;
         parameters.idPattern = options.idPattern;
