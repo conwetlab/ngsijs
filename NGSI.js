@@ -281,6 +281,7 @@
             ENTITY_ATTRS_COLLECTION: 'ngsi-ld/v1/entities/%(entityId)s/attrs',
             SUBSCRIPTION_COLLECTION: 'ngsi-ld/v1/subscriptions',
             SUBSCRIPTION_ENTRY: 'ngsi-ld/v1/subscriptions/%(subscriptionId)s',
+            TEMPORAL_ENTITY_ATTRS_COLLECTION: 'ngsi-ld/v1/temporal/entities/%(entityId)s/attrs',
             TEMPORAL_ENTITY_COLLECTION: 'ngsi-ld/v1/temporal/entities',
             TEMPORAL_ENTITY_ENTRY: 'ngsi-ld/v1/temporal/entities/%(entityId)s',
             TYPE_COLLECTION: 'ngsi-ld/v1/types',
@@ -8207,6 +8208,153 @@
 
         return makeJSONRequest2.call(connection, url, {
             method: "DELETE",
+            requestHeaders: {
+                "NGSILD-Tenant": options.tenant
+            }
+        }).then((response) => {
+            if (response.status === 400) {
+                return parse_bad_request_ld(response);
+            } else if (response.status === 404) {
+                return parse_not_found_response_ld(response);
+            } else if (response.status !== 204) {
+                return Promise.reject(new NGSI.InvalidResponseError("Unexpected error code: " + response.status));
+            }
+            return Promise.resolve({});
+        });
+    };
+
+    /**
+     * Adds attributes to the Temporal Representation of an Entity
+     *
+     * > This method is aligned with NGSI-LD (CIM 009 v1.3.1 Specification)
+     *
+     * @since 1.4
+     *
+     * @name NGSI.Connection#ld.addTemporalEntityAttributes
+     * @method "ld.addTemporalEntityAttributes"
+     * @memberof NGSI.Connection
+     *
+     * @param {Object} changes
+     *
+     * New values for the attributes. Must contain the `id` of the entity to
+     * update if not provided using the options parameter.
+     *
+     * @param {Object} [options]
+     *
+     * Object with extra options:
+     *
+     * - `@context` (`String`): URI pointing to the JSON-LD document which
+     *   contains the `@context` to be used to expand the terms when updating
+     *   entity details.
+     * - `id` (`String`, required): Id of the entity to update
+     * - `tenant` (`String`): Tenant to use in this operation
+     *
+     * @throws {NGSI.BadRequestError}
+     * @throws {NGSI.ConnectionError}
+     * @throws {NGSI.InvalidResponseError}
+     * @throws {NGSI.NotFoundError}
+     *
+     * @returns {Promise}
+     *
+     * @example <caption>Adding attributes values</caption>
+     *
+     * connection.ld.addTemporalEntityAttributes({
+     *     "speed": [
+     *         {
+     *             "type": "Property",
+     *             "value": 120,
+     *             "observedAt": "2018-08-01T12:09:00Z"
+     *         }, {
+     *             "type": "Property",
+     *             "value": 80,
+     *             "observedAt": "2018-08-01T12:11:00Z"
+     *         }, {
+     *             "type": "Property",
+     *             "value": 100,
+     *             "observedAt": "2018-08-01T12:13:00Z"
+     *         }
+     *     ],
+     *     "@context": [
+     *        "https://schema.lab.fiware.org/ld/context",
+     *        "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+     *     ]
+     * }, {
+     *     id: "urn:ngsi-ld:Vehicle:B9211"
+     * }).then(
+     *     (response) => {
+     *         // Request ended correctly
+     *         // response.updated will contain the list of updated attributes
+     *         // while response.notUpdated will contain the list with the
+     *         // attributes that were not updated
+     *     }, (error) => {
+     *         // Error updating the attributes of the entity
+     *     }
+     * );
+     *
+     * @example <caption>Add attributes values (inserting the id into the payload)</caption>
+     *
+     * connection.ld.addTemporalEntityAttributes({
+     *     "id": "urn:ngsi-ld:Vehicle:B9211",
+     *     "speed": [
+     *         {
+     *             "type": "Property",
+     *             "value": 120,
+     *             "observedAt": "2018-08-01T12:09:00Z"
+     *         }, {
+     *             "type": "Property",
+     *             "value": 80,
+     *             "observedAt": "2018-08-01T12:11:00Z"
+     *         }, {
+     *             "type": "Property",
+     *             "value": 100,
+     *             "observedAt": "2018-08-01T12:13:00Z"
+     *         }
+     *     ],
+     *     "@context": [
+     *        "https://schema.lab.fiware.org/ld/context",
+     *        "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+     *     ]
+     * }).then(
+     *     (response) => {
+     *         // Request ended correctly
+     *         // response.updated will contain the list of updated attributes
+     *         // while response.notUpdated will contain the list with the
+     *         // attributes that were not updated
+     *     }, (error) => {
+     *         // Error updating the attributes of the entity
+     *     }
+     * );
+     *
+     */
+    NGSI.Connection.LD.prototype.addTemporalEntityAttributes = function addTemporalEntityAttributes(changes, options) {
+        if (changes == null || typeof changes !== "object") {
+            throw new TypeError("changes parameter should be an object");
+        }
+
+        if (options == null) {
+            options = {};
+        }
+
+        const id = options.id != null ? options.id : changes.id;
+        if (id == null) {
+            throw new TypeError("missing entity id");
+        } else if (changes.id != null) {
+            // Remove id from the payload
+            delete changes.id;
+        }
+
+        const connection = privates.get(this);
+        const url = new URL(
+            interpolate(
+                NGSI.endpoints.ld.TEMPORAL_ENTITY_ATTRS_COLLECTION,
+                {entityId: encodeURIComponent(id)}
+            ),
+            connection.url
+        );
+
+        return makeJSONRequest2.call(connection, url, {
+            method: "POST",
+            postBody: changes,
             requestHeaders: {
                 "NGSILD-Tenant": options.tenant
             }

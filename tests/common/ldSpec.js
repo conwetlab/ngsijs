@@ -3928,6 +3928,205 @@ if ((typeof require === 'function') && typeof global != null) {
 
         });
 
+        describe("addTemporalEntityAttributes(changes[, options])", () => {
+
+            it("throws a TypeError exception when not passing the changes parameter", () => {
+                expect(() => {
+                    connection.ld.addTemporalEntityAttributes();
+                }).toThrowError(TypeError);
+            });
+
+            it("throws a TypeError exception when not providing an id", () => {
+                expect(() => {
+                    connection.ld.addTemporalEntityAttributes({
+                        "myattribute": {
+                            "type": "Property",
+                            "value": 5
+                        }
+                    });
+                }).toThrowError(TypeError);
+            });
+
+            it("allows basic usage passing entity id directly on the changes parameter", (done) => {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/temporal/entities/urn%3Angsi-ld%3ARoad%3ASpain-Road-A62/attrs", {
+                    method: "POST",
+                    status: 204,
+                    checkRequestContent: (url, options) => {
+                        expect(options.parameters).toBe(undefined);
+                    }
+                });
+
+                assertSuccess(
+                    connection.ld.addTemporalEntityAttributes({
+                        "id": "urn:ngsi-ld:Road:Spain-Road-A62",
+                        "speed": [
+                            {
+                                "type": "Property",
+                                "value": 120,
+                                "observedAt": "2018-08-01T12:09:00Z"
+                            }, {
+                                "type": "Property",
+                                "value": 80,
+                                "observedAt": "2018-08-01T12:11:00Z"
+                            }, {
+                                "type": "Property",
+                                "value": 100,
+                                "observedAt": "2018-08-01T12:13:00Z"
+                            }
+                        ]
+                    }),
+                    (result) => {
+                        expect(result).toEqual({});
+                    }
+                ).finally(done);
+            });
+
+            it("allows basic usage passing entity id on the options parameter", (done) => {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/temporal/entities/urn%3Angsi-ld%3ARoad%3ASpain-Road-A62/attrs", {
+                    method: "POST",
+                    status: 204,
+                    checkRequestContent: (url, options) => {
+                        expect(options.parameters).toBe(undefined);
+                    }
+                });
+
+                assertSuccess(
+                    connection.ld.addTemporalEntityAttributes({
+                        "speed": [
+                            {
+                                "type": "Property",
+                                "value": 120,
+                                "observedAt": "2018-08-01T12:09:00Z"
+                            }, {
+                                "type": "Property",
+                                "value": 80,
+                                "observedAt": "2018-08-01T12:11:00Z"
+                            }, {
+                                "type": "Property",
+                                "value": 100,
+                                "observedAt": "2018-08-01T12:13:00Z"
+                            }
+                        ]
+                    }, {
+                        "id": "urn:ngsi-ld:Road:Spain-Road-A62",
+                    }),
+                    (result) => {
+                        expect(result).toEqual({});
+                    }
+                ).finally(done);
+            });
+
+            it("entity not found", (done) => {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/temporal/entities/urn%3Angsi-ld%3ARoad%3ASpain-Road-A62/attrs", {
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    method: "POST",
+                    status: 404,
+                    responseText: '{"type": "https://uri.etsi.org/ngsi-ld/errors/ResourceNotFound", "title": "No context element found", "detail": "no detail"}'
+                });
+
+                assertFailure(
+                    connection.ld.addTemporalEntityAttributes({
+                        "id": "urn:ngsi-ld:Road:Spain-Road-A62",
+                        "speed": [
+                            {
+                                "type": "Property",
+                                "value": 120,
+                                "observedAt": "2018-08-01T12:09:00Z"
+                            }
+                        ]
+                    }),
+                    (e) => {
+                        expect(e).toEqual(jasmine.any(NGSI.NotFoundError));
+                        expect(e.message).toBe("No context element found");
+                    }
+                ).finally(done);
+            });
+
+            it("invalid 404", (done) => {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/temporal/entities/urn%3Angsi-ld%3ARoad%3ASpain-Road-A62/attrs", {
+                    method: "POST",
+                    status: 404
+                });
+
+                assertFailure(
+                    connection.ld.addTemporalEntityAttributes({
+                        "id": "urn:ngsi-ld:Road:Spain-Road-A62",
+                        "speed": [
+                            {
+                                "type": "Property",
+                                "value": 120,
+                                "observedAt": "2018-08-01T12:09:00Z"
+                            }
+                        ]
+                    }),
+                    (e) => {
+                        expect(e).toEqual(jasmine.any(NGSI.InvalidResponseError));
+                    }
+                ).finally(done);
+            });
+
+            it("bad request", (done) => {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/temporal/entities/urn%3Angsi-ld%3ARoad%3ASpain-Road-A62/attrs", {
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    method: "POST",
+                    status: 400,
+                    responseText: '{"type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData", "title": "Invalid characters in attribute value", "detail": "no detail"}'
+                });
+
+                assertFailure(
+                    connection.ld.addTemporalEntityAttributes({
+                        "id": "urn:ngsi-ld:Road:Spain-Road-A62",
+                        "temperature": "("
+                    }),
+                    (e) => {
+                        expect(e).toEqual(jasmine.any(NGSI.BadRequestError));
+                        expect(e.message).toBe("Invalid characters in attribute value");
+                    }
+                ).finally(done);
+            });
+
+            it("invalid 400", (done) => {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/temporal/entities/urn%3Angsi-ld%3ARoad%3ASpain-Road-A62/attrs", {
+                    method: "POST",
+                    status: 400
+                });
+
+                assertFailure(
+                    connection.ld.addTemporalEntityAttributes({
+                        "id": "urn:ngsi-ld:Road:Spain-Road-A62",
+                        "temperature": 21.7
+                    }),
+                    (e) => {
+                        expect(e).toEqual(jasmine.any(NGSI.InvalidResponseError));
+                    }
+                ).finally(done);
+            });
+
+            it("handles unexpected error codes", (done) => {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/temporal/entities/urn%3Angsi-ld%3ARoad%3ASpain-Road-A62/attrs", {
+                    method: "POST",
+                    status: 201
+                });
+
+                assertFailure(
+                    connection.ld.addTemporalEntityAttributes({
+                        "id": "urn:ngsi-ld:Road:Spain-Road-A62",
+                        "temperature": {
+                            "value": 21.7
+                        }
+                    }),
+                    (e) => {
+                        expect(e).toEqual(jasmine.any(NGSI.InvalidResponseError));
+                    }
+                ).finally(done);
+            });
+
+        });
+
     });
 
 })();
