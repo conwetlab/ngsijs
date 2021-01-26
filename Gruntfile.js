@@ -83,6 +83,7 @@ module.exports = function (grunt) {
             },
             librarydebug: {
                 options: {
+                    browsers: ["Chrome"],
                     singleRun: false
                 }
             },
