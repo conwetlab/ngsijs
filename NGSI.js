@@ -282,6 +282,7 @@
             SUBSCRIPTION_COLLECTION: 'ngsi-ld/v1/subscriptions',
             SUBSCRIPTION_ENTRY: 'ngsi-ld/v1/subscriptions/%(subscriptionId)s',
             TEMPORAL_ENTITY_ATTRS_COLLECTION: 'ngsi-ld/v1/temporal/entities/%(entityId)s/attrs',
+            TEMPORAL_ENTITY_ATTRS_ENTRY: 'ngsi-ld/v1/temporal/entities/%(entityId)s/attrs/%(attribute)s',
             TEMPORAL_ENTITY_COLLECTION: 'ngsi-ld/v1/temporal/entities',
             TEMPORAL_ENTITY_ENTRY: 'ngsi-ld/v1/temporal/entities/%(entityId)s',
             TYPE_COLLECTION: 'ngsi-ld/v1/types',
@@ -7513,8 +7514,8 @@
      *
      * @since 1.4
      *
-     * @name NGSI.Connection#ld.updateEntityAttributes
-     * @method "ld.updateEntityAttributes"
+     * @name NGSI.Connection#ld.deleteEntityAttribute
+     * @method "ld.deleteEntityAttribute"
      * @memberof NGSI.Connection
      *
      * @param {Object} options
@@ -7525,7 +7526,7 @@
      * - `attribute` (`String`, required): Target Attribute (Property or
      *   Relationship) to be delete.
      * - `datasetId` (`String`): Specifies the *datasetId* of the attribute to be deleted.
-     * - `deleteAll` (`Boolean`): If true all attribute instances are deleted, otherwise
+     * - `deleteAll` (`Boolean`): If `true` all attribute instances are deleted, otherwise
      *    (default) only attribute instances without a *datasetId* are deleted
      * - `@context` (`String`): URI pointing to the JSON-LD document which
      *   contains the `@context` to be used to expand attribute name.the terms associated with
@@ -8365,6 +8366,105 @@
                 return parse_not_found_response_ld(response);
             } else if (response.status !== 204) {
                 return Promise.reject(new NGSI.InvalidResponseError("Unexpected error code: " + response.status));
+            }
+            return Promise.resolve({});
+        });
+    };
+
+    /**
+     * Delete a temporal attribute from a given temporal entity.
+     *
+     * > This method is aligned with NGSI-LD (CIM 009 v1.3.1 Specification)
+     *
+     * @since 1.4
+     *
+     * @name NGSI.Connection#ld.deleteTemporalEntityAttribute
+     * @method "ld.deleteTempporalEntityAttribute"
+     * @memberof NGSI.Connection
+     *
+     * @param {Object} options
+     *
+     * Object with options:
+     *
+     * - `id` (`String`, required): Id of the entity to update
+     * - `attribute` (`String`, required): Target Attribute (Property or
+     *   Relationship) to be delete.
+     * - `datasetId` (`String`): Specifies the *datasetId* of the attribute to be deleted.
+     * - `deleteAll` (`Boolean`): If `true` all attribute instances are deleted, otherwise
+     *    (default) only attribute instances without a *datasetId* are deleted
+     * - `@context` (`String`): URI pointing to the JSON-LD document which
+     *   contains the `@context` to be used to expand attribute name.the terms associated with
+     *   the changes.
+     * - `tenant` (`String`): Tenant to use in this operation
+     *
+     * @throws {NGSI.BadRequestError}
+     * @throws {NGSI.ConnectionError}
+     * @throws {NGSI.InvalidResponseError}
+     * @throws {NGSI.NotFoundError}
+     *
+     * @returns {Promise}
+     *
+     * @example <caption>Deletes the name attribute</caption>
+     *
+     * connection.ld.deleteTemporalEntityAttribute({
+     *     "id": "urn:ngsi-ld:Vehicle:A4567",
+     *     "attribute": "name"
+     *     "@context": "https://fiware.github.io/data-models/context.jsonld"
+     * }).then(
+     *     (response) => {
+     *         // Request ended correctly
+     *     }, (error) => {
+     *         // Error updating the attributes of the entity
+     *     }
+     * );
+     *
+     */
+    NGSI.Connection.LD.prototype.deleteTemporalEntityAttribute = function deleteTemporalEntityAttribute(options) {
+        if (options == null) {
+            throw new TypeError("missing options parameter");
+        }
+
+        if (options.id == null) {
+            throw new TypeError("missing id option");
+        } else if (options.attribute == null) {
+            throw new TypeError("missing attribute option");
+        }
+
+        const connection = privates.get(this);
+        const url = new URL(
+            interpolate(
+                NGSI.endpoints.ld.TEMPORAL_ENTITY_ATTRS_ENTRY,
+                {
+                    entityId: encodeURIComponent(options.id),
+                    attribute: encodeURIComponent(options.attribute)
+                }
+            ),
+            connection.url
+        );
+
+        const parameters = {
+            datasetId: options.datasetId,
+            deleteAll: options.deleteAll
+        };
+
+        const headers = {
+            "NGSILD-Tenant": options.tenant
+        };
+        if (typeof options["@context"] === "string") {
+            headers.Link = '<' + encodeURI(options["@context"]) + '>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"';
+        }
+
+        return makeJSONRequest2.call(connection, url, {
+            method: "DELETE",
+            parameters: parameters,
+            requestHeaders: headers
+        }).then((response) => {
+            if (response.status === 400) {
+                return parse_bad_request_ld(response);
+            } else if (response.status === 404) {
+                return parse_not_found_response_ld(response);
+            } else if (response.status !== 204) {
+                return Promise.reject(new NGSI.InvalidResponseError('Unexpected error code: ' + response.status));
             }
             return Promise.resolve({});
         });

@@ -4127,6 +4127,167 @@ if ((typeof require === 'function') && typeof global != null) {
 
         });
 
+        describe('deleteTemporalEntityAttribute(options)', () => {
+
+            it("throws a TypeError exception when not passing the options parameter", () => {
+                expect(() => {
+                    connection.ld.deleteTemporalEntityAttribute();
+                }).toThrowError(TypeError);
+            });
+
+            it("throws a TypeError exception when not passing the id option", () => {
+                expect(() => {
+                    connection.ld.deleteTemporalEntityAttribute({
+                        attribute: "temperature"
+                    });
+                }).toThrowError(TypeError);
+            });
+
+            it("throws a TypeError exception when not passing the attribute option", () => {
+                expect(() => {
+                    connection.ld.deleteTemporalEntityAttribute({
+                        id: "Bcn_Welt"
+                    });
+                }).toThrowError(TypeError);
+            });
+
+            it("deletes attributes from entities", (done) => {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/temporal/entities/urn%3Angsi-ld%3AVehicle%3ABus1/attrs/https%3A%2F%2Furi.fiware.org%2Fns%2Fdata-models%23speed", {
+                    checkRequestContent: (url, options) => {
+                        expect("options" in options.parameters).toBeFalsy();
+                        expect("Link" in options.requestHeaders).toBeFalsy();
+                    },
+                    method: "DELETE",
+                    status: 204
+                });
+
+                assertSuccess(
+                    connection.ld.deleteTemporalEntityAttribute({
+                        id: "urn:ngsi-ld:Vehicle:Bus1",
+                        attribute: "https://uri.fiware.org/ns/data-models#speed"
+                    }),
+                    (result) => {
+                        expect(result).toEqual({});
+                    }
+                ).finally(done);
+            });
+
+            it("deletes attributes from entities using @context resolution", (done) => {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/temporal/entities/urn%3Angsi-ld%3AVehicle%3ABus1/attrs/speed", {
+                    checkRequestContent: (url, options) => {
+                        expect("options" in options.parameters).toBeFalsy();
+                        expect(options.requestHeaders.Link).toBe('<https://fiware.github.io/data-models/context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"');
+                    },
+                    method: "DELETE",
+                    status: 204
+                });
+
+                assertSuccess(
+                    connection.ld.deleteTemporalEntityAttribute({
+                        id: "urn:ngsi-ld:Vehicle:Bus1",
+                        attribute: "speed",
+                        "@context": "https://fiware.github.io/data-models/context.jsonld"
+                    }),
+                    (result) => {
+                        expect(result).toEqual({});
+                    }
+                ).finally(done);
+            });
+
+            it("entity not found", (done) => {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/temporal/entities/Bcn_Welt/attrs/temperature", {
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    method: "DELETE",
+                    status: 404,
+                    responseText: '{"type": "https://uri.etsi.org/ngsi-ld/errors/ResourceNotFound", "title": "No context element found", "detail": "no detail"}'
+                });
+
+                assertFailure(
+                    connection.ld.deleteTemporalEntityAttribute({
+                        id: "Bcn_Welt",
+                        attribute: "temperature"
+                    }),
+                    (e) => {
+                        expect(e).toEqual(jasmine.any(NGSI.NotFoundError));
+                        expect(e.message).toBe("No context element found");
+                    }
+                ).finally(done);
+            });
+
+            it("invalid 404", (done) => {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/temporal/entities/Bcn_Welt/attrs/temperature", {
+                    method: "DELETE",
+                    status: 404
+                });
+
+                assertFailure(
+                    connection.ld.deleteTemporalEntityAttribute({
+                        id: "Bcn_Welt",
+                        attribute: "temperature"
+                    }),
+                    (e) => {
+                        expect(e).toEqual(jasmine.any(NGSI.InvalidResponseError));
+                    }
+                ).finally(done);
+            });
+
+            it("bad request", (done) => {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/temporal/entities/21%24(/attrs/speed", {
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    method: "DELETE",
+                    status: 400,
+                    responseText: '{"type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData", "title": "Invalid characters in entity id", "detail": "no detail"}'
+                });
+
+                assertFailure(
+                    connection.ld.deleteTemporalEntityAttribute({id: "21$(", attribute: "speed"}),
+                    (e) => {
+                        expect(e).toEqual(jasmine.any(NGSI.BadRequestError));
+                        expect(e.message).toBe("Invalid characters in entity id");
+                    }
+                ).finally(done);
+            });
+            it("invalid 409", (done) => {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/temporal/entities/Bcn_Welt/attrs/temperature", {
+                    method: "DELETE",
+                    status: 409
+                });
+
+                assertFailure(
+                    connection.ld.deleteTemporalEntityAttribute({
+                        id: "Bcn_Welt",
+                        attribute: "temperature"
+                    }),
+                    (e) => {
+                        expect(e).toEqual(jasmine.any(NGSI.InvalidResponseError));
+                    }
+                ).finally(done);
+            });
+
+            it("unexpected error code", (done) => {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/temporal/entities/Bcn_Welt/attrs/temperature", {
+                    method: "DELETE",
+                    status: 200
+                });
+
+                assertFailure(
+                    connection.ld.deleteTemporalEntityAttribute({
+                        id: "Bcn_Welt",
+                        attribute: "temperature",
+                        "@context": "https://fiware.github.io/data-models/context.jsonld"
+                    }),
+                    (e) => {
+                        expect(e).toEqual(jasmine.any(NGSI.InvalidResponseError));
+                    }
+                ).finally(done);
+            });
+
+        });
+
     });
 
 })();
