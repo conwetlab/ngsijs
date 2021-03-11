@@ -1,5 +1,6 @@
 /*
  *     Copyright (c) 2017 CoNWeT Lab., Universidad Politécnica de Madrid
+ *     Copyright (c) 2021 Future Internet Consulting and Development Solutions S.L.
  *
  *     This file is part of ngsijs.
  *
@@ -50,7 +51,12 @@ if ((typeof require === 'function') && typeof global != null) {
 
         var ajaxMockup = ajaxMockFactory.createFunction();
 
-        beforeEach(function () {
+        beforeEach(() => {
+            ajaxMockup.clear();
+            EventSource.clear();
+        });
+
+        afterAll(() => {
             ajaxMockup.clear();
             EventSource.clear();
         });
@@ -459,7 +465,7 @@ if ((typeof require === 'function') && typeof global != null) {
 
         });
 
-        describe("connect()", function () {
+        describe("connect()", () => {
 
             it("returns a promise", function (done) {
                 var proxy = new NGSI.ProxyConnection("http://ngsiproxy.example.com/", ajaxMockup);
@@ -523,10 +529,10 @@ if ((typeof require === 'function') && typeof global != null) {
                 expect(p1).toBe(p2);
             });
 
-            it("handles timeout exceptions connecting to the ngsi-proxy", function (done) {
+            it("handles timeout exceptions connecting to the ngsi-proxy", (done) => {
                 // EventSource creation is delayed due promise chaining
                 // Use real setTimeout for firing the timeout exception
-                setTimeout(function () {
+                setTimeout(() => {
                     // Fire timeout exception
                     jasmine.clock().tick(30001);
                 }, 0);
@@ -553,19 +559,21 @@ if ((typeof require === 'function') && typeof global != null) {
                         expect(EventSource.mockedeventsources[0].close).toHaveBeenCalledWith();
                         expect(proxy.connected).toBeFalsy();
                         expect(proxy.connecting).toBeFalsy();
-                        jasmine.clock().uninstall();
                     }
-                ).finally(done);
+                ).finally(() => {
+                    jasmine.clock().uninstall();
+                    done();
+                });
             });
 
-            it("handles error responses", function (done) {
+            it("handles error responses", (done) => {
                 // Emulate http://ngsiproxy.example.com/eventsource/1 returns an error code (e.g. 404)
-                EventSource.eventsourceconfs["http://ngsiproxy.example.com/eventsource/1"] = "error";
+                EventSource.eventsourceconfs["http://ngsiproxy.example.com/eventsource/100"] = "error";
 
                 var proxy = new NGSI.ProxyConnection("http://ngsiproxy.example.com/", ajaxMockup);
                 ajaxMockup.addStaticURL("http://ngsiproxy.example.com/eventsource", {
                     headers: {
-                        'Location': 'http://ngsiproxy.example.com/eventsource/1'
+                        'Location': 'http://ngsiproxy.example.com/eventsource/100'
                     },
                     method: "POST",
                     status: 201
@@ -573,7 +581,7 @@ if ((typeof require === 'function') && typeof global != null) {
 
                 var p = proxy.connect();
 
-                expect(proxy.connecting).toBeTruthy();
+                expect(proxy.connecting).toBe(true);
                 expect(p).toEqual(jasmine.any(Promise));
                 p.then(
                     () => {
@@ -581,12 +589,14 @@ if ((typeof require === 'function') && typeof global != null) {
                     },
                     (error) => {
                         expect(error).toEqual(jasmine.any(NGSI.ConnectionError));
+                        expect(EventSource.mockedeventsources[0].close).toHaveBeenCalledTimes(1);
                         expect(EventSource.mockedeventsources[0].close).toHaveBeenCalledWith();
-                        expect(proxy.connected).toBeFalsy();
-                        expect(proxy.connecting).toBeFalsy();
-                        done();
+                        expect(proxy.connected).toBe(false);
+                        expect(proxy.connecting).toBe(false);
                     }
-                );
+                ).finally(() => {
+                    done();
+                });
             });
 
             it("handles normal connection errors", function (done) {

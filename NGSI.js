@@ -1305,8 +1305,8 @@
     const connect_to_eventsource = function connect_to_eventsource() {
         var priv = privates.get(this);
         return new Promise(function (resolve, reject) {
-            var closeTimeout;
-            var wait_event_source_init = function wait_event_source_init(e) {
+            let closeTimeout, handle_connection_rejected, handle_connection_timeout;
+            const wait_event_source_init = function wait_event_source_init(e) {
                 var data = JSON.parse(e.data);
 
                 clearTimeout(closeTimeout);
@@ -1335,14 +1335,17 @@
 
                 resolve();
             };
-            var abort_event_source = function abort_event_source(message) {
+            const abort_event_source = function abort_event_source(message) {
+                clearTimeout(closeTimeout);
                 priv.promise = null;
+                priv.source.removeEventListener('error', handle_connection_rejected, true);
+                priv.source.removeEventListener('init', wait_event_source_init, true);
                 priv.source.close();
                 priv.source = null;
                 reject(new NGSI.ConnectionError(message));
             };
-            var handle_connection_rejected = abort_event_source.bind(null, "Connection rejected");
-            var handle_connection_timeout = abort_event_source.bind(null, "Connection timeout");
+            handle_connection_rejected = abort_event_source.bind(null, "Connection rejected");
+            handle_connection_timeout = abort_event_source.bind(null, "Connection timeout");
 
             priv.source = new EventSource(priv.source_url);
             priv.source.addEventListener('error', handle_connection_rejected, true);
