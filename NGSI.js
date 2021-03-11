@@ -283,6 +283,7 @@
             SUBSCRIPTION_ENTRY: 'ngsi-ld/v1/subscriptions/%(subscriptionId)s',
             TEMPORAL_ENTITY_ATTRS_COLLECTION: 'ngsi-ld/v1/temporal/entities/%(entityId)s/attrs',
             TEMPORAL_ENTITY_ATTRS_ENTRY: 'ngsi-ld/v1/temporal/entities/%(entityId)s/attrs/%(attribute)s',
+            TEMPORAL_ENTITY_ATTRS_INSTANCE_ENTRY: 'ngsi-ld/v1/temporal/entities/%(entityId)s/attrs/%(attribute)s/%(instanceId)s',
             TEMPORAL_ENTITY_COLLECTION: 'ngsi-ld/v1/temporal/entities',
             TEMPORAL_ENTITY_ENTRY: 'ngsi-ld/v1/temporal/entities/%(entityId)s',
             TYPE_COLLECTION: 'ngsi-ld/v1/types',
@@ -7362,13 +7363,18 @@
             throw new TypeError('missing entity id');
         }
 
+        const attribute = options.attribute;
+        if (attribute == null) {
+            throw new TypeError('missing entity attribute to update');
+        }
+
         const connection = privates.get(this);
         const url = new URL(
             interpolate(
                 NGSI.endpoints.ld.ENTITY_ATTR_ENTRY,
                 {
-                    entityId: encodeURIComponent(options.id),
-                    attribute: encodeURIComponent(options.attribute)
+                    entityId: encodeURIComponent(id),
+                    attribute: encodeURIComponent(attribute)
                 }
             ),
             connection.url
@@ -8457,6 +8463,219 @@
         return makeJSONRequest2.call(connection, url, {
             method: "DELETE",
             parameters: parameters,
+            requestHeaders: headers
+        }).then((response) => {
+            if (response.status === 400) {
+                return parse_bad_request_ld(response);
+            } else if (response.status === 404) {
+                return parse_not_found_response_ld(response);
+            } else if (response.status !== 204) {
+                return Promise.reject(new NGSI.InvalidResponseError('Unexpected error code: ' + response.status));
+            }
+            return Promise.resolve({});
+        });
+    };
+
+    /**
+     * Updates an attribute instance from Temporal Representation of an Entity.
+     *
+     * > This method is aligned with NGSI-LD (CIM 009 v1.3.1 Specification)
+     *
+     * @since 1.4
+     *
+     * @name NGSI.Connection#ld.updateTemporalEntityAttributeInstance
+     * @method "ld.updateTemporalEntityAttributeInstance"
+     * @memberof NGSI.Connection
+     *
+     * @param {Object} changes
+     *
+     * Changes to apply to the attribute.
+     *
+     * @param {Object} [options]
+     *
+     * Object with extra options:
+     *
+     * - `attribute` (`String`, required): Target Attribute (Property or
+     *   Relationship) to be updated.
+     * - `@context` (`String`): URI pointing to the JSON-LD document which
+     *   contains the `@context` to be used to expand the terms when updating
+     *   entity details.
+     * - `id` (`String`, required): Id of the entity to update
+     * - `instance` (`String`, required): Entity Attribute instance to be
+     *   modified, identified by its *instanceId*.
+     * - `attribute` (`String`, required): Target Attribute (Property or
+     *   Relationship) to be updated.
+     * - `tenant` (`String`): Tenant to use in this operation
+     *
+     * @throws {NGSI.BadRequestError}
+     * @throws {NGSI.ConnectionError}
+     * @throws {NGSI.InvalidResponseError}
+     * @throws {NGSI.NotFoundError}
+     *
+     * @returns {Promise}
+     *
+     * @example <caption>Append or update the temperature attribute</caption>
+     *
+     * connection.ld.updateEntityAttribute({
+     *     "type": "Property",
+     *     "value": "Bus 1"
+     * }, {
+     *     id: "urn:ngsi-ld:Vehicle:A4567",
+     *     attribute: "name",
+     *     "@context": [
+     *         "https://fiware.github.io/data-models/context.jsonld"
+     *     ]
+     * }).then(
+     *     (response) => {
+     *         // Attribute updated correctly
+     *     }, (error) => {
+     *         // Error updating the attribute of the entity
+     *     }
+     * );
+     *
+     */
+    NGSI.Connection.LD.prototype.updateTemporalEntityAttributeInstance = function updateTemporalEntityAttributeInstance(changes, options) {
+        if (changes == null || typeof changes !== "object") {
+            throw new TypeError('changes parameter should be an object');
+        }
+
+        if (options == null) {
+            options = {};
+        }
+
+        const id = options.id;
+        if (id == null) {
+            throw new TypeError('missing entity id');
+        }
+
+        const attribute = options.attribute;
+        if (attribute == null) {
+            throw new TypeError('missing entity attribute to update');
+        }
+
+        const instance = options.instance;
+        if (instance == null) {
+            throw new TypeError('missing attribute instance id');
+        }
+
+        const connection = privates.get(this);
+        const url = new URL(
+            interpolate(
+                NGSI.endpoints.ld.TEMPORAL_ENTITY_ATTRS_INSTANCE_ENTRY,
+                {
+                    entityId: encodeURIComponent(id),
+                    attribute: encodeURIComponent(attribute),
+                    instanceId: encodeURIComponent(instance)
+                }
+            ),
+            connection.url
+        );
+
+        const headers = {
+            "NGSILD-Tenant": options.tenant
+        };
+        if (typeof options["@context"] === "string") {
+            headers.Link = '<' + encodeURI(options["@context"]) + '>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"';
+        }
+
+        return makeJSONRequest2.call(connection, url, {
+            method: "PATCH",
+            postBody: changes,
+            requestHeaders: headers
+        }).then((response) => {
+            if (response.status === 400) {
+                return parse_bad_request_ld(response);
+            } else if (response.status === 404) {
+                return parse_not_found_response_ld(response);
+            } else if (response.status !== 204) {
+                return Promise.reject(new NGSI.InvalidResponseError('Unexpected error code: ' + response.status));
+            }
+            return Promise.resolve({});
+        });
+    };
+
+    /**
+     * Deletes an attribute instance from a Temporal Representation of Entity.
+     *
+     * > This method is aligned with NGSI-LD (CIM 009 v1.3.1 Specification)
+     *
+     * @since 1.4
+     *
+     * @name NGSI.Connection#ld.deleteTemporalEntityAttribute
+     * @method "ld.deleteTempporalEntityAttribute"
+     * @memberof NGSI.Connection
+     *
+     * @param {Object} options
+     *
+     * Object with options:
+     *
+     * - `id` (`String`, required): Id of the entity to update
+     * - `attribute` (`String`, required): Target Attribute (Property or
+     *   Relationship) to be delete.
+     * - `@context` (`String`): URI pointing to the JSON-LD document which
+     *   contains the `@context` to be used to expand attribute name.the terms associated with
+     *   the changes.
+     * - `instance` (`String`, required): Entity Attribute instance to be
+     *   deleted, identified by its *instanceId*.
+     * - `tenant` (`String`): Tenant to use in this operation
+     *
+     * @throws {NGSI.BadRequestError}
+     * @throws {NGSI.ConnectionError}
+     * @throws {NGSI.InvalidResponseError}
+     * @throws {NGSI.NotFoundError}
+     *
+     * @returns {Promise}
+     *
+     * @example <caption>Deletes the name attribute</caption>
+     *
+     * connection.ld.deleteTemporalEntityAttribute({
+     *     "id": "urn:ngsi-ld:Vehicle:A4567",
+     *     "attribute": "name"
+     *     "@context": "https://fiware.github.io/data-models/context.jsonld"
+     * }).then(
+     *     (response) => {
+     *         // Request ended correctly
+     *     }, (error) => {
+     *         // Error updating the attributes of the entity
+     *     }
+     * );
+     *
+     */
+    NGSI.Connection.LD.prototype.deleteTemporalEntityAttributeInstance = function deleteTemporalEntityAttributeInstance(options) {
+        if (options == null) {
+            throw new TypeError("missing options parameter");
+        }
+
+        if (options.id == null) {
+            throw new TypeError("missing id option");
+        } else if (options.attribute == null) {
+            throw new TypeError("missing attribute option");
+        } else if (options.instance == null) {
+            throw new TypeError("missing instance option");
+        }
+
+        const connection = privates.get(this);
+        const url = new URL(
+            interpolate(
+                NGSI.endpoints.ld.TEMPORAL_ENTITY_ATTRS_INSTANCE_ENTRY,
+                {
+                    entityId: encodeURIComponent(options.id),
+                    attribute: encodeURIComponent(options.attribute),
+                    instanceId: encodeURIComponent(options.instance)
+                }
+            ),
+            connection.url
+        );
+
+        const headers = {
+            "NGSILD-Tenant": options.tenant
+        };
+        if (typeof options["@context"] === "string") {
+            headers.Link = '<' + encodeURI(options["@context"]) + '>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"';
+        }
+
+        return makeJSONRequest2.call(connection, url, {
+            method: "DELETE",
             requestHeaders: headers
         }).then((response) => {
             if (response.status === 400) {

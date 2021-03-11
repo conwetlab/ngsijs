@@ -4288,6 +4288,408 @@ if ((typeof require === 'function') && typeof global != null) {
 
         });
 
+        describe('updateTemporalEntityAttributeInstance(changes[, options])', () => {
+
+            it("throws a TypeError exception when not passing the changes parameter", () => {
+                expect(() => {
+                    connection.ld.updateTemporalEntityAttributeInstance();
+                }).toThrowError(TypeError);
+            });
+
+            it("throws a TypeError exception when not passing the options parameter", () => {
+                expect(() => {
+                    connection.ld.updateTemporalEntityAttributeInstance({
+                        type: "Property",
+                        value: 5
+                    });
+                }).toThrowError(TypeError);
+            });
+
+            it("throws a TypeError exception when not providing an id", () => {
+                expect(() => {
+                    connection.ld.updateTemporalEntityAttributeInstance({
+                        type: "Property",
+                        value: 5
+                    }, {
+                        attribute: "https://uri.fiware.org/ns/data-models#speed",
+                        instance: "urn:ngsi-ld:90da46e9-7017-4311-b2fe-14b91abb5c52"
+                    });
+                }).toThrowError(TypeError);
+            });
+
+            it("throws a TypeError exception when not providing an attribute name", () => {
+                expect(() => {
+                    connection.ld.updateTemporalEntityAttributeInstance({
+                        type: "Property",
+                        value: 5
+                    }, {
+                        id: "urn:ngsi-ld:Vehicle:Bus1",
+                        instance: "urn:ngsi-ld:90da46e9-7017-4311-b2fe-14b91abb5c52"
+                    });
+                }).toThrowError(TypeError);
+            });
+
+            it("throws a TypeError exception when not providing an instance id", () => {
+                expect(() => {
+                    connection.ld.updateTemporalEntityAttributeInstance({
+                        type: "Property",
+                        value: 5
+                    }, {
+                        id: "urn:ngsi-ld:Vehicle:Bus1",
+                        attribute: "https://uri.fiware.org/ns/data-models#speed"
+                    });
+                }).toThrowError(TypeError);
+            });
+
+            it("allows basic usage passing entity id, attribute and the instance id on the options parameter", (done) => {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/temporal/entities/urn%3Angsi-ld%3AVehicle%3ABus1/attrs/https%3A%2F%2Furi.fiware.org%2Fns%2Fdata-models%23speed/urn%3Angsi-ld%3A90da46e9-7017-4311-b2fe-14b91abb5c52", {
+                    method: 'PATCH',
+                    status: 204,
+                    checkRequestContent: (url, options) => {
+                        expect(options.parameters).toBe(undefined);
+                    }
+                });
+
+                assertSuccess(
+                    connection.ld.updateTemporalEntityAttributeInstance({
+                        value: 21.7
+                    }, {
+                        id: "urn:ngsi-ld:Vehicle:Bus1",
+                        attribute: "https://uri.fiware.org/ns/data-models#speed",
+                        instance: "urn:ngsi-ld:90da46e9-7017-4311-b2fe-14b91abb5c52"
+                    }),
+                    (result) => {
+                        expect(result).toEqual({});
+                    }
+                ).finally(done);
+            });
+
+            it("allows updating attributes from entities using @context resolution", (done) => {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/temporal/entities/urn%3Angsi-ld%3AVehicle%3ABus1/attrs/speed/urn%3Angsi-ld%3A90da46e9-7017-4311-b2fe-14b91abb5c52", {
+                    checkRequestContent: (url, options) => {
+                        expect(options.requestHeaders.Link).toBe('<https://fiware.github.io/data-models/context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"');
+                    },
+                    method: "PATCH",
+                    status: 204
+                });
+
+                assertSuccess(
+                    connection.ld.updateTemporalEntityAttributeInstance({
+                        value: 21.7
+                    }, {
+                        id: "urn:ngsi-ld:Vehicle:Bus1",
+                        attribute: "speed",
+                        instance: "urn:ngsi-ld:90da46e9-7017-4311-b2fe-14b91abb5c52",
+                        "@context": "https://fiware.github.io/data-models/context.jsonld"
+                    }),
+                    (result) => {
+                        expect(result).toEqual({});
+                    }
+                ).finally(done);
+            });
+
+            it("entity not found", (done) => {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/temporal/entities/urn%3Angsi-ld%3AVehicle%3ABus1/attrs/https%3A%2F%2Furi.fiware.org%2Fns%2Fdata-models%23speed/urn%3Angsi-ld%3A90da46e9-7017-4311-b2fe-14b91abb5c52", {
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    method: "PATCH",
+                    status: 404,
+                    responseText: '{"type": "https://uri.etsi.org/ngsi-ld/errors/ResourceNotFound", "title": "No context element found", "detail": "no detail"}'
+                });
+
+                assertFailure(
+                    connection.ld.updateTemporalEntityAttributeInstance({
+                        "value": 21.7
+                    }, {
+                        id: "urn:ngsi-ld:Vehicle:Bus1",
+                        attribute: "https://uri.fiware.org/ns/data-models#speed",
+                        instance: "urn:ngsi-ld:90da46e9-7017-4311-b2fe-14b91abb5c52"
+                    }),
+                    (e) => {
+                        expect(e).toEqual(jasmine.any(NGSI.NotFoundError));
+                        expect(e.message).toBe("No context element found");
+                    }
+                ).finally(done);
+            });
+
+            it("invalid 404", (done) => {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/temporal/entities/urn%3Angsi-ld%3AVehicle%3ABus1/attrs/https%3A%2F%2Furi.fiware.org%2Fns%2Fdata-models%23speed/urn%3Angsi-ld%3A90da46e9-7017-4311-b2fe-14b91abb5c52", {
+                    method: "PATCH",
+                    status: 404
+                });
+
+                assertFailure(
+                    connection.ld.updateTemporalEntityAttributeInstance({
+                        value: 21.7
+                    }, {
+                        id: "urn:ngsi-ld:Vehicle:Bus1",
+                        attribute: "https://uri.fiware.org/ns/data-models#speed",
+                        instance: "urn:ngsi-ld:90da46e9-7017-4311-b2fe-14b91abb5c52"
+                    }),
+                    (e) => {
+                        expect(e).toEqual(jasmine.any(NGSI.InvalidResponseError));
+                    }
+                ).finally(done);
+            });
+
+            it("bad request", (done) => {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/temporal/entities/21%24(/attrs/https%3A%2F%2Furi.fiware.org%2Fns%2Fdata-models%23speed/urn%3Angsi-ld%3A90da46e9-7017-4311-b2fe-14b91abb5c52", {
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    method: "PATCH",
+                    status: 400,
+                    responseText: '{"type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData", "title": "Invalid characters in entity id", "detail": "no detail"}'
+                });
+
+                assertFailure(
+                    connection.ld.updateTemporalEntityAttributeInstance({
+                        value: 21.7
+                    }, {
+                        id: "21$(",
+                        attribute: "https://uri.fiware.org/ns/data-models#speed",
+                        instance: "urn:ngsi-ld:90da46e9-7017-4311-b2fe-14b91abb5c52"
+                    }),
+                    (e) => {
+                        expect(e).toEqual(jasmine.any(NGSI.BadRequestError));
+                        expect(e.message).toBe("Invalid characters in entity id");
+                    }
+                ).finally(done);
+            });
+
+            it("invalid 400", (done) => {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/temporal/entities/urn%3Angsi-ld%3AVehicle%3ABus1/attrs/https%3A%2F%2Furi.fiware.org%2Fns%2Fdata-models%23speed/urn%3Angsi-ld%3A90da46e9-7017-4311-b2fe-14b91abb5c52", {
+                    method: "PATCH",
+                    status: 400
+                });
+
+                assertFailure(
+                    connection.ld.updateTemporalEntityAttributeInstance({
+                        value: 21.7
+                    }, {
+                        id: "urn:ngsi-ld:Vehicle:Bus1",
+                        attribute: "https://uri.fiware.org/ns/data-models#speed",
+                        instance: "urn:ngsi-ld:90da46e9-7017-4311-b2fe-14b91abb5c52"
+                    }),
+                    (e) => {
+                        expect(e).toEqual(jasmine.any(NGSI.InvalidResponseError));
+                    }
+                ).finally(done);
+            });
+
+            it("handles unexpected error codes", (done) => {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/temporal/entities/urn%3Angsi-ld%3AVehicle%3ABus1/attrs/https%3A%2F%2Furi.fiware.org%2Fns%2Fdata-models%23speed/urn%3Angsi-ld%3A90da46e9-7017-4311-b2fe-14b91abb5c52", {
+                    method: "PATCH",
+                    status: 201
+                });
+
+                assertFailure(
+                    connection.ld.updateTemporalEntityAttributeInstance({
+                        value: 21.7
+                    }, {
+                        id: "urn:ngsi-ld:Vehicle:Bus1",
+                        attribute: "https://uri.fiware.org/ns/data-models#speed",
+                        instance: "urn:ngsi-ld:90da46e9-7017-4311-b2fe-14b91abb5c52"
+                    }),
+                    (e) => {
+                        expect(e).toEqual(jasmine.any(NGSI.InvalidResponseError));
+                    }
+                ).finally(done);
+            });
+
+        });
+
+        describe('deleteTemporalEntityAttributeInstance(options)', () => {
+
+            it("throws a TypeError exception when not passing the options parameter", () => {
+                expect(() => {
+                    connection.ld.deleteTemporalEntityAttributeInstance();
+                }).toThrowError(TypeError);
+            });
+
+            it("throws a TypeError exception when not passing the id option", () => {
+                expect(() => {
+                    connection.ld.deleteTemporalEntityAttributeInstance({
+                        attribute: "temperature",
+                        instance: "urn:ngsi-ld:90da46e9-7017-4311-b2fe-14b91abb5c52"
+                    });
+                }).toThrowError(TypeError);
+            });
+
+            it("throws a TypeError exception when not passing the attribute option", () => {
+                expect(() => {
+                    connection.ld.deleteTemporalEntityAttributeInstance({
+                        id: "Bcn_Welt",
+                        instance: "urn:ngsi-ld:90da46e9-7017-4311-b2fe-14b91abb5c52"
+                    });
+                }).toThrowError(TypeError);
+            });
+
+            it("throws a TypeError exception when not passing the instance option", () => {
+                expect(() => {
+                    connection.ld.deleteTemporalEntityAttributeInstance({
+                        id: "Bcn_Welt",
+                        attribute: "temperature"
+                    });
+                }).toThrowError(TypeError);
+            });
+
+            it("deletes attributes from entities", (done) => {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/temporal/entities/urn%3Angsi-ld%3AVehicle%3ABus1/attrs/https%3A%2F%2Furi.fiware.org%2Fns%2Fdata-models%23speed/urn%3Angsi-ld%3A90da46e9-7017-4311-b2fe-14b91abb5c52", {
+                    checkRequestContent: (url, options) => {
+                        expect(options.parameters).toBe(undefined);
+                        expect("Link" in options.requestHeaders).toBeFalsy();
+                    },
+                    method: "DELETE",
+                    status: 204
+                });
+
+                assertSuccess(
+                    connection.ld.deleteTemporalEntityAttributeInstance({
+                        id: "urn:ngsi-ld:Vehicle:Bus1",
+                        attribute: "https://uri.fiware.org/ns/data-models#speed",
+                        instance: "urn:ngsi-ld:90da46e9-7017-4311-b2fe-14b91abb5c52"
+                    }),
+                    (result) => {
+                        expect(result).toEqual({});
+                    }
+                ).finally(done);
+            });
+
+            it("deletes attributes from entities using @context resolution", (done) => {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/temporal/entities/urn%3Angsi-ld%3AVehicle%3ABus1/attrs/speed/urn%3Angsi-ld%3A90da46e9-7017-4311-b2fe-14b91abb5c52", {
+                    checkRequestContent: (url, options) => {
+                        expect(options.parameters).toBe(undefined);
+                        expect(options.requestHeaders.Link).toBe('<https://fiware.github.io/data-models/context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"');
+                    },
+                    method: "DELETE",
+                    status: 204
+                });
+
+                assertSuccess(
+                    connection.ld.deleteTemporalEntityAttributeInstance({
+                        id: "urn:ngsi-ld:Vehicle:Bus1",
+                        attribute: "speed",
+                        instance: "urn:ngsi-ld:90da46e9-7017-4311-b2fe-14b91abb5c52",
+                        "@context": "https://fiware.github.io/data-models/context.jsonld"
+                    }),
+                    (result) => {
+                        expect(result).toEqual({});
+                    }
+                ).finally(done);
+            });
+
+            it("entity not found", (done) => {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/temporal/entities/Bcn_Welt/attrs/temperature/urn%3Angsi-ld%3A90da46e9-7017-4311-b2fe-14b91abb5c52", {
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    method: "DELETE",
+                    status: 404,
+                    responseText: '{"type": "https://uri.etsi.org/ngsi-ld/errors/ResourceNotFound", "title": "No context element found", "detail": "no detail"}'
+                });
+
+                assertFailure(
+                    connection.ld.deleteTemporalEntityAttributeInstance({
+                        id: "Bcn_Welt",
+                        attribute: "temperature",
+                        instance: "urn:ngsi-ld:90da46e9-7017-4311-b2fe-14b91abb5c52",
+                        "@context": "https://fiware.github.io/data-models/context.jsonld"
+
+                    }),
+                    (e) => {
+                        expect(e).toEqual(jasmine.any(NGSI.NotFoundError));
+                        expect(e.message).toBe("No context element found");
+                    }
+                ).finally(done);
+            });
+
+            it("invalid 404", (done) => {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/temporal/entities/Bcn_Welt/attrs/temperature/urn%3Angsi-ld%3A90da46e9-7017-4311-b2fe-14b91abb5c52", {
+                    method: "DELETE",
+                    status: 404
+                });
+
+                assertFailure(
+                    connection.ld.deleteTemporalEntityAttributeInstance({
+                        id: "Bcn_Welt",
+                        attribute: "temperature",
+                        instance: "urn:ngsi-ld:90da46e9-7017-4311-b2fe-14b91abb5c52",
+                        "@context": "https://fiware.github.io/data-models/context.jsonld"
+
+                    }),
+                    (e) => {
+                        expect(e).toEqual(jasmine.any(NGSI.InvalidResponseError));
+                    }
+                ).finally(done);
+            });
+
+            it("bad request", (done) => {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/temporal/entities/21%24(/attrs/speed/urn%3Angsi-ld%3A90da46e9-7017-4311-b2fe-14b91abb5c52", {
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    method: "DELETE",
+                    status: 400,
+                    responseText: '{"type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData", "title": "Invalid characters in entity id", "detail": "no detail"}'
+                });
+
+                assertFailure(
+                    connection.ld.deleteTemporalEntityAttributeInstance({
+                        id: "21$(",
+                        attribute: "speed",
+                        instance: "urn:ngsi-ld:90da46e9-7017-4311-b2fe-14b91abb5c52",
+                        "@context": "https://fiware.github.io/data-models/context.jsonld"
+                    }),
+                    (e) => {
+                        expect(e).toEqual(jasmine.any(NGSI.BadRequestError));
+                        expect(e.message).toBe("Invalid characters in entity id");
+                    }
+                ).finally(done);
+            });
+
+            it("invalid 409", (done) => {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/temporal/entities/Bcn_Welt/attrs/temperature/urn%3Angsi-ld%3A90da46e9-7017-4311-b2fe-14b91abb5c52", {
+                    method: "DELETE",
+                    status: 409
+                });
+
+                assertFailure(
+                    connection.ld.deleteTemporalEntityAttributeInstance({
+                        id: "Bcn_Welt",
+                        attribute: "temperature",
+                        instance: "urn:ngsi-ld:90da46e9-7017-4311-b2fe-14b91abb5c52",
+                        "@context": "https://fiware.github.io/data-models/context.jsonld"
+
+                    }),
+                    (e) => {
+                        expect(e).toEqual(jasmine.any(NGSI.InvalidResponseError));
+                    }
+                ).finally(done);
+            });
+
+            it("unexpected error code", (done) => {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/temporal/entities/Bcn_Welt/attrs/temperature/urn%3Angsi-ld%3A90da46e9-7017-4311-b2fe-14b91abb5c52", {
+                    method: "DELETE",
+                    status: 200
+                });
+
+                assertFailure(
+                    connection.ld.deleteTemporalEntityAttributeInstance({
+                        id: "Bcn_Welt",
+                        attribute: "temperature",
+                        instance: "urn:ngsi-ld:90da46e9-7017-4311-b2fe-14b91abb5c52",
+                        "@context": "https://fiware.github.io/data-models/context.jsonld"
+                    }),
+                    (e) => {
+                        expect(e).toEqual(jasmine.any(NGSI.InvalidResponseError));
+                    }
+                ).finally(done);
+            });
+
+        });
+
     });
 
 })();
