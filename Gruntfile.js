@@ -69,10 +69,23 @@ module.exports = function (grunt) {
 
         karma: {
             options: {
+                files: [
+                    {pattern: 'responses/*', included: false, served: true},
+                    'tests/helpers/*.js',
+                    'NGSI.js',
+                    'tests/browser/*Spec.js',
+                    'tests/common/*Spec.js'
+                ],
                 frameworks: ['jasmine'],
                 reporters: ["progress", "coverage"],
                 browsers: ["ChromeHeadless", "FirefoxHeadless"],
                 singleRun: true
+            },
+            librarydebug: {
+                options: {
+                    browsers: ["Chrome"],
+                    singleRun: false
+                }
             },
             library: {
                 options: {
@@ -80,13 +93,6 @@ module.exports = function (grunt) {
                         type: 'html',
                         dir: 'build/coverage/library'
                     },
-                    files: [
-                        {pattern: 'responses/*', included: false, served: true},
-                        'tests/helpers/*.js',
-                        'NGSI.js',
-                        'tests/browser/*Spec.js',
-                        'tests/common/*Spec.js'
-                    ],
                     preprocessors: {
                         "NGSI.js": ['coverage'],
                     }
@@ -104,13 +110,6 @@ module.exports = function (grunt) {
                             {type: 'lcov', dir: 'build/coverage/library', subdir: 'lcov'},
                         ]
                     },
-                    files: [
-                        {pattern: 'responses/*', included: false, served: true},
-                        'tests/helpers/*.js',
-                        'NGSI.js',
-                        'tests/browser/*Spec.js',
-                        'tests/common/*Spec.js'
-                    ],
                     preprocessors: {
                         "NGSI.js": ['coverage'],
                     }
@@ -118,7 +117,7 @@ module.exports = function (grunt) {
             }
         },
 
-        uglify: {
+        terser: {
             library: {
                 options: {
                     sourceMap: true
@@ -133,23 +132,31 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks("gruntify-eslint");
     grunt.loadNpmTasks("grunt-bump");
     grunt.loadNpmTasks("grunt-contrib-copy");
-    grunt.loadNpmTasks("grunt-contrib-uglify");
+    grunt.loadNpmTasks("grunt-terser");
     grunt.loadNpmTasks('grunt-karma');
     grunt.loadNpmTasks("grunt-jsdoc");
 
-    grunt.registerTask('default', [
+    grunt.registerTask('test', [
         'eslint',
         'karma:library',
+    ]);
+
+    grunt.registerTask('default', [
+        'test',
         'copy',
-        'uglify',
+        'terser',
         'jsdoc'
+    ]);
+
+    grunt.registerTask('debug', [
+        'karma:librarydebug',
     ]);
 
     grunt.registerTask('ci', [
         'eslint',
         'karma:libraryci',
         'copy',
-        'uglify',
+        'terser',
         'jsdoc'
     ]);
 
