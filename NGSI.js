@@ -2993,10 +2993,11 @@
      *
      * Object with extra options:
      *
-     * - `attrs` (`String`): Comma-separated list of attribute names whose data
-     *   are to be included in the response. The attributes are retrieved in the
-     *   order specified by this parameter. If this parameter is not included,
-     *   the attributes are retrieved in arbitrary order.
+     * - `attrs` (`String` | `Array`): String array or comma-separated list of
+     *   attribute names whose data are to be included in the response. The
+     *   attributes are retrieved in the order specified by this parameter. If
+     *   this parameter is not included, the attributes are retrieved in
+     *   arbitrary order.
      * - `correlator` (`String`): Transaction id
      * - `count` (`Boolean`; default: `false`): Request total count
      * - `id` (`String`): A comma-separated list of entity ids to retrieve.
@@ -3104,7 +3105,7 @@
             parameters.options = optionsparams.join(',');
         }
 
-        parameters.attrs = options.attrs;
+        parameters.attrs = Array.isArray(options.attrs) ? options.attrs.join(",") : options.attrs;
         parameters.id = options.id;
         parameters.idPattern = options.idPattern;
         parameters.orderBy = options.orderBy;
