@@ -7275,7 +7275,7 @@
         return makeJSONRequest2.call(connection, url, {
             method: "POST",
             parameters: parameters,
-            contentType: "application/merge-patch+json",
+            contentType: "application/json",
             postBody: changes,
             requestHeaders: headers
         }).then((response) => {
