@@ -5968,8 +5968,10 @@
      *      - `type` or `typePattern`: Type or type pattern of the entities total
      *      search for. Both cannot be used at the same time. If omitted, it
      *      means "any entity type"
-     * - `attributes` (`Array`): a list of attribute names to search for. If
+     * - `attrs` (`Array`): a list of attribute names to search for. If
      *   omitted, it means "all attributes".
+     * - `expression` (`Object`) an expression composed of `q`, `mq`, `georel`,
+     *   `geometry` and `coords`.
      * - `metadata` (`Array`): a list of metadata names to include in the
      *   response. See "Filtering out attributes and metadata" section for more
      *   detail.
