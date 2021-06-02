@@ -3009,8 +3009,8 @@
      *   the maximum number of entities you want to receive from the server
      * - `offset` (`Number`; default: `0`): Allows you to skip a given number of
      *   elements at the beginning
-     * - `metadata` (`String`): A comma-separated list of metadata names to
-     *   include in the response
+     * - `metadata` (`String` | `Array`): String array or comma-separated list of
+     *   attribute metadata names to include in the response
      * - `mq` (`String`): A query expression for attribute metadata, composed of
      *   a list of statements separated by semicolons (`;`)
      * - `orderBy` (`String`): Criteria for ordering results
@@ -3109,7 +3109,7 @@
         parameters.id = options.id;
         parameters.idPattern = options.idPattern;
         parameters.orderBy = options.orderBy;
-        parameters.metadata = options.metadata;
+        parameters.metadata = Array.isArray(options.metadata) ? options.metadata.join(",") : options.metadata;
         parameters.mq = options.mq;
         parameters.q = options.q;
         parameters.type = options.type;
