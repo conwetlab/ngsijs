@@ -61,7 +61,7 @@ module.exports = function (grunt) {
             library: {
                 src: ['NGSI.js', 'README.md'],
                 options: {
-                    destination: 'dist/docs/library',
+                    destination: 'dist/docs',
                     configure: '.jsdocrc'
                 }
             }
