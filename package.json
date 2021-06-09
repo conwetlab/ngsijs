@@ -19,6 +19,8 @@
     "iot",
     "IoT",
     "NGSI",
+    "NGSIv2",
+    "NGSI-LD",
     "orion",
     "wirecloud"
   ],
