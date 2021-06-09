@@ -1,12 +1,12 @@
 {
-  "vendor": "CoNWeT",
+  "vendor": "Ficodes",
   "name": "ngsijs",
-  "version": "1.4.0-rc.1",
-  "description": "Node JavaScript library for Orion Context Broker",
+  "version": "1.4.0",
+  "description": "JavaScript library for the FIWARE Context Broker services (web browsers & Node.js)",
   "main": "./ngsi-node.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/conwetlab/ngsijs"
+    "url": "https://github.com/Ficodes/ngsijs"
   },
   "scripts": {
     "test": "./node_modules/istanbul/lib/cli.js cover -- ./node_modules/jasmine/bin/jasmine.js --config=jasmine.json"
@@ -22,15 +22,19 @@
     "orion",
     "wirecloud"
   ],
-  "author": "CoNWeT Lab., Universidad Politecnica de Madrid",
+  "author": {
+    "name": "Álvaro Arranz",
+    "email": "aarranz@ficodes.com",
+    "url": "https://www.ficodes.com"
+  },
   "license": "AGPLv3 with linking exception",
   "engines": {
     "node": ">= 0.10.11"
   },
   "bugs": {
-    "url": "https://github.com/conwetlab/ngsijs/issues"
+    "url": "https://github.com/Ficodes/ngsijs/issues"
   },
-  "homepage": "https://github.com/conwetlab/ngsijs",
+  "homepage": "https://github.com/Ficodes/ngsijs",
   "devDependencies": {
     "grunt": "^1.0.4",
     "grunt-bump": "^0.8.0",
