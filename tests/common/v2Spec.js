@@ -3936,7 +3936,7 @@ if ((typeof require === 'function') && typeof global != null) {
 
         });
 
-        describe('listEntities([options])', function () {
+        describe('listEntities([options])', () => {
 
             it("throws a TypeError exception when using the id and idPattern options at the same time", function () {
                 expect(function () {
@@ -4043,6 +4043,32 @@ if ((typeof require === 'function') && typeof global != null) {
                     });
                     done();
                 }, function (e) {
+                    fail("Failure callback called");
+                });
+            });
+
+            it("basic request with empty results (using the attrs option, providing an array)", (done) => {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/v2/entities", {
+                    headers: {
+                        'Fiware-correlator': 'correlatortoken'
+                    },
+                    checkRequestContent: (url, options) => {
+                        expect(options.parameters.attrs).toBe("dateCreated,*");
+                    },
+                    method: "GET",
+                    status: 200,
+                    responseText: '[]'
+                });
+
+                connection.v2.listEntities({attrs: ["dateCreated", "*"]}).then((result) => {
+                    expect(result).toEqual({
+                        correlator: "correlatortoken",
+                        limit: 20,
+                        offset: 0,
+                        results: []
+                    });
+                    done();
+                }, (e) => {
                     fail("Failure callback called");
                 });
             });

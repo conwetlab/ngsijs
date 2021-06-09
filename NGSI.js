@@ -1259,6 +1259,35 @@
         return Promise.reject(exc);
     };
 
+    /**
+     * Parses comma-separated value options allowing arrays.
+     *
+     * @param value value to be processed
+     * @param [allow_empty=true] if false, passing an empty string/array value
+     *        (undefined/null is still possible) will throw a TypeError exception.
+     * @param [option] option name. required if allow_empty is false
+     *
+     * @throws {TypeError}
+     */
+    const parse_list_option = function parse_list_option(value, allow_empty, option) {
+        allow_empty = allow_empty == null ? true : !!allow_empty;
+        if (Array.isArray(value)) {
+            if (!allow_empty && value.length === 0) {
+                throw new TypeError(`invalid empty array value for the ${option} option`);
+            }
+
+            return value.length > 0 ? value.join(',') : undefined;
+        } else if (value != null) {
+            value = value.toString().trim();
+            if (!allow_empty && value === "") {
+                throw new TypeError(`invalid empty value for the ${option} option`);
+            }
+            return value;
+        } else {
+            return undefined;
+        }
+    };
+
     NGSI.parseNotifyContextRequest = function parseNotifyContextRequest(data, options) {
         return {
             elements: parse_context_response_list_json(data.contextResponses, false, options)[0],
@@ -2993,14 +3022,15 @@
      *
      * Object with extra options:
      *
-     * - `attrs` (`String`): Comma-separated list of attribute names whose data
-     *   are to be included in the response. The attributes are retrieved in the
-     *   order specified by this parameter. If this parameter is not included,
-     *   the attributes are retrieved in arbitrary order.
+     * - `attrs` (`String`|`Array`): String array or comma-separated list of
+     *   attribute names whose data are to be included in the response. The
+     *   attributes are retrieved in the order specified by this parameter. If
+     *   this parameter is not included, the attributes are retrieved in
+     *   arbitrary order.
      * - `correlator` (`String`): Transaction id
      * - `count` (`Boolean`; default: `false`): Request total count
-     * - `id` (`String`): A comma-separated list of entity ids to retrieve.
-     *   Incompatible with the `idPattern` option.
+     * - `id` (`String`|`Array`): String array or comma-separated list of entity
+     *   ids to retrieve. Incompatible with the `idPattern` option.
      * - `idPattern` (`String`): A correctly formated regular expression.
      *   Retrieve entities whose ID matches the regular expression. Incompatible
      *   with the `id` option
@@ -3008,8 +3038,8 @@
      *   the maximum number of entities you want to receive from the server
      * - `offset` (`Number`; default: `0`): Allows you to skip a given number of
      *   elements at the beginning
-     * - `metadata` (`String`): A comma-separated list of metadata names to
-     *   include in the response
+     * - `metadata` (`String`|`Array`): String array or comma-separated list of
+     *   attribute metadata names to include in the response
      * - `mq` (`String`): A query expression for attribute metadata, composed of
      *   a list of statements separated by semicolons (`;`)
      * - `orderBy` (`String`): Criteria for ordering results
@@ -3025,8 +3055,8 @@
      *   for details.
      * - `service` (`String`): Service/tenant to use in this operation
      * - `servicepath` (`String`): Service path to use in this operation
-     * - `type` (`String`): A comma-separated list of entity types to retrieve.
-     *   Incompatible with the `typePattern` option.
+     * - `type` (`String`|`Array`): String array or comma-separated list of
+     *   entity types to retrieve. Incompatible with the `typePattern` option.
      * - `typePattern` (`String`): A correctly formated regular expression.
      *   Retrieve entities whose type matches the regular expression.
      *   Incompatible with the `type` option.
@@ -3104,14 +3134,14 @@
             parameters.options = optionsparams.join(',');
         }
 
-        parameters.attrs = options.attrs;
-        parameters.id = options.id;
+        parameters.attrs = parse_list_option(options.attrs);
+        parameters.id = parse_list_option(options.id, false, "id");
         parameters.idPattern = options.idPattern;
         parameters.orderBy = options.orderBy;
-        parameters.metadata = options.metadata;
+        parameters.metadata = parse_list_option(options.metadata);
         parameters.mq = options.mq;
         parameters.q = options.q;
-        parameters.type = options.type;
+        parameters.type = parse_list_option(options.type, false, "type");
         parameters.typePattern = options.typePattern;
         parameters.georel = options.georel;
         parameters.geometry = options.geometry;
@@ -5967,8 +5997,10 @@
      *      - `type` or `typePattern`: Type or type pattern of the entities total
      *      search for. Both cannot be used at the same time. If omitted, it
      *      means "any entity type"
-     * - `attributes` (`Array`): a list of attribute names to search for. If
+     * - `attrs` (`Array`): a list of attribute names to search for. If
      *   omitted, it means "all attributes".
+     * - `expression` (`Object`) an expression composed of `q`, `mq`, `georel`,
+     *   `geometry` and `coords`.
      * - `metadata` (`Array`): a list of metadata names to include in the
      *   response. See "Filtering out attributes and metadata" section for more
      *   detail.
@@ -6151,7 +6183,8 @@
      * - `sysAttrs` (`Boolean`): Request system-generated attributes (`createdAt`,
      *   `modifiedAt`).
      * - `tenant` (`String`): Tenant to use in this operation
-     * - `type` (`String`): A comma-separated list of entity types to retrieve.
+     * - `type` (`String`|`Array`): String array or comma-separated list of
+     *   entity types to retrieve.
      *
      * @throws {NGSI.BadRequestError}
      * @throws {NGSI.ConnectionError}
@@ -6213,12 +6246,12 @@
             parameters.options = optionsparams.join(',');
         }
 
-        parameters.attrs = Array.isArray(options.attrs) ? options.attrs.join(',') : options.attrs;
+        parameters.attrs = parse_list_option(options.attrs, true);
         parameters.csf = options.csf;
-        parameters.id = options.id;
+        parameters.id = parse_list_option(options.id, false, "id");
         parameters.idPattern = options.idPattern;
         parameters.q = options.q;
-        parameters.type = options.type;
+        parameters.type = parse_list_option(options.type, false, "type");
         parameters.geoproperty = options.geoproperty;
         parameters.georel = options.georel;
         parameters.geometry = options.geometry;
@@ -6446,10 +6479,11 @@
      * String with the id of the entity to query or an object with extra
      * options:
      *
-     * - `attrs` (`String`): Comma-separated list of attribute names whose data
-     *   are to be included in the response. The attributes are retrieved in the
-     *   order specified by this parameter. If this parameter is not included,
-     *   the attributes are retrieved in arbitrary order.
+     * - `attrs` (`String`|`Array`): String array or comma-separated list of
+     *   attribute names whose data are to be included in the response. The
+     *   attributes are retrieved in the order specified by this parameter. If
+     *   this parameter is not included, the attributes are retrieved in
+     *   arbitrary order.
      * - `@context` (`String`): URI pointing to the JSON-LD document which
      *   contains the `@context` to be used to expand the terms when retrieving
      *   entity details.
@@ -6506,7 +6540,7 @@
         const connection = privates.get(this);
         const url = new URL(interpolate(NGSI.endpoints.ld.ENTITY_ENTRY, {entityId: encodeURIComponent(options.id)}), connection.url);
         const parameters = {
-            attrs: options.attrs
+            attrs: parse_list_option(options.attrs)
         };
         if (options.keyValues === true) {
             parameters.options = "keyValues";
@@ -7844,8 +7878,8 @@
      * - `csf` (`String`): Context Source filter.
      * - `endTimeAt` (`String`): DateTime to use as final date when `timerel` is
      *   `between`.
-     * - `id` (`String`): A comma-separated list of entity ids to retrieve.
-     *   Incompatible with the `idPattern` option.
+     * - `id` (`String`|`Array`): String array or comma-separated list of entity
+     *   ids to retrieve. Incompatible with the `idPattern` option.
      * - `idPattern` (`String`): A correctly formated regular expression.
      *   Retrieve entities whose ID matches the regular expression. Incompatible
      *   with the `id` option
@@ -7858,23 +7892,24 @@
      * - `orderBy` (`String`): Criteria for ordering results
      * - `q` (`String`): A query expression, composed of a list of statements
      *   separated by semicolons (`;`)
-     * - `georel` (`String`): Spatial relationship between matching entities and
-     *   a reference shape. See "Geographical Queries" section in NGSIv2 specification
-     *   for details.
-     * - `geometry` (`String`): Geographical area to which the query is restricted.
-     *   See "Geographical Queries" section in NGSIv2 specification for details.
+     * - `georel` (`String`): Geospatial relationship (use when making
+     *   geo-queries).
+     * - `geometry` (`String`): Type of reference geometry (used when making
+     *   geo-queries).
      * - `geoproperty` (`String`): The name of the Property that contains the
      *   geospatial data that will be used to resolve the geoquery.
      * - `temporalValues` (`Boolean'): Request information using the simplified
      *   temporal representation of entities.
      * - `timeAt` (`String`): DateTime representing the comparison point for the
-     *   before and after relation and the starting point for the between relation.
+     *   before and after relation and the starting point for the between
+     *   relation.
      * - `timerel` (`String`): Allowed values: "before", "after", "between".
      * - `timeproperty` (`String`): The name of the Property that contains the
-     *   temporal data that will be used to resolve the temporal query. By default,
-     *   will be `observedAt`.
+     *   temporal data that will be used to resolve the temporal query. By
+     *   default, will be `observedAt`.
      * - `tenant` (`String`): Tenant to use in this operation
-     * - `type` (`String`): A comma-separated list of entity types to retrieve.
+     * - `type` (`String`|`Array`): String array or comma-separated list of entity
+     *   types to retrieve.
      *
      * @throws {NGSI.BadRequestError}
      * @throws {NGSI.ConnectionError}
@@ -7913,10 +7948,6 @@
             options = {};
         }
 
-        if (Array.isArray(options.attrs) && options.attrs.length === 0) {
-            options.attrs = null;
-        }
-
         if (options.id != null && options.idPattern != null) {
             throw new TypeError("id and idPattern options cannot be used at the same time");
         }
@@ -7949,19 +7980,19 @@
             parameters.options = optionsparams.join(',');
         }
 
-        parameters.attrs = Array.isArray(options.attrs) ? options.attrs.join(',') : options.attrs;
+        parameters.attrs = parse_list_option(options.attrs, false, "attrs");
         parameters.endTimeAt = options.endTimeAt != null ? (
             typeof(options.endTimeAt.toISOString) === "function" ? options.endTimeAt.toISOString() : options.endTimeAt
         ) : undefined;
         parameters.csf = options.csf;
-        parameters.id = options.id;
+        parameters.id = parse_list_option(options.id, false, "id");
         parameters.idPattern = options.idPattern;
         parameters.lastN = options.lastN;
         parameters.q = options.q;
         parameters.timeAt = typeof(options.timeAt.toISOString) === "function" ? options.timeAt.toISOString() : options.timeAt;
         parameters.timerel = options.timerel;
         parameters.timeproperty = options.timeproperty;
-        parameters.type = options.type;
+        parameters.type = parse_list_option(options.type, false, "type");
         parameters.geoproperty = options.geoproperty;
         parameters.georel = options.georel;
         parameters.geometry = options.geometry;

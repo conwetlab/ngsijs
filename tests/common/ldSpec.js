@@ -845,6 +845,29 @@ if ((typeof require === 'function') && typeof global != null) {
                 }).finally(done);
             });
 
+            it("basic get request using the attrs option", (done) => {
+                ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/entities/urn%3Angsi-ld%3ARoad%3ASpain-Road-A62", {
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    method: 'GET',
+                    status: 200,
+                    responseText: JSON.stringify(KEY_VALUES_ENTITY),
+                    checkRequestContent: (url, options) => {
+                        expect(options.parameters.attrs).toBe("a,b");
+                    }
+                });
+
+                connection.ld.getEntity({id: "urn:ngsi-ld:Road:Spain-Road-A62", attrs: ["a", "b"]}).then((result) => {
+                    expect(result).toEqual({
+                        entity: KEY_VALUES_ENTITY,
+                        format: "application/json"
+                    });
+                }, (e) => {
+                    fail("Failure callback called");
+                }).finally(done);
+            });
+
             it("get request using the @context option", (done) => {
                 ajaxMockup.addStaticURL("http://ngsi.server.com/ngsi-ld/v1/entities/urn%3Angsi-ld%3ARoad%3ASpain-Road-A62", {
                     headers: {
@@ -956,6 +979,38 @@ if ((typeof require === 'function') && typeof global != null) {
                     connection.ld.queryEntities({
                         id: "urn:myentity",
                         idPattern: "my.*"
+                    });
+                }).toThrowError(TypeError);
+            });
+
+            it("throws a TypeError exception when passing an empty array to the id option", () => {
+                expect(() => {
+                    connection.ld.queryEntities({
+                        id: []
+                    });
+                }).toThrowError(TypeError);
+            });
+
+            it("throws a TypeError exception when passing an empty string to the id option", () => {
+                expect(() => {
+                    connection.ld.queryEntities({
+                        id: "  "
+                    });
+                }).toThrowError(TypeError);
+            });
+
+            it("throws a TypeError exception when passing an empty array to the type option", () => {
+                expect(() => {
+                    connection.ld.queryEntities({
+                        type: []
+                    });
+                }).toThrowError(TypeError);
+            });
+
+            it("throws a TypeError exception when passing an empty string to the type option", () => {
+                expect(() => {
+                    connection.ld.queryEntities({
+                        type: "  "
                     });
                 }).toThrowError(TypeError);
             });
