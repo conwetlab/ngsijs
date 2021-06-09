@@ -2,9 +2,9 @@ ngsijs
 ======
 
 [![License](https://img.shields.io/badge/license-AGPLv3+%20with%20classpath--like%20exception-blue.svg)](LICENSE)
-[![Documentation Status](https://img.shields.io/badge/docs-stable-brightgreen.svg?style=flat)](https://conwetlab.github.io/ngsijs/stable)
-[![Build Status](https://travis-ci.org/conwetlab/ngsijs.svg?branch=master)](https://travis-ci.org/conwetlab/ngsijs)
-[![Coverage Status](https://coveralls.io/repos/github/conwetlab/ngsijs/badge.svg?branch=master)](https://coveralls.io/github/conwetlab/ngsijs?branch=master)
+[![Documentation Status](https://img.shields.io/badge/docs-stable-brightgreen.svg?style=flat)](https://ficodes.github.io/ngsijs/stable)
+[![Tests](https://github.com/Ficodes/ngsijs/actions/workflows/unittests.yml/badge.svg)](https://github.com/Ficodes/ngsijs/actions/workflows/unittests.yml)
+[![Coverage Status](https://coveralls.io/repos/github/Ficodes/ngsijs/badge.svg?branch=master)](https://coveralls.io/github/Ficodes/ngsijs?branch=master)
 
 Ngsijs is the JavaScript library used by
 [WireCloud](https://github.com/Wirecloud/wirecloud) for adding FIWARE NGSI
@@ -18,7 +18,7 @@ This library has been developed following the FIWARE
 and has been tested to work against version 0.26.0+ of the Orion Context Broker.
 
 Reference documentation of the API is available at
-[http://conwetlab.github.io/ngsijs/stable/NGSI.html](http://conwetlab.github.io/ngsijs/stable/NGSI.html).
+[http://ficodes.github.io/ngsijs/stable/NGSI.html](http://ficodes.github.io/ngsijs/stable/NGSI.html).
 
 
 Using ngsijs from normal web pages
@@ -57,7 +57,7 @@ connection.v2.listEntities().then((response) => {
 ```
 
 This example will display the `id` of the first 20 entities. See the
-documentation of the [`listEntities`](http://conwetlab.github.io/ngsijs/stable/NGSI.Connection.html#.%22v2.listEntities%22__anchor)
+documentation of the [`listEntities`](http://ficodes.github.io/ngsijs/stable/NGSI.Connection.html#.%22v2.listEntities%22__anchor)
 method for more info.
 
 To be able to receive notifications inside a web browser the library requires
