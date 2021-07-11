@@ -112,3 +112,35 @@ the "3.2.1. Using Orion Context Broker" tutorial available at the
 [FIWARE Academy].
 
 [FIWARE Academy]: http://edu.fiware.org/course/view.php?id=53#section-3
+
+
+## Testing
+
+NGSI.js tests are based on [Jasmine](https://jasmine.github.io/) and are
+executed using [Karma](https://karma-runner.github.io/) and
+[grunt](https://gruntjs.com/contributing) when testing the browser integration
+and directly using Jasmine when testing Node.js integration. Both environments
+are using [Istanbul](https://istanbul.js.org/) for generating coverage reports.
+
+To be able to execute those tests, you need to install all the requried
+dependencies. To do so, execute the following commands on a local working copy
+of [the NGSI.js repository](https://github.com/Ficodes/ngsijs):
+
+```bash
+$ sudo npm install -g grunt-cli
+$ npm install
+```
+
+Once installed, you can run the tests on Firefox and Chrome by issuing the
+following command:
+
+```bash
+$ grunt test
+```
+
+On the other hand, if you wish to run the tests using Node.js, just issue the
+following command:
+
+```
+$ npm test
+```
