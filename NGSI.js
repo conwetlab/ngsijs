@@ -1345,6 +1345,11 @@
 
                 priv.source.removeEventListener("error", handle_connection_rejected, true);
                 priv.source.removeEventListener("init", wait_event_source_init, true);
+                priv.source.addEventListener("open", () => {
+                    priv.callbacks.forEach((callback) => {
+                        callback.method(null, null, true, "open");
+                    });
+                }, true);
                 priv.source.addEventListener("error", (e) => {
                     const callbacks = priv.callbacks;
                     if (e.target.readyState === e.target.CLOSED) {
