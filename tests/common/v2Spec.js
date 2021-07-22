@@ -1343,12 +1343,10 @@ if ((typeof require === 'function') && typeof global != null) {
 
                 // Mock ngsi proxy responses
                 connection.ngsi_proxy = {
-                    requestCallback: jasmine.createSpy("requestCallback").and.callFake(function () {
-                        return Promise.resolve({
-                            callback_id: "1",
-                            url: "http://ngsiproxy.example.com/callback/1"
-                        });
-                    }),
+                    requestCallback: jasmine.createSpy("requestCallback").and.returnValue(Promise.resolve({
+                        callback_id: "1",
+                        url: "http://ngsiproxy.example.com/callback/1"
+                    })),
                     associateSubscriptionId: jasmine.createSpy("associateSubscriptionId"),
                     closeCallback: jasmine.createSpy("closeCallback")
                 };
@@ -1405,6 +1403,61 @@ if ((typeof require === 'function') && typeof global != null) {
                 }, function (e) {
                     fail("Failure callback called");
                 });
+            });
+
+            it("manage disconnect event when using the ngsi-proxy", (done) => {
+                const listener = jasmine.createSpy("listener");
+                const subscription = {
+                    "description": "One subscription to rule them all",
+                    "subject": {
+                        "entities": [
+                            {
+                                "idPattern": ".*",
+                                "type": "Room"
+                            }
+                        ]
+                    },
+                    "notification": {
+                        "callback": listener
+                    },
+                    "expires": "2016-04-05T14:00:00.00Z",
+                    "throttling": 5
+                };
+
+                // Mock ngsi proxy responses
+                connection.ngsi_proxy = {
+                    requestCallback: jasmine.createSpy("requestCallback").and.returnValue(Promise.resolve({
+                        callback_id: "1",
+                        url: "http://ngsiproxy.example.com/callback/1"
+                    })),
+                    associateSubscriptionId: jasmine.createSpy("associateSubscriptionId"),
+                    closeCallback: jasmine.createSpy("closeCallback")
+                };
+
+                ajaxMockup.addStaticURL("http://ngsi.server.com/v2/subscriptions", {
+                    method: "POST",
+                    status: 201,
+                    headers: {
+                        'Fiware-correlator': 'correlatortoken',
+                        'Location': '/v2/subscriptions/abcde98765'
+                    }
+                });
+
+                connection.v2.createSubscription(subscription).then((result) => {
+                    connection.ngsi_proxy.requestCallback.calls.argsFor(0)[0](
+                        null,
+                        null,
+                        true,
+                        "disconnected"
+                    );
+                    expect(listener).toHaveBeenCalledWith(
+                        null,
+                        null,
+                        true,
+                        "disconnected"
+                    );
+                    done();
+                }).catch(fail).finally(done);
             });
 
             describe("handles connection errors:", function () {
