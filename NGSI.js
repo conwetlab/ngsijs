@@ -1343,19 +1343,20 @@
                 priv.promise = null;
                 priv.connection_id = data.id;
 
-                priv.source.removeEventListener('error', handle_connection_rejected, true);
-                priv.source.removeEventListener('init', wait_event_source_init, true);
-                priv.source.addEventListener('error', function (e) {
-                    priv.connected = false;
-                    priv.source = null;
-                    priv.connection_id = null;
-                    var oldCallbacks = priv.callbacks;
-                    priv.callbacks = {};
-                    priv.callbacksBySubscriptionId = {};
-
-                    for (var key in oldCallbacks) {
-                        oldCallbacks[key].method(null, null, true);
+                priv.source.removeEventListener("error", handle_connection_rejected, true);
+                priv.source.removeEventListener("init", wait_event_source_init, true);
+                priv.source.addEventListener("error", (e) => {
+                    const callbacks = priv.callbacks;
+                    if (e.target.readyState === e.target.CLOSED) {
+                        priv.connected = false;
+                        priv.source = null;
+                        priv.connection_id = null;
+                        priv.callbacks = {};
+                        priv.callbacksBySubscriptionId = {};
                     }
+                    callbacks.forEach((callback) => {
+                        callback.method(null, null, true, e.target.readyState === e.target.CLOSED ? "closed" : "disconnected");
+                    });
                 }, true);
                 priv.source.addEventListener('notification', function (e) {
                     var data = JSON.parse(e.data);
