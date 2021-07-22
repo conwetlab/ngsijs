@@ -105,7 +105,7 @@ if ((typeof require === 'function') && typeof global != null) {
             var connection;
             var listener = function () {};
 
-            beforeEach(function (done) {
+            beforeEach((done) => {
                 connection = new NGSI.ProxyConnection("http://ngsiproxy.example.com/", ajaxMockup);
                 ajaxMockup.addStaticURL("http://ngsiproxy.example.com/eventsource", {
                     headers: {
@@ -126,7 +126,7 @@ if ((typeof require === 'function') && typeof global != null) {
                 connection.requestCallback(listener).then(done);
             });
 
-            it("ignores non managed callbacks", function () {
+            it("ignores non managed callbacks", () => {
                 expect(connection.associateSubscriptionId("nonmanaged", "1", "v2")).toBe(connection);
                 expect(connection.callbackSubscriptions).toEqual({
                     "1": null
@@ -722,28 +722,84 @@ if ((typeof require === 'function') && typeof global != null) {
                             headers: headers
                         })
                     });
-                    expect(listener).toHaveBeenCalledWith(payload, headers);
+                    expect(listener).toHaveBeenCalledWith(payload, headers, false, null);
                     done();
                 });
             });
 
-            it("reports disconnection events", (done) => {
+            it("reports disconnected events", (done) => {
                 ajaxMockup.addStaticURL("http://ngsiproxy.example.com/callbacks", {
                     status: 201,
                     responseText: '{"callback_id": "1", "url": "http://ngsiproxy.example.com/callback/1"}'
                 });
-                var listener = jasmine.createSpy("listener");
+                const listener = jasmine.createSpy("listener");
 
-                var p = connection.requestCallback(listener);
+                const p = connection.requestCallback(listener);
 
                 expect(p).toEqual(jasmine.any(Promise));
-                p.then(function (proxy_callback) {
-                    EventSource.mockedeventsources[0].events.error[0]();
-                    expect(listener).toHaveBeenCalledWith(null, null, true);
-                    expect(connection.connected).toBeFalsy();
-                    expect(connection.connecting).toBeFalsy();
-                    done();
+                p.then((proxy_callback) => {
+                    const source = EventSource.mockedeventsources[0];
+                    source.readyState = source.CONNECTING;
+                    source.events.error[0]({
+                        target: source
+                    });
+                    expect(listener).toHaveBeenCalledTimes(1);
+                    expect(listener).toHaveBeenCalledWith(null, null, true, "disconnected");
+                    expect(connection.connected).toBe(true);
+                    expect(connection.connecting).toBe(true);
+                }).catch(fail).finally(done);
+            });
+
+            it("reports connected events", (done) => {
+                ajaxMockup.addStaticURL("http://ngsiproxy.example.com/callbacks", {
+                    status: 201,
+                    responseText: '{"callback_id": "1", "url": "http://ngsiproxy.example.com/callback/1"}'
                 });
+                const listener = jasmine.createSpy("listener");
+
+                const p = connection.requestCallback(listener);
+
+                expect(p).toEqual(jasmine.any(Promise));
+                p.then((proxy_callback) => {
+                    const source = EventSource.mockedeventsources[0];
+                    source.readyState = source.CONNECTING;
+                    source.events.error[0]({
+                        target: source
+                    });
+                    listener.calls.reset();
+
+                    // Now reconnect
+                    source.events.open[0]({
+                        target: source
+                    });
+
+                    expect(listener).toHaveBeenCalledTimes(1);
+                    expect(listener).toHaveBeenCalledWith(null, null, true, "connected");
+                    expect(connection.connected).toBe(true);
+                    expect(connection.connecting).toBe(false);
+                }).catch(fail).finally(done);
+            });
+
+            it("reports closed events", (done) => {
+                ajaxMockup.addStaticURL("http://ngsiproxy.example.com/callbacks", {
+                    status: 201,
+                    responseText: '{"callback_id": "1", "url": "http://ngsiproxy.example.com/callback/1"}'
+                });
+                const listener = jasmine.createSpy("listener");
+
+                const p = connection.requestCallback(listener);
+
+                expect(p).toEqual(jasmine.any(Promise));
+                p.then((proxy_callback) => {
+                    const source = EventSource.mockedeventsources[0];
+                    source.readyState = source.CLOSED;
+                    source.events.error[0]({
+                        target: source
+                    });
+                    expect(listener).toHaveBeenCalledWith(null, null, true, "closed");
+                    expect(connection.connected).toBe(false);
+                    expect(connection.connecting).toBe(false);
+                }).catch(fail).finally(done);
             });
 
             it("reports connection errors", function (done) {

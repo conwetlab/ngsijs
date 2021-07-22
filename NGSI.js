@@ -1343,23 +1343,33 @@
                 priv.promise = null;
                 priv.connection_id = data.id;
 
-                priv.source.removeEventListener('error', handle_connection_rejected, true);
-                priv.source.removeEventListener('init', wait_event_source_init, true);
-                priv.source.addEventListener('error', function (e) {
-                    priv.connected = false;
-                    priv.source = null;
-                    priv.connection_id = null;
-                    var oldCallbacks = priv.callbacks;
-                    priv.callbacks = {};
-                    priv.callbacksBySubscriptionId = {};
-
-                    for (var key in oldCallbacks) {
-                        oldCallbacks[key].method(null, null, true);
+                priv.source.removeEventListener("error", handle_connection_rejected, true);
+                priv.source.removeEventListener("init", wait_event_source_init, true);
+                priv.source.addEventListener("open", () => {
+                    priv.promise = null;
+                    Object.values(priv.callbacks).forEach((callback) => {
+                        callback.method(null, null, true, "connected");
+                    });
+                }, true);
+                priv.source.addEventListener("error", (e) => {
+                    const callbacks = Object.values(priv.callbacks);
+                    if (e.target.readyState === e.target.CLOSED) {
+                        priv.promise = null;
+                        priv.source = null;
+                        priv.connection_id = null;
+                        priv.callbacks = {};
+                        priv.callbacksBySubscriptionId = {};
+                    } else {
+                        // Use a resolved promise to mark this connection as connecting
+                        priv.promise = Promise.resolve();
                     }
+                    callbacks.forEach((callback) => {
+                        callback.method(null, null, true, e.target.readyState === e.target.CLOSED ? "closed" : "disconnected");
+                    });
                 }, true);
                 priv.source.addEventListener('notification', function (e) {
                     var data = JSON.parse(e.data);
-                    priv.callbacks[data.callback_id].method(data.payload, data.headers);
+                    priv.callbacks[data.callback_id].method(data.payload, data.headers, false, null);
                 }, true);
 
                 resolve();
@@ -1444,7 +1454,6 @@
         privates.set(this, {
             callbacks: {},
             callbacksBySubscriptionId: {},
-            connected: false,
             connection_id: null,
             promise: null,
             source: null
@@ -2723,7 +2732,7 @@
      *     null,
      *     [{type: 'ONCHANGE', condValues: ['position']}],
      *     {
-     *         onNotify: function (data) {
+     *         onNotify: function (data, error, statechange, newstate) {
      *             // called when a notification arrives
      *         },
      *         onSuccess: function (data) {
@@ -2756,10 +2765,12 @@
         var url = new URL(NGSI.endpoints.v1.SUBSCRIBE_CONTEXT, this.url);
         if (typeof options.onNotify === 'function' && this.ngsi_proxy != null) {
 
-            var onNotify = function onNotify(payload) {
-                var doc = JSON.parse(payload);
-                var data = NGSI.parseNotifyContextRequest(doc, options);
-                options.onNotify(data);
+            const onNotify = (payload, headers, statechange, newstate) => {
+                if (payload != null) {
+                    payload = JSON.parse(payload);
+                    payload = NGSI.parseNotifyContextRequest(payload, options);
+                }
+                options.onNotify(payload, headers, statechange, newstate);
             };
 
             this.ngsi_proxy.requestCallback(onNotify).then(function (proxy_callback) {
@@ -5044,15 +5055,17 @@
      *        }
      *    },
      *    "notification": {
-     *        "callback": function (notification, headers, error) {
+     *        "callback": (notification, headers, statechange, newstate) => {
      *            // notification.attrsformat provides information about the format used by notification.data
      *            // notification.data contains the modified entities
      *            // notification.subscriptionId provides the associated subscription id
      *            // etc...
      *
-     *            // In case of disconnection from the ngsi-proxy, this method
-     *            // will be called with error = true and notification and
-     *            // header being null
+     *            // In case of state change, statechange will be true and
+     *            // newstate will provide details about the new state.
+     *            // Supported states are: disconnected, connected and closed.
+     *            // notification and header parameters will be null if
+     *            // statechange is true
      *        },
      *        "attrs": [
      *            "temperature",
@@ -5090,11 +5103,14 @@
                 throw new TypeError('invalid callback configuration');
             }
 
-            var onNotify = function onNotify(payload, headers) {
-                var notification = JSON.parse(payload);
-                notification.attrsformat = headers['ngsiv2-attrsformat'];
-                this(notification);
-            }.bind(subscription.notification.callback);
+            const callback = subscription.notification.callback;
+            const onNotify = (payload, headers, statechange, newstate) => {
+                if (payload != null) {
+                    payload = JSON.parse(payload);
+                    payload.attrsformat = headers['ngsiv2-attrsformat'];
+                }
+                callback(payload, headers, statechange, newstate);
+            };
 
             p = connection.ngsi_proxy.requestCallback(onNotify).then(
                 function (response) {
@@ -6828,15 +6844,17 @@
      *         "attributes": ["speed"],
      *         "format": "keyValues",
      *         "endpoint": {
-     *             "callback": (notification, headers, error) => {
+     *             "callback": (notification, headers, statechange, newstate) => {
      *                 // notification.attrsformat provides information about the format used by notification.data
      *                 // notification.data contains the modified entities
      *                 // notification.subscriptionId provides the associated subscription id
      *                 // etc...
      *
-     *                 // In case of disconnection from the ngsi-proxy, this method
-     *                 // will be called with error = true (the notification and
-     *                 // the header parameters will contain a null value)
+     *                 // In case of state change, statechange will be true and
+     *                 // newstate will provide details about the new state.
+     *                 // Supported states are: disconnected, connected and closed.
+     *                 // notification and header parameters will be null if
+     *                 // statechange is true
      *             },
      *             "accept": "application/json"
      *         }
@@ -6893,11 +6911,13 @@
 
             const callback = subscription.notification.endpoint.callback;
             const format = subscription.notification.format || "normalized";
-            const onNotify = (payload, headers) => {
-                const notification = JSON.parse(payload);
-                notification.format = format;
-                notification.contentType = headers['content-type'];
-                callback(notification);
+            const onNotify = (payload, headers, statechange, newstate) => {
+                if (payload != null) {
+                    payload = JSON.parse(payload);
+                    payload.format = format;
+                    payload.contentType = headers["content-type"];
+                }
+                callback(payload, headers, statechange, newstate);
             };
 
             p = connection.ngsi_proxy.requestCallback(onNotify).then(
