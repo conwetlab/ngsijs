@@ -1,7 +1,7 @@
 {
   "vendor": "Ficodes",
   "name": "ngsijs",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "description": "JavaScript library for the FIWARE Context Broker services (web browsers & Node.js)",
   "main": "./ngsi-node.js",
   "repository": {
