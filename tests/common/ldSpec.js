@@ -1515,17 +1515,26 @@ if ((typeof require === 'function') && typeof global != null) {
                             }),
                             {
                                 "content-type": "application/json"
-                            }
+                            },
+                            false,
+                            null
                         );
-                        expect(listener).toHaveBeenCalledWith({
-                            format: "normalized",
-                            contentType: "application/json",
-                            id: "urn:ngsi-ld:Notification:1",
-                            type: "Notification",
-                            subscriptionId: "urn:ngsi-ld:Subscription:5ee0a80950053da73775b62c",
-                            notifiedAt: "2020-06-11T12:34:00+02:00",
-                            data: notification_data
-                        });
+                        expect(listener).toHaveBeenCalledWith(
+                            {
+                                format: "normalized",
+                                contentType: "application/json",
+                                id: "urn:ngsi-ld:Notification:1",
+                                type: "Notification",
+                                subscriptionId: "urn:ngsi-ld:Subscription:5ee0a80950053da73775b62c",
+                                notifiedAt: "2020-06-11T12:34:00+02:00",
+                                data: notification_data
+                            },
+                            {
+                                "content-type": "application/json"
+                            },
+                            false,
+                            null
+                        );
                     },
                     (e) => {
                         fail("Failure callback called");

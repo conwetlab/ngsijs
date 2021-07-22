@@ -1385,13 +1385,21 @@ if ((typeof require === 'function') && typeof global != null) {
                         }),
                         {
                             "ngsiv2-attrsformat": "normalized"
-                        }
+                        },
+                        false,
+                        null
                     );
-                    expect(listener).toHaveBeenCalledWith({
-                        attrsformat: "normalized",
-                        data: notification_data,
-                        subscriptionId: "abcde98765"
-                    });
+                    expect(listener).toHaveBeenCalledWith(
+                        {
+                            attrsformat: "normalized",
+                            data: notification_data,
+                            subscriptionId: "abcde98765"
+                        }, {
+                            "ngsiv2-attrsformat": "normalized"
+                        },
+                        false,
+                        null
+                    );
 
                     done();
                 }, function (e) {

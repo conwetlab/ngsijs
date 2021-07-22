@@ -9,6 +9,7 @@
 
         EventSource.mockedeventsources.push(this);
         this.events = {
+            open: [],
             error: [],
             init: [],
             close: [],
@@ -16,14 +17,9 @@
         };
 
         if (EventSource.eventsourceconfs[url] !== "timeout") {
-            var timeout = setTimeout(() => {
-                var i;
-                var event = !EventSource.eventsourceconfs[url] ? this.events.init : this.events.error;
-                for (i = 0; i < event.length; i++) {
-                    try {
-                        event[i]({data: "{\"id\": 1}"});
-                    } catch (e) {}
-                }
+            const timeout = setTimeout(() => {
+                const event = !EventSource.eventsourceconfs[url] ? "init" : "error";
+                this.dispatchEvent(event, event === "init" ? {data: "{\"id\": 1}"} : null);
             }, 0);
             EventSource.timeouts.push(timeout);
         }
@@ -36,6 +32,17 @@
         EventSource.timeouts = [];
         EventSource.mockedeventsources = [];
         EventSource.eventsourceconfs = {};
+    };
+
+    EventSource.prototype.CONNECTING = 0;
+    EventSource.prototype.OPEN = 1;
+    EventSource.prototype.CLOSED = 2;
+    EventSource.prototype.dispatchEvent = function dispatchEvent(event, data) {
+        this.events[event].forEach((listener) => {
+            try {
+                listener(data);
+            } catch (e) {}
+        });
     };
 
     EventSource.prototype.addEventListener = function addEventListener(event_name, handler) {
